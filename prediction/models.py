@@ -12,32 +12,53 @@ class InputData(models.Model):
     """Stores the 14 input parameters entered by a parent for their child's hobby prediction."""
 
     YESNO = [('Yes', 'Yes'), ('No', 'No')]
-    WON_ARTS_CHOICES = [('Yes', 'Yes'), ('No', 'No'), ('Maybe', 'Maybe')]
+    WON_ARTS_CHOICES = [('Yes', 'Yes'), ('No', 'No')]
     FAV_SUB_CHOICES = [
         ('Mathematics', 'Mathematics'),
         ('Science', 'Science'),
-        ('History/Geography', 'History/Geography'),
-        ('Any language', 'Any language'),
+        ('History', 'History'),
+        ('Languages', 'Languages'),
+        ('Arts', 'Arts'),
+    ]
+    DIET_CHOICES = [
+        ('Healthy', 'Healthy'),
+        ('Average', 'Average'),
+        ('Junk', 'Junk'),
     ]
     SCALE_CHOICES = [(i, str(i)) for i in range(1, 7)]
-    AGE_CHOICES = [(i, str(i)) for i in range(5, 18)]  # Ages 5 to 17
+    LOGICAL_TEST_CHOICES = [(i, str(i)) for i in range(1, 11)]
+    AGE_CHOICES = [(i, str(i)) for i in range(5, 18)]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='inputs')
 
+    # Base & Academics
     age = models.IntegerField(choices=AGE_CHOICES, verbose_name="Child's Age")
     olympiad_participation = models.CharField(max_length=5, choices=YESNO, verbose_name='Olympiad Participation')
     scholarship = models.CharField(max_length=5, choices=YESNO, verbose_name='Scholarship')
-    school = models.CharField(max_length=5, choices=YESNO, verbose_name='School Involvement')
     fav_sub = models.CharField(max_length=30, choices=FAV_SUB_CHOICES, verbose_name='Favourite Subject')
     projects = models.CharField(max_length=5, choices=YESNO, verbose_name='Projects')
     grasp_pow = models.IntegerField(choices=SCALE_CHOICES, verbose_name='Grasping Power')
+    
+    # Sports
     time_sprt = models.IntegerField(choices=SCALE_CHOICES, verbose_name='Time on Sports (hrs/day)')
     medals = models.CharField(max_length=5, choices=YESNO, verbose_name='Medals Won')
     career_sprt = models.CharField(max_length=5, choices=YESNO, verbose_name='Career in Sports Interest')
     act_sprt = models.CharField(max_length=5, choices=YESNO, verbose_name='Active in Sports')
+    
+    # Arts
     fant_arts = models.CharField(max_length=5, choices=YESNO, verbose_name='Fascination for Arts')
     won_arts = models.CharField(max_length=10, choices=WON_ARTS_CHOICES, verbose_name='Won Art Competitions')
     time_art = models.IntegerField(choices=SCALE_CHOICES, verbose_name='Time on Arts (hrs/day)')
+
+    # Analytical Thinking
+    solves_puzzles = models.CharField(max_length=5, choices=YESNO, verbose_name='Solves Puzzles')
+    logical_score = models.IntegerField(choices=LOGICAL_TEST_CHOICES, verbose_name='Logical Reasoning Score (1-10)')
+    plays_board_games = models.CharField(max_length=5, choices=YESNO, verbose_name='Plays Chess or Board Games')
+
+    # Health & Fitness
+    daily_exercise = models.IntegerField(verbose_name='Daily Exercise (minutes)')
+    dietary_habits = models.CharField(max_length=15, choices=DIET_CHOICES, verbose_name='Dietary Habits')
+    health_awareness = models.CharField(max_length=5, choices=YESNO, verbose_name='Health Awareness')
 
     submitted_at = models.DateTimeField(auto_now_add=True)
 
@@ -57,6 +78,8 @@ class Prediction(models.Model):
         ('Academics', 'Academics'),
         ('Sports', 'Sports'),
         ('Arts', 'Arts'),
+        ('Analytical Thinking', 'Analytical Thinking'),
+        ('Health & Fitness', 'Health & Fitness'),
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='predictions')

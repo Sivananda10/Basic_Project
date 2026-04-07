@@ -18,6 +18,14 @@
                             <div class="result-icon bg-danger-light">
                                 <i class="bi bi-palette-fill display-1 text-danger"></i>
                             </div>
+                        {% elif prediction.predicted_hobby == 'Analytical Thinking' %}
+                            <div class="result-icon bg-warning-light">
+                                <i class="bi bi-puzzle-fill display-1 text-warning"></i>
+                            </div>
+                        {% elif prediction.predicted_hobby == 'Health & Fitness' %}
+                            <div class="result-icon bg-info-light">
+                                <i class="bi bi-heart-pulse-fill display-1 text-info"></i>
+                            </div>
                         {% else %}
                             <div class="result-icon bg-success-light">
                                 <i class="bi bi-book-fill display-1 text-success"></i>
@@ -29,6 +37,8 @@
                     <h1 class="display-4 fw-bold
                         {% if prediction.predicted_hobby == 'Sports' %}text-primary
                         {% elif prediction.predicted_hobby == 'Arts' %}text-danger
+                        {% elif prediction.predicted_hobby == 'Analytical Thinking' %}text-warning
+                        {% elif prediction.predicted_hobby == 'Health & Fitness' %}text-info
                         {% else %}text-success{% endif %}">
                         {{ prediction.predicted_hobby }}
                     </h1>
@@ -48,6 +58,12 @@
                         {% elif prediction.predicted_hobby == 'Arts' %}
                             Your child has a creative mind with passion for artistic expression.
                             Consider enrolling them in drawing, painting, music, dance, or craft classes.
+                        {% elif prediction.predicted_hobby == 'Analytical Thinking' %}
+                            Your child enjoys solving puzzles and logical challenges.
+                            Consider chess clubs, robotics, coding, or strategy games.
+                        {% elif prediction.predicted_hobby == 'Health & Fitness' %}
+                            Your child is highly active and values a healthy lifestyle.
+                            Consider martial arts, yoga, gymnastics, or outdoor adventure sports.
                         {% else %}
                             Your child has a strong academic inclination with love for learning and intellectual challenges.
                             Consider enrolling them in science clubs, math olympiads, coding, or quiz competitions.
@@ -59,25 +75,32 @@
                 <div class="card-footer bg-light p-4">
                     <h6 class="fw-bold mb-3"><i class="bi bi-list-check"></i> Input Summary</h6>
                     <div class="row text-start small">
-                        <div class="col-md-4">
-                        <p><strong>Age:</strong> {{ input_data.age }} years</p>
+                        <div class="col-md-3">
+                            <p><strong>Age:</strong> {{ input_data.age }} years</p>
                             <p><strong>Olympiad:</strong> {{ input_data.olympiad_participation }}</p>
                             <p><strong>Scholarship:</strong> {{ input_data.scholarship }}</p>
-                            <p><strong>School:</strong> {{ input_data.school }}</p>
                             <p><strong>Fav Subject:</strong> {{ input_data.fav_sub }}</p>
                             <p><strong>Projects:</strong> {{ input_data.projects }}</p>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <p><strong>Grasping Power:</strong> {{ input_data.grasp_pow }}/6</p>
                             <p><strong>Sports Time:</strong> {{ input_data.time_sprt }} hrs/day</p>
                             <p><strong>Medals:</strong> {{ input_data.medals }}</p>
                             <p><strong>Career in Sports:</strong> {{ input_data.career_sprt }}</p>
-                        </div>
-                        <div class="col-md-4">
                             <p><strong>Active Sports:</strong> {{ input_data.act_sprt }}</p>
+                        </div>
+                        <div class="col-md-3">
                             <p><strong>Arts Fascination:</strong> {{ input_data.fant_arts }}</p>
                             <p><strong>Won Arts:</strong> {{ input_data.won_arts }}</p>
                             <p><strong>Arts Time:</strong> {{ input_data.time_art }} hrs/day</p>
+                            <p><strong>Solves Puzzles:</strong> {{ input_data.solves_puzzles }}</p>
+                            <p><strong>Logical Score:</strong> {{ input_data.logical_score }}/10</p>
+                        </div>
+                        <div class="col-md-3">
+                            <p><strong>Plays Board Games:</strong> {{ input_data.plays_board_games }}</p>
+                            <p><strong>Daily Exercise:</strong> {{ input_data.daily_exercise }} mins</p>
+                            <p><strong>Dietary Habits:</strong> {{ input_data.dietary_habits }}</p>
+                            <p><strong>Health Awareness:</strong> {{ input_data.health_awareness }}</p>
                         </div>
                     </div>
                 </div>

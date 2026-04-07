@@ -44,19 +44,19 @@ def preprocess_input(form_data, label_encoders, scaler):
     Applies the same encoding and scaling used during training.
     """
     # Binary columns
-    binary_cols = ['Olympiad_Participation', 'Scholarship', 'School',
-                   'Projects', 'Medals', 'Career_sprt', 'Act_sprt', 'Fant_arts']
+    binary_cols = ['Olympiad_Participation', 'Scholarship', 
+                   'Projects', 'Medals', 'Career_sprt', 'Act_sprt', 'Fant_arts',
+                   'Won_arts', 'Solves_Puzzles', 'Plays_Board_Games', 'Health_Awareness']
     # Multi-class categorical columns
-    multi_cat_cols = ['Fav_sub', 'Won_arts']
+    multi_cat_cols = ['Fav_sub', 'Dietary_Habits']
     # Numerical columns
-    num_cols = ['Age', 'Grasp_pow', 'Time_sprt', 'Time_art']
+    num_cols = ['Age', 'Grasp_pow', 'Time_sprt', 'Time_art', 'Logical_Score', 'Daily_Exercise_Mins']
 
     # Map form field names to dataset column names
     field_map = {
         'age': 'Age',
         'olympiad_participation': 'Olympiad_Participation',
         'scholarship': 'Scholarship',
-        'school': 'School',
         'fav_sub': 'Fav_sub',
         'projects': 'Projects',
         'grasp_pow': 'Grasp_pow',
@@ -67,6 +67,12 @@ def preprocess_input(form_data, label_encoders, scaler):
         'fant_arts': 'Fant_arts',
         'won_arts': 'Won_arts',
         'time_art': 'Time_art',
+        'solves_puzzles': 'Solves_Puzzles',
+        'logical_score': 'Logical_Score',
+        'plays_board_games': 'Plays_Board_Games',
+        'daily_exercise': 'Daily_Exercise_Mins',
+        'dietary_habits': 'Dietary_Habits',
+        'health_awareness': 'Health_Awareness',
     }
 
     # Build feature dict with dataset column names
@@ -108,6 +114,73 @@ def preprocess_input(form_data, label_encoders, scaler):
 def home(request):
     """Landing page."""
     return render(request, 'home.html')
+
+
+def about(request):
+    """About page."""
+    return render(request, 'about.html')
+
+
+def contact(request):
+    """Contact page."""
+    if request.method == 'POST':
+        messages.success(request, 'Thank you for your message! We will get back to you soon.')
+        return redirect('contact')
+    return render(request, 'contact.html')
+
+
+@login_required
+def profile(request):
+    """User profile — view and edit."""
+    from django.contrib.auth.models import User
+    user = request.user
+    total_predictions = Prediction.objects.filter(user=user).count()
+    recent_predictions = Prediction.objects.filter(user=user).order_by('-predicted_at')[:5]
+
+    if request.method == 'POST':
+        action = request.POST.get('action', 'update_profile')
+
+        if action == 'update_profile':
+            first_name = request.POST.get('first_name', '').strip()
+            last_name  = request.POST.get('last_name', '').strip()
+            email      = request.POST.get('email', '').strip()
+
+            if email and email != user.email:
+                if User.objects.filter(email=email).exclude(pk=user.pk).exists():
+                    messages.error(request, 'That email is already in use by another account.')
+                    return redirect('profile')
+
+            user.first_name = first_name
+            user.last_name  = last_name
+            user.email      = email
+            user.save()
+            messages.success(request, 'Profile updated successfully!')
+            return redirect('profile')
+
+        elif action == 'change_password':
+            current_pw  = request.POST.get('current_password', '')
+            new_pw      = request.POST.get('new_password', '')
+            confirm_pw  = request.POST.get('confirm_password', '')
+
+            from django.contrib.auth import update_session_auth_hash
+            if not user.check_password(current_pw):
+                messages.error(request, 'Current password is incorrect.')
+            elif new_pw != confirm_pw:
+                messages.error(request, 'New passwords do not match.')
+            elif len(new_pw) < 8:
+                messages.error(request, 'Password must be at least 8 characters.')
+            else:
+                user.set_password(new_pw)
+                user.save()
+                update_session_auth_hash(request, user)  # keep logged in
+                messages.success(request, 'Password changed successfully!')
+            return redirect('profile')
+
+    context = {
+        'total_predictions': total_predictions,
+        'recent_predictions': recent_predictions,
+    }
+    return render(request, 'profile.html', context)
 
 
 # ──────────────────────────────────────────────
@@ -189,7 +262,6 @@ def predict_hobby(request):
                 'age': input_data.age,
                 'olympiad_participation': input_data.olympiad_participation,
                 'scholarship': input_data.scholarship,
-                'school': input_data.school,
                 'fav_sub': input_data.fav_sub,
                 'projects': input_data.projects,
                 'grasp_pow': input_data.grasp_pow,
@@ -200,6 +272,12 @@ def predict_hobby(request):
                 'fant_arts': input_data.fant_arts,
                 'won_arts': input_data.won_arts,
                 'time_art': input_data.time_art,
+                'solves_puzzles': input_data.solves_puzzles,
+                'logical_score': input_data.logical_score,
+                'plays_board_games': input_data.plays_board_games,
+                'daily_exercise': input_data.daily_exercise,
+                'dietary_habits': input_data.dietary_habits,
+                'health_awareness': input_data.health_awareness,
             }
 
             try:
@@ -241,9 +319,54 @@ def predict_hobby(request):
 
 @login_required
 def prediction_history(request):
-    """Show past predictions for the logged-in user."""
-    predictions = Prediction.objects.filter(user=request.user).select_related('input_data', 'feedback')
-    return render(request, 'history.html', {'predictions': predictions})
+    """Show past predictions for the logged-in user with chart analytics."""
+    import json
+    from collections import Counter
+
+    predictions = (
+        Prediction.objects.filter(user=request.user)
+        .select_related('input_data', 'feedback')
+        .order_by('-predicted_at')
+    )
+
+    total = predictions.count()
+
+    # ── Category distribution ──
+    hobby_counts = Counter(p.predicted_hobby for p in predictions)
+    all_categories = ['Sports', 'Arts', 'Academics', 'Analytical Thinking', 'Health & Fitness']
+    cat_labels  = all_categories
+    cat_data    = [hobby_counts.get(c, 0) for c in all_categories]
+    cat_colors  = ['#4361ee', '#f72585', '#06d6a0', '#ffd166', '#4cc9f0']
+
+    # ── Confidence over time (last 10) ──
+    recent = list(predictions[:10])[::-1]
+    conf_labels = [p.predicted_at.strftime('%b %d') for p in recent]
+    conf_data   = [float(p.confidence_score) if p.confidence_score else 0 for p in recent]
+
+    # ── Accuracy from feedback ──
+    feedback_preds = [p for p in predictions if hasattr(p, 'feedback') and p.feedback]
+    accurate = sum(1 for p in feedback_preds if p.feedback.is_accurate)
+    inaccurate = len(feedback_preds) - accurate
+    accuracy_pct = round((accurate / len(feedback_preds)) * 100) if feedback_preds else None
+
+    # ── Most predicted category ──
+    top_hobby = hobby_counts.most_common(1)[0][0] if hobby_counts else None
+
+    context = {
+        'predictions'   : predictions,
+        'total'         : total,
+        'top_hobby'     : top_hobby,
+        'accuracy_pct'  : accuracy_pct,
+        'feedback_count': len(feedback_preds),
+        'cat_labels'    : json.dumps(cat_labels),
+        'cat_data'      : json.dumps(cat_data),
+        'cat_colors'    : json.dumps(cat_colors),
+        'conf_labels'   : json.dumps(conf_labels),
+        'conf_data'     : json.dumps(conf_data),
+        'accurate'      : accurate,
+        'inaccurate'    : inaccurate,
+    }
+    return render(request, 'history.html', context)
 
 
 @login_required
@@ -294,7 +417,7 @@ def admin_dashboard(request):
 
     # Hobby distribution from predictions
     hobby_stats = {}
-    for hobby in ['Academics', 'Sports', 'Arts']:
+    for hobby in ['Academics', 'Sports', 'Arts', 'Analytical Thinking', 'Health & Fitness']:
         hobby_stats[hobby] = Prediction.objects.filter(predicted_hobby=hobby).count()
 
     # Feedback accuracy

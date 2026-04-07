@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}About — Kids Hobby Predictor{% endblock %}
+
+{% block content %}
+<style>
+.ab-hero {
+  background: linear-gradient(135deg, #06061a 0%, #0d0d22 60%, #050510 100%);
+  padding: 80px 0 70px;
+  position: relative;
+  overflow: hidden;
+}
+.ab-hero::before {
+  content:'';
+  position:absolute;
+  width:600px;height:600px;border-radius:50%;
+  background:radial-gradient(circle,rgba(67,97,238,.2),transparent 65%);
+  top:-20%;right:-10%;
+  filter:blur(60px);pointer-events:none;
+}
+.ab-page-tag {
+  display:inline-block;padding:5px 16px;border-radius:99px;
+  font-size:.75rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;
+  border:1px solid rgba(67,97,238,.3);background:rgba(67,97,238,.1);
+  color:#7da3ff;margin-bottom:16px;
+}
+.ab-page-title {
+  font-size:clamp(2rem,4vw,3rem);font-weight:800;color:#fff;
+  letter-spacing:-.8px;margin-bottom:14px;
+}
+.ab-page-desc {
+  font-size:1.05rem;color:#8888a8;max-width:560px;line-height:1.75;
+}
+/* Cards */
+.ab-section { padding:80px 0; background:#f9fafb; }
+.ab-card {
+  background:#fff;border:1px solid rgba(0,0,0,.06);
+  border-radius:20px;padding:36px 32px;
+  box-shadow:0 4px 24px rgba(0,0,0,.04);
+  transition:all .4s cubic-bezier(.16,1,.3,1);
+  height:100%;
+}
+.ab-card:hover {
+  transform:translateY(-6px);
+  box-shadow:0 20px 48px rgba(67,97,238,.08);
+  border-color:rgba(67,97,238,.14);
+}
+.ab-card-icon {
+  width:56px;height:56px;border-radius:16px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.5rem;margin-bottom:18px;
+}
+.ab-card-title { font-size:1.1rem;font-weight:700;color:#1a1a2e;margin-bottom:8px; }
+.ab-card-desc  { font-size:.88rem;color:#6b7280;line-height:1.65; }
+/* Tech stack */
+.ab-tech { padding:80px 0;background:#fff; }
+.ab-tech-item {
+  display:flex;align-items:center;gap:14px;
+  padding:18px 22px;border-radius:14px;
+  border:1px solid rgba(0,0,0,.06);background:#fafbff;
+  transition:all .3s;
+}
+.ab-tech-item:hover { border-color:rgba(67,97,238,.2);background:#fff;transform:translateX(4px); }
+.ab-tech-icon { width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0; }
+.ab-tech-name { font-size:.9rem;font-weight:700;color:#1a1a2e; }
+.ab-tech-role { font-size:.78rem;color:#9ca3af; }
+/* Mission */
+.ab-mission {
+  background:linear-gradient(135deg,#06061a,#0d0d22);
+  padding:80px 0;position:relative;overflow:hidden;
+}
+.ab-mission::before {
+  content:'';position:absolute;width:500px;height:500px;border-radius:50%;
+  background:radial-gradient(circle,rgba(247,37,133,.12),transparent 65%);
+  bottom:-20%;left:-10%;filter:blur(60px);pointer-events:none;
+}
+.ab-mission-title { font-size:clamp(1.8rem,3.5vw,2.4rem);font-weight:800;color:#fff;letter-spacing:-.5px;margin-bottom:14px; }
+.ab-mission-text  { font-size:1rem;color:#8888a8;line-height:1.8;margin-bottom:0; }
+.ab-stat-pill {
+  display:inline-flex;flex-direction:column;align-items:center;
+  padding:20px 28px;border-radius:18px;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);
+}
+.ab-stat-pill-val { font-size:2rem;font-weight:800;letter-spacing:-1px;background:linear-gradient(135deg,#4361ee,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text; }
+.ab-stat-pill-lbl { font-size:.72rem;font-weight:600;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.9px; }
+/* Override global h2::after from style.css */
+.ab-hero h1::after,
+.ab-mission h2::after,
+.ab-section h2::after,
+.ab-tech h2::after { display:none !important; }
+</style>
+
+<!-- Hero -->
+<div class="ab-hero">
+  <div class="container position-relative" style="z-index:2;">
+    <span class="ab-page-tag">About Us</span>
+    <h1 class="ab-page-title">Built to Unlock<br>Every Child's Potential</h1>
+    <p class="ab-page-desc">We combine machine learning with child development insights to help parents guide their children toward hobbies that truly fit them.</p>
+  </div>
+</div>
+
+<!-- Mission + Stats -->
+<section class="ab-mission">
+  <div class="container position-relative" style="z-index:2;">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6">
+        <div style="width:36px;height:3px;border-radius:2px;background:#4361ee;margin-bottom:18px;"></div>
+        <h2 class="ab-mission-title">Our Mission</h2>
+        <p class="ab-mission-text">
+          Every child is unique. Our mission is to empower parents with intelligent tools that reveal their child's natural strengths — so they can nurture the right hobby at the right age. By combining real-world data with state-of-the-art machine learning, we give every family a data-driven head start.
+        </p>
+      </div>
+      <div class="col-lg-6">
+        <div class="row g-3">
+          <div class="col-6">
+            <div class="ab-stat-pill w-100">
+              <span class="ab-stat-pill-val">2500+</span>
+              <span class="ab-stat-pill-lbl">Training Records</span>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="ab-stat-pill w-100">
+              <span class="ab-stat-pill-val">92.5%</span>
+              <span class="ab-stat-pill-lbl">Accuracy</span>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="ab-stat-pill w-100">
+              <span class="ab-stat-pill-val">19</span>
+              <span class="ab-stat-pill-lbl">Parameters</span>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="ab-stat-pill w-100">
+              <span class="ab-stat-pill-val">5</span>
+              <span class="ab-stat-pill-lbl">Hobby Domains</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- What we offer -->
+<section class="ab-section">
+  <div class="container">
+    <div class="text-center mb-5">
+      <div style="width:36px;height:3px;border-radius:2px;background:#4361ee;margin:0 auto 16px;"></div>
+      <h2 style="font-size:clamp(1.8rem,3.5vw,2.4rem);font-weight:800;color:#1a1a2e;letter-spacing:-.5px;margin-bottom:10px;">What We Offer</h2>
+      <p style="color:#6b7280;font-size:.95rem;max-width:480px;margin:0 auto;">A full-stack, ML-powered platform designed around accuracy, privacy, and simplicity.</p>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="ab-card">
+          <div class="ab-card-icon" style="background:linear-gradient(135deg,rgba(67,97,238,.1),rgba(67,97,238,.04));color:#4361ee;border:1px solid rgba(67,97,238,.15);">
+            <i class="bi bi-cpu"></i>
+          </div>
+          <h4 class="ab-card-title">Random Forest AI</h4>
+          <p class="ab-card-desc">Our core model uses ensemble learning with 5 algorithms evaluated in parallel, then selects the best-performing one for each prediction.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="ab-card">
+          <div class="ab-card-icon" style="background:linear-gradient(135deg,rgba(6,214,160,.1),rgba(6,214,160,.04));color:#06d6a0;border:1px solid rgba(6,214,160,.15);">
+            <i class="bi bi-shield-lock"></i>
+          </div>
+          <h4 class="ab-card-title">Privacy First</h4>
+          <p class="ab-card-desc">No child's data is ever sold or shared. All inputs are processed securely, and user data stays within the platform.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="ab-card">
+          <div class="ab-card-icon" style="background:linear-gradient(135deg,rgba(247,37,133,.1),rgba(247,37,133,.04));color:#f72585;border:1px solid rgba(247,37,133,.15);">
+            <i class="bi bi-lightning-charge"></i>
+          </div>
+          <h4 class="ab-card-title">Instant Results</h4>
+          <p class="ab-card-desc">Fill out 19 questions and receive a full prediction with confidence score and category breakdown in under 30 seconds.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="ab-card">
+          <div class="ab-card-icon" style="background:linear-gradient(135deg,rgba(255,209,102,.12),rgba(255,209,102,.04));color:#f4a300;border:1px solid rgba(255,209,102,.2);">
+            <i class="bi bi-bar-chart-line"></i>
+          </div>
+          <h4 class="ab-card-title">5 Hobby Domains</h4>
+          <p class="ab-card-desc">Sports, Arts, Academics, Analytical Thinking, and Health & Fitness — a comprehensive taxonomy that covers every child's potential.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="ab-card">
+          <div class="ab-card-icon" style="background:linear-gradient(135deg,rgba(76,201,240,.1),rgba(76,201,240,.04));color:#4cc9f0;border:1px solid rgba(76,201,240,.15);">
+            <i class="bi bi-people"></i>
+          </div>
+          <h4 class="ab-card-title">Parent-Centric</h4>
+          <p class="ab-card-desc">Designed for parents, not just data scientists. Simple language, easy inputs, and clear outcomes — no technical knowledge needed.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="ab-card">
+          <div class="ab-card-icon" style="background:linear-gradient(135deg,rgba(124,58,237,.1),rgba(124,58,237,.04));color:#7c3aed;border:1px solid rgba(124,58,237,.15);">
+            <i class="bi bi-gift"></i>
+          </div>
+          <h4 class="ab-card-title">Completely Free</h4>
+          <p class="ab-card-desc">Every feature — predictions, history, feedback — is free. No subscription, no hidden charges, no paywalls.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

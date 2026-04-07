@@ -1,308 +1,1138 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Kids Hobby Predictor — Home{% endblock %}
+{% block title %}Kids Hobby Predictor — Discover Your Child's Passion{% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
-<section class="hero-section text-white">
-    <div class="container py-5">
-        <div class="row align-items-center g-5">
-            <div class="col-lg-6 text-center text-lg-start">
-                <span class="badge bg-white bg-opacity-25 text-white px-3 py-2 mb-3 rounded-pill fw-normal fade-in-up">
-                    <i class="bi bi-stars"></i> AI-Powered Hobby Prediction
-                </span>
-                <h1 class="display-3 fw-bold mb-4 fade-in-up delay-1">
-                    Discover Your<br>
-                    Child's <span class="text-warning">Perfect Hobby</span>
-                </h1>
-                <p class="lead mb-4 fs-5 opacity-90 fade-in-up delay-2">
-                    Parents — let our <strong>Random Forest AI</strong> analyze your child's 
-                    interests, skills & activities to predict the ideal hobby for ages 5-17.
-                </p>
-                <div class="fade-in-up delay-3">
-                    {% if user.is_authenticated %}
-                        <a href="{% url 'predict' %}" class="btn btn-warning btn-lg px-5 py-3 fw-bold shadow-lg me-2">
-                            <i class="bi bi-magic"></i> Predict Hobby Now
-                        </a>
-                        <a href="{% url 'history' %}" class="btn btn-outline-light btn-lg px-4 py-3 fw-bold">
-                            <i class="bi bi-clock-history"></i> View History
-                        </a>
-                    {% else %}
-                        <a href="{% url 'register' %}" class="btn btn-warning btn-lg px-5 py-3 fw-bold shadow-lg me-2">
-                            <i class="bi bi-person-plus"></i> Get Started Free
-                        </a>
-                        <a href="{% url 'login' %}" class="btn btn-outline-light btn-lg px-5 py-3 fw-bold">
-                            <i class="bi bi-box-arrow-in-right"></i> Login
-                        </a>
-                    {% endif %}
-                </div>
-                <!-- Trust indicators -->
-                <div class="mt-4 fade-in-up delay-4">
-                    <div class="d-flex flex-wrap gap-4 justify-content-center justify-content-lg-start">
-                        <div class="d-flex align-items-center">
-                            <i class="bi bi-check-circle-fill text-warning me-2"></i>
-                            <small class="opacity-75">92.5% Accuracy</small>
-                        </div>
-                        <div class="d-flex align-items-center">
-                            <i class="bi bi-check-circle-fill text-warning me-2"></i>
-                            <small class="opacity-75">1,601+ Records</small>
-                        </div>
-                        <div class="d-flex align-items-center">
-                            <i class="bi bi-check-circle-fill text-warning me-2"></i>
-                            <small class="opacity-75">Free to Use</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Hero Illustration -->
-            <div class="col-lg-6 text-center d-none d-lg-block">
-                <div class="hero-illustration fade-in-up delay-2">
-                    <!-- SVG Illustration: Kids doing hobbies -->
-                    <svg viewBox="0 0 500 400" xmlns="http://www.w3.org/2000/svg" class="w-100" style="max-height: 420px;">
-                        <!-- Background circle -->
-                        <circle cx="250" cy="200" r="170" fill="rgba(255,255,255,0.08)" class="pulse-slow"/>
-                        <circle cx="250" cy="200" r="130" fill="rgba(255,255,255,0.06)" class="pulse-slow delay-1"/>
-                        
-                        <!-- Book kid (Academics) -->
-                        <g transform="translate(100, 140)" class="float-element">
-                            <rect x="0" y="30" width="80" height="60" rx="8" fill="#06d6a0" opacity="0.9"/>
-                            <rect x="5" y="35" width="70" height="50" rx="5" fill="white" opacity="0.3"/>
-                            <line x1="15" y1="48" x2="65" y2="48" stroke="white" stroke-width="2" opacity="0.5"/>
-                            <line x1="15" y1="58" x2="55" y2="58" stroke="white" stroke-width="2" opacity="0.5"/>
-                            <line x1="15" y1="68" x2="60" y2="68" stroke="white" stroke-width="2" opacity="0.5"/>
-                            <circle cx="40" cy="15" r="15" fill="#ffd166"/>
-                            <text x="40" y="20" text-anchor="middle" font-size="16" fill="white">📚</text>
-                        </g>
+<style>
+/* ============================================================
+   PREMIUM HOME — self-contained styles
+   ============================================================ */
+:root {
+  --c-blue:    #4361ee;
+  --c-purple:  #7c3aed;
+  --c-pink:    #f72585;
+  --c-teal:    #06d6a0;
+  --c-gold:    #ffd166;
+  --c-cyan:    #4cc9f0;
+  --c-dark:    #05050f;
+  --c-surface: #0d0d22;
+  --c-border:  rgba(255,255,255,0.07);
+  --c-muted:   #8888a8;
+  --ease:      cubic-bezier(.16,1,.3,1);
+}
 
-                        <!-- Sports kid -->
-                        <g transform="translate(310, 100)" class="float-element delay-2">
-                            <circle cx="40" cy="40" r="35" fill="#4361ee" opacity="0.9"/>
-                            <text x="40" y="48" text-anchor="middle" font-size="30" fill="white">⚽</text>
-                        </g>
+/* ── global reset for this page ── */
+.hp-main { margin-top: -1px; }  /* flush under navbar */
 
-                        <!-- Arts kid -->
-                        <g transform="translate(200, 250)" class="float-element delay-3">
-                            <rect x="0" y="10" width="90" height="70" rx="10" fill="#f72585" opacity="0.9"/>
-                            <text x="45" y="55" text-anchor="middle" font-size="30" fill="white">🎨</text>
-                        </g>
+/* ── util ── */
+.hp-tag {
+  display: inline-block;
+  padding: 5px 16px;
+  border-radius: 99px;
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  border: 1px solid rgba(67,97,238,.25);
+  background: rgba(67,97,238,.08);
+  color: var(--c-blue);
+  margin-bottom: 14px;
+}
+.hp-section-title {
+  font-size: clamp(1.9rem,3.5vw,2.6rem);
+  font-weight: 800;
+  letter-spacing: -.6px;
+  margin-bottom: 10px;
+}
+.hp-section-desc {
+  font-size: 1rem;
+  color: #6b7280;
+  max-width: 500px;
+  margin: 0 auto;
+  line-height: 1.7;
+}
 
-                        <!-- Connection lines (animated) -->
-                        <line x1="180" y1="180" x2="310" y2="140" stroke="rgba(255,255,255,0.2)" stroke-width="2" stroke-dasharray="5,5" class="dash-animate"/>
-                        <line x1="180" y1="200" x2="240" y2="270" stroke="rgba(255,255,255,0.2)" stroke-width="2" stroke-dasharray="5,5" class="dash-animate"/>
-                        <line x1="320" y1="170" x2="280" y2="260" stroke="rgba(255,255,255,0.2)" stroke-width="2" stroke-dasharray="5,5" class="dash-animate"/>
+/* ── reveal animations ── */
+.hp-reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity .65s var(--ease), transform .65s var(--ease);
+}
+.hp-revealed { opacity: 1; transform: translateY(0); }
 
-                        <!-- Center AI brain -->
-                        <g transform="translate(220, 160)" class="pulse-slow">
-                            <circle cx="30" cy="30" r="28" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
-                            <text x="30" y="38" text-anchor="middle" font-size="24" fill="white">🧠</text>
-                        </g>
-                    </svg>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
 
-<!-- How It Works (Animated Flow) -->
-<section class="py-5" id="how-it-works">
-    <div class="container">
-        <div class="text-center mb-5">
-            <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill mb-2">Simple Process</span>
-            <h2 class="fw-bold">How It Works</h2>
-        </div>
-        <div class="row g-4 align-items-center">
-            <!-- Step 1 -->
-            <div class="col-md-4">
-                <div class="card h-100 border-0 shadow-sm text-center p-4 card-hover flow-card" data-aos="fade-up">
-                    <div class="card-body">
-                        <div class="step-number">1</div>
-                        <div class="icon-circle bg-primary-light mx-auto mb-3">
-                            <i class="bi bi-pencil-square fs-1 text-primary"></i>
-                        </div>
-                        <h5 class="fw-bold">Enter Child's Data</h5>
-                        <p class="text-muted small">Parents fill in 14 simple questions about their child's age, interests, activities, and academic participation.</p>
-                        <div class="flow-features mt-3">
-                            <span class="badge bg-primary bg-opacity-10 text-primary me-1 mb-1">Age</span>
-                            <span class="badge bg-primary bg-opacity-10 text-primary me-1 mb-1">Academics</span>
-                            <span class="badge bg-primary bg-opacity-10 text-primary me-1 mb-1">Sports</span>
-                            <span class="badge bg-primary bg-opacity-10 text-primary me-1 mb-1">Arts</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Arrow -->
-            <div class="col-md-4 position-relative">
-                <div class="flow-arrow d-none d-md-block flow-arrow-left">
-                    <i class="bi bi-arrow-right text-primary"></i>
-                </div>
-                <div class="card h-100 border-0 shadow-sm text-center p-4 card-hover flow-card" data-aos="fade-up" data-aos-delay="200">
-                    <div class="card-body">
-                        <div class="step-number step-number-success">2</div>
-                        <div class="icon-circle bg-success-light mx-auto mb-3">
-                            <i class="bi bi-cpu fs-1 text-success"></i>
-                        </div>
-                        <h5 class="fw-bold">AI Analysis</h5>
-                        <p class="text-muted small">Our Random Forest ML model compares patterns with 1,601+ training records to identify the best match.</p>
-                        <div class="flow-features mt-3">
-                            <span class="badge bg-success bg-opacity-10 text-success me-1 mb-1">Random Forest</span>
-                            <span class="badge bg-success bg-opacity-10 text-success me-1 mb-1">5 Algorithms</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="flow-arrow d-none d-md-block flow-arrow-right">
-                    <i class="bi bi-arrow-right text-primary"></i>
-                </div>
-            </div>
-            <!-- Step 3 -->
-            <div class="col-md-4">
-                <div class="card h-100 border-0 shadow-sm text-center p-4 card-hover flow-card" data-aos="fade-up" data-aos-delay="400">
-                    <div class="card-body">
-                        <div class="step-number step-number-warning">3</div>
-                        <div class="icon-circle bg-warning-light mx-auto mb-3">
-                            <i class="bi bi-trophy fs-1 text-warning"></i>
-                        </div>
-                        <h5 class="fw-bold">Get Prediction</h5>
-                        <p class="text-muted small">Instantly receive the predicted hobby — Sports, Arts, or Academics — with a confidence percentage.</p>
-                        <div class="flow-features mt-3">
-                            <span class="badge bg-warning bg-opacity-10 text-warning me-1 mb-1">92.5% Accuracy</span>
-                            <span class="badge bg-warning bg-opacity-10 text-warning me-1 mb-1">Instant</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+/* ════════════════════════════════════
+   HERO
+════════════════════════════════════ */
+.hp-hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  padding: 130px 0 90px;
 
-<!-- Hobby Categories -->
-<section class="py-5 bg-light">
-    <div class="container">
-        <div class="text-center mb-5">
-            <span class="badge bg-danger bg-opacity-10 text-danger px-3 py-2 rounded-pill mb-2">3 Categories</span>
-            <h2 class="fw-bold">Hobby Categories</h2>
-        </div>
-        <div class="row g-4">
-            <div class="col-md-4">
-                <div class="card h-100 border-0 shadow text-center p-4 hobby-card hobby-sports" data-aos="zoom-in">
-                    <div class="card-body">
-                        <div class="hobby-emoji mb-3">🏆</div>
-                        <h4 class="fw-bold">Sports</h4>
-                        <p class="text-muted">Active, competitive, and passionate about physical activities like cricket, football, athletics.</p>
-                        <div class="mt-3">
-                            <span class="badge bg-primary bg-opacity-10 text-primary">Cricket</span>
-                            <span class="badge bg-primary bg-opacity-10 text-primary">Football</span>
-                            <span class="badge bg-primary bg-opacity-10 text-primary">Athletics</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card h-100 border-0 shadow text-center p-4 hobby-card hobby-arts" data-aos="zoom-in" data-aos-delay="100">
-                    <div class="card-body">
-                        <div class="hobby-emoji mb-3">🎨</div>
-                        <h4 class="fw-bold">Arts</h4>
-                        <p class="text-muted">Creative interests in drawing, painting, music, crafts, and performing arts.</p>
-                        <div class="mt-3">
-                            <span class="badge bg-danger bg-opacity-10 text-danger">Drawing</span>
-                            <span class="badge bg-danger bg-opacity-10 text-danger">Music</span>
-                            <span class="badge bg-danger bg-opacity-10 text-danger">Crafts</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card h-100 border-0 shadow text-center p-4 hobby-card hobby-academics" data-aos="zoom-in" data-aos-delay="200">
-                    <div class="card-body">
-                        <div class="hobby-emoji mb-3">📚</div>
-                        <h4 class="fw-bold">Academics</h4>
-                        <p class="text-muted">Strong inclination towards learning, research, science projects, and intellectual pursuits.</p>
-                        <div class="mt-3">
-                            <span class="badge bg-success bg-opacity-10 text-success">Science</span>
-                            <span class="badge bg-success bg-opacity-10 text-success">Maths</span>
-                            <span class="badge bg-success bg-opacity-10 text-success">Research</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+  /* ── Background: photo + dark gradient overlay ── */
+  background:
+    linear-gradient(135deg,
+      rgba(5,5,16,.88) 0%,
+      rgba(13,13,34,.82) 40%,
+      rgba(5,5,16,.9) 100%),
+    url('https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=1920&q=85&fit=crop')
+    center center / cover no-repeat;
+}
 
-<!-- Stats Section -->
-<section class="py-5 stats-section">
-    <div class="container">
-        <div class="text-center mb-5">
-            <span class="badge bg-info bg-opacity-10 text-info px-3 py-2 rounded-pill mb-2">Platform Stats</span>
-            <h2 class="fw-bold">Why Trust Us?</h2>
-        </div>
-        <div class="row text-center g-4">
-            <div class="col-sm-3">
-                <div class="p-4 stat-card" data-aos="fade-up">
-                    <div class="stat-icon mb-2"><i class="bi bi-database-fill text-primary fs-2"></i></div>
-                    <h2 class="fw-bold counter text-primary">1,601+</h2>
-                    <p class="text-muted fw-semibold mb-0">Training Records</p>
-                </div>
-            </div>
-            <div class="col-sm-3">
-                <div class="p-4 stat-card" data-aos="fade-up" data-aos-delay="100">
-                    <div class="stat-icon mb-2"><i class="bi bi-sliders text-success fs-2"></i></div>
-                    <h2 class="fw-bold counter text-success">14</h2>
-                    <p class="text-muted fw-semibold mb-0">Input Parameters</p>
-                </div>
-            </div>
-            <div class="col-sm-3">
-                <div class="p-4 stat-card" data-aos="fade-up" data-aos-delay="200">
-                    <div class="stat-icon mb-2"><i class="bi bi-gear-wide-connected text-warning fs-2"></i></div>
-                    <h2 class="fw-bold counter text-warning">5</h2>
-                    <p class="text-muted fw-semibold mb-0">ML Algorithms</p>
-                </div>
-            </div>
-            <div class="col-sm-3">
-                <div class="p-4 stat-card" data-aos="fade-up" data-aos-delay="300">
-                    <div class="stat-icon mb-2"><i class="bi bi-bullseye text-danger fs-2"></i></div>
-                    <h2 class="fw-bold counter text-danger">92.5%</h2>
-                    <p class="text-muted fw-semibold mb-0">Prediction Accuracy</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+/* aurora blobs */
+.hp-hero::before,
+.hp-hero::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  pointer-events: none;
+  animation: hp-drift 14s ease-in-out infinite alternate;
+}
+.hp-hero::before {
+  width: 800px; height: 800px;
+  background: radial-gradient(circle, rgba(67,97,238,.28) 0%, rgba(124,58,237,.14) 50%, transparent 70%);
+  top: -25%; left: -18%;
+}
+.hp-hero::after {
+  width: 700px; height: 700px;
+  background: radial-gradient(circle, rgba(247,37,133,.2) 0%, rgba(76,201,240,.1) 50%, transparent 70%);
+  bottom: -35%; right: -12%;
+  animation-direction: alternate-reverse;
+  animation-duration: 18s;
+}
+@keyframes hp-drift {
+  0%   { transform: translate(0,0) scale(1); }
+  100% { transform: translate(30px,-25px) scale(1.08); }
+}
 
-<!-- CTA Section -->
-<section class="py-5 bg-primary-gradient text-white text-center">
-    <div class="container">
-        <h2 class="fw-bold mb-3 fade-in-up">Ready to Discover Your Child's Hobby?</h2>
-        <p class="lead opacity-90 mb-4 fade-in-up delay-1">It takes less than 2 minutes. Free and instant results.</p>
+/* dot grid */
+.hp-hero-grid {
+  position: absolute; inset: 0;
+  background-image: radial-gradient(rgba(255,255,255,.025) 1px, transparent 1px);
+  background-size: 38px 38px;
+  z-index: 1; pointer-events: none;
+}
+
+/* floating orbs */
+.hp-orb {
+  position: absolute; border-radius: 50%;
+  pointer-events: none; z-index: 2;
+  transition: transform .25s ease-out;
+}
+.hp-orb-1 {
+  width:280px; height:280px;
+  background: radial-gradient(circle,rgba(67,97,238,.4),transparent 70%);
+  top:12%; right:9%;
+  animation: hp-float 8s ease-in-out infinite;
+}
+.hp-orb-2 {
+  width:190px; height:190px;
+  background: radial-gradient(circle,rgba(247,37,133,.32),transparent 70%);
+  bottom:18%; left:7%;
+  animation: hp-float 11s ease-in-out infinite 2s;
+}
+.hp-orb-3 {
+  width:140px; height:140px;
+  background: radial-gradient(circle,rgba(6,214,160,.28),transparent 70%);
+  top:58%; right:22%;
+  animation: hp-float 7s ease-in-out infinite 4s;
+}
+@keyframes hp-float {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-22px); }
+}
+
+/* hero content */
+.hp-hero-inner { position: relative; z-index: 5; text-align: center; }
+
+.hp-badge {
+  display: inline-flex; align-items: center; gap: 9px;
+  padding: 8px 20px; border-radius: 99px;
+  background: rgba(67,97,238,.1);
+  border: 1px solid rgba(67,97,238,.22);
+  color: var(--c-cyan);
+  font-size: .82rem; font-weight: 600; letter-spacing: .4px;
+  margin-bottom: 28px; backdrop-filter: blur(8px);
+}
+.hp-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--c-teal);
+  box-shadow: 0 0 10px var(--c-teal);
+  animation: hp-pulse 2s ease-in-out infinite;
+}
+@keyframes hp-pulse {
+  0%,100% { opacity:1; transform:scale(1); }
+  50%      { opacity:.45; transform:scale(1.6); }
+}
+
+.hp-h1 {
+  font-size: clamp(2.6rem,6vw,4.4rem);
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -1.5px;
+  line-height: 1.1;
+  margin-bottom: 22px;
+}
+.hp-grad {
+  background: linear-gradient(135deg,var(--c-blue) 0%,var(--c-pink) 50%,var(--c-cyan) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  background-size: 200%;
+  animation: hp-grad-shift 5s ease-in-out infinite;
+}
+@keyframes hp-grad-shift {
+  0%,100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+
+.hp-sub {
+  font-size: 1.1rem; line-height: 1.75;
+  color: var(--c-muted);
+  max-width: 560px; margin: 0 auto 40px;
+}
+.hp-sub strong { color: #d1d5f0; font-weight: 600; }
+
+/* CTA buttons */
+.hp-btns { display:flex; gap:14px; justify-content:center; flex-wrap:wrap; margin-bottom:52px; }
+
+.hp-btn {
+  display: inline-flex; align-items: center; gap: 9px;
+  padding: 15px 34px; border-radius: 13px;
+  font-size: .97rem; font-weight: 700;
+  text-decoration: none; letter-spacing: .2px;
+  position: relative; overflow: hidden;
+  transition: all .35s var(--ease);
+}
+.hp-btn-primary {
+  background: linear-gradient(135deg,var(--c-blue),var(--c-purple));
+  color: #fff;
+  box-shadow: 0 0 0 1px rgba(67,97,238,.3), 0 8px 28px rgba(67,97,238,.3), inset 0 1px 0 rgba(255,255,255,.12);
+}
+.hp-btn-primary:hover {
+  color:#fff; transform:translateY(-3px);
+  box-shadow: 0 0 0 1px rgba(67,97,238,.4), 0 16px 44px rgba(67,97,238,.38), inset 0 1px 0 rgba(255,255,255,.15);
+}
+.hp-btn-ghost {
+  background: rgba(255,255,255,.05);
+  color: #c8c8e8;
+  border: 1px solid var(--c-border);
+  backdrop-filter: blur(8px);
+}
+.hp-btn-ghost:hover {
+  background: rgba(255,255,255,.09); color:#fff;
+  border-color: rgba(255,255,255,.18); transform:translateY(-3px);
+}
+/* shimmer sweep */
+.hp-btn::after {
+  content:''; position:absolute; inset:0;
+  background: linear-gradient(120deg,transparent 35%,rgba(255,255,255,.12) 50%,transparent 65%);
+  background-size:250%; background-position:200% 0;
+  border-radius:inherit;
+  animation: hp-shim 3.5s ease-in-out infinite;
+}
+@keyframes hp-shim {
+  0%  { background-position:200% 0; }
+  100%{ background-position:-200% 0; }
+}
+
+/* trust strip */
+.hp-trust {
+  display:flex; align-items:center; justify-content:center;
+  gap:18px; flex-wrap:wrap;
+}
+.hp-trust-item {
+  display:flex; align-items:center; gap:6px;
+  font-size:.82rem; color:var(--c-muted); font-weight:500;
+}
+.hp-trust-item i { color:var(--c-teal); }
+.hp-trust-sep { width:1px; height:14px; background:var(--c-border); }
+
+/* hero fade to next section */
+.hp-hero-fade {
+  position:absolute; bottom:0; left:0; right:0; height:110px;
+  background: linear-gradient(to top,#f9fafb,transparent);
+  z-index:4; pointer-events:none;
+}
+
+
+/* ════════════════════════════════════
+   HOW IT WORKS
+════════════════════════════════════ */
+.hp-hiw {
+  background: #f9fafb;
+  padding: 100px 0 110px;
+  position: relative;
+  overflow: hidden;
+}
+/* soft bg shapes */
+.hp-hiw-shape {
+  position:absolute; border-radius:50%;
+  pointer-events:none;
+}
+.hp-hiw-shape-1 {
+  width:420px; height:420px;
+  background:rgba(67,97,238,.04);
+  top:-100px; left:-130px;
+}
+.hp-hiw-shape-2 {
+  width:320px; height:320px;
+  background:rgba(6,214,160,.045);
+  bottom:-80px; right:-100px;
+}
+
+/* steps row */
+.hp-steps {
+  display:flex; align-items:flex-start; justify-content:center;
+  gap:0; position:relative; max-width:960px; margin:0 auto;
+}
+
+/* dashed SVG arc connector */
+.hp-steps-svg {
+  position:absolute;
+  top: 88px; left:0; right:0; width:100%; height:130px;
+  z-index:0; pointer-events:none;
+  opacity:.55;
+}
+
+/* Single step */
+.hp-step {
+  flex:1; max-width:280px; text-align:center;
+  position:relative; z-index:1;
+  padding: 0 16px;
+}
+
+/* card holding illustration */
+.hp-step-card {
+  background:#fff;
+  border:1px solid rgba(0,0,0,.06);
+  border-radius:20px;
+  padding:28px 24px 24px;
+  box-shadow: 0 4px 24px rgba(0,0,0,.05);
+  transition: transform .45s var(--ease), box-shadow .45s var(--ease);
+  margin-bottom:22px;
+  min-height:200px;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  position:relative; overflow:hidden;
+}
+.hp-step-card:hover {
+  transform:translateY(-8px);
+  box-shadow: 0 20px 56px rgba(0,0,0,.09);
+}
+
+/* step number badge */
+.hp-step-num {
+  position:absolute; top:14px; right:16px;
+  font-size:.7rem; font-weight:800; letter-spacing:1px;
+  color:rgba(67,97,238,.25);
+}
+
+/* Step icon circles (big, coloured) */
+.hp-step-icon {
+  width:72px; height:72px; border-radius:20px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.9rem; margin-bottom:18px;
+  transition: transform .4s var(--ease);
+}
+.hp-step-card:hover .hp-step-icon { transform:scale(1.1) rotate(-4deg); }
+
+.hp-icon-blue   { background:linear-gradient(135deg,rgba(67,97,238,.12),rgba(67,97,238,.05)); color:var(--c-blue);   border:1px solid rgba(67,97,238,.15); }
+.hp-icon-purple { background:linear-gradient(135deg,rgba(124,58,237,.12),rgba(124,58,237,.05)); color:var(--c-purple); border:1px solid rgba(124,58,237,.15); }
+.hp-icon-teal   { background:linear-gradient(135deg,rgba(6,214,160,.12),rgba(6,214,160,.05));  color:var(--c-teal);   border:1px solid rgba(6,214,160,.15); }
+
+/* Illustrated mini-window inside step card */
+.hp-mini-window {
+  width:130px; background:#f8f9fc;
+  border-radius:9px; overflow:hidden;
+  border:1px solid rgba(0,0,0,.07);
+  box-shadow:0 4px 16px rgba(0,0,0,.06);
+  margin-bottom:0;
+  transition:transform .45s var(--ease);
+}
+.hp-step-card:hover .hp-mini-window { transform:translateY(-4px); }
+.hp-mini-tbar {
+  display:flex; gap:4px; padding:6px 9px;
+  background:#eef0f4; border-bottom:1px solid rgba(0,0,0,.05);
+}
+.hp-mini-tbar span {
+  width:6px;height:6px;border-radius:50%;background:#d1d5db;
+}
+.hp-mini-tbar span:nth-child(1){background:#fc8981;}
+.hp-mini-tbar span:nth-child(2){background:#fdbc40;}
+.hp-mini-tbar span:nth-child(3){background:#34c759;}
+.hp-mini-body { padding:10px 10px 12px; display:flex; flex-direction:column; gap:5px; }
+.hp-line { height:5px;border-radius:3px;background:#e5e7eb; }
+.hp-line-sm  { width:55%; }
+.hp-line-md  { width:75%; }
+.hp-line-xs  { width:38%; }
+.hp-mini-field { height:14px; border-radius:4px; background:#fff; border:1px solid #e5e7eb; }
+.hp-mini-btn   { height:12px; width:48%; border-radius:4px; background:var(--c-blue); margin-top:3px; }
+/* chart */
+.hp-mini-chart {
+  display:flex; align-items:flex-end; gap:3px; height:42px; padding:0;
+}
+.hp-mini-bar { flex:1; border-radius:3px 3px 0 0; min-width:11px; }
+/* progress */
+.hp-mini-prog-wrap { height:5px;border-radius:3px;background:#e5e7eb;overflow:hidden;margin-top:4px; }
+.hp-mini-prog      { height:100%;border-radius:3px;background:linear-gradient(90deg,var(--c-teal),var(--c-blue)); width:76%; }
+
+/* floating decoration elements */
+.hp-step-badge {
+  position:absolute; bottom:14px; right:14px;
+  width:30px;height:30px;border-radius:9px;
+  background:linear-gradient(135deg,var(--c-blue),var(--c-purple));
+  color:#fff; font-size:.75rem;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 14px rgba(67,97,238,.4);
+  animation:hp-float 4s ease-in-out infinite;
+}
+.hp-step-check {
+  position:absolute; bottom:12px; right:12px;
+  width:28px;height:28px;border-radius:50%;
+  background:var(--c-teal);
+  color:#fff; font-size:.85rem;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 14px rgba(6,214,160,.45);
+  animation:hp-float 5s ease-in-out infinite 1.2s;
+}
+
+/* step label & desc */
+.hp-step-label {
+  font-size:1.05rem; font-weight:700; color:#1a1a2e; margin-bottom:7px;
+}
+.hp-step-desc {
+  font-size:.84rem; color:#6b7280; line-height:1.65;
+}
+
+/* connector arrows between steps */
+.hp-arrow {
+  display:flex; align-items:center; padding-top:80px;
+  flex-shrink:0; opacity:.6;
+}
+.hp-arrow svg { width:60px; height:24px; }
+
+
+/* ════════════════════════════════════
+   CATEGORIES (dark)
+════════════════════════════════════ */
+.hp-cats {
+  background:var(--c-dark);
+  padding: 100px 0;
+  overflow-x: hidden;
+}
+.hp-cats-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+  gap:20px;
+  max-width:1100px; margin:0 auto;
+}
+.hp-cat {
+  background:var(--c-surface);
+  border:1px solid var(--c-border);
+  border-radius:20px;
+  padding:38px 24px 32px;
+  text-align:center;
+  position:relative;overflow:hidden;
+  transition:all .45s var(--ease);
+  cursor:default;
+}
+.hp-cat:hover {
+  transform:translateY(-10px);
+  border-color:var(--cat-c);
+  box-shadow:0 24px 60px var(--cat-glow);
+}
+.hp-cat-emoji {
+  font-size:3.2rem; margin-bottom:18px;
+  transition:transform .45s var(--ease);
+}
+.hp-cat:hover .hp-cat-emoji { transform:scale(1.22) rotate(-7deg); }
+.hp-cat-title { font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:8px; }
+.hp-cat-desc  { font-size:.83rem;color:var(--c-muted);line-height:1.6;margin-bottom:18px; }
+.hp-cat-tags  { display:flex;gap:6px;flex-wrap:wrap;justify-content:center; }
+.hp-cat-tags span {
+  padding:3px 12px;border-radius:99px;
+  font-size:.7rem;font-weight:600;
+  background:rgba(255,255,255,.04);
+  color:var(--c-muted);
+  border:1px solid var(--c-border);
+  transition:all .3s;
+}
+.hp-cat:hover .hp-cat-tags span { border-color:var(--cat-c); color:var(--cat-c); }
+.hp-cat-glow {
+  position:absolute; bottom:-55%;left:50%;
+  transform:translateX(-50%);
+  width:200%;height:200%;border-radius:50%;
+  background:radial-gradient(circle,var(--cat-glow),transparent 60%);
+  opacity:0;transition:opacity .45s;pointer-events:none;
+}
+.hp-cat:hover .hp-cat-glow { opacity:.38; }
+
+
+/* ════════════════════════════════════
+   STATS
+════════════════════════════════════ */
+.hp-stats-sec {
+  background:#f9fafb;
+  padding:100px 0;
+}
+.hp-stats-grid {
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:22px;
+  max-width:960px; margin:0 auto;
+}
+.hp-stat {
+  background:#fff;
+  border:1px solid rgba(0,0,0,.05);
+  border-radius:20px;
+  padding:38px 22px;
+  text-align:center;
+  position:relative;overflow:hidden;
+  transition:all .45s var(--ease);
+}
+.hp-stat:hover {
+  transform:translateY(-6px);
+  box-shadow:0 20px 48px rgba(67,97,238,.08);
+  border-color:rgba(67,97,238,.14);
+}
+.hp-stat-ico {
+  position:absolute;top:16px;right:18px;
+  font-size:1.15rem;color:rgba(67,97,238,.14);
+  transition:all .3s;
+}
+.hp-stat:hover .hp-stat-ico { color:rgba(67,97,238,.3);transform:scale(1.2); }
+.hp-stat-val {
+  font-size:2.9rem;font-weight:800;letter-spacing:-2px;line-height:1;
+  background:linear-gradient(135deg,var(--c-blue),var(--c-purple));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:8px;
+}
+.hp-stat-lbl {
+  font-size:.78rem;font-weight:700;
+  color:#9ca3af;text-transform:uppercase;letter-spacing:1.1px;
+}
+
+
+/* ════════════════════════════════════
+   CTA
+════════════════════════════════════ */
+.hp-cta {
+  background:var(--c-dark);
+  padding:120px 0;
+  position:relative;overflow:hidden;
+}
+.hp-cta::before,
+.hp-cta::after {
+  content:''; position:absolute; border-radius:50%; pointer-events:none;
+  animation:hp-drift 10s ease-in-out infinite alternate;
+}
+.hp-cta::before {
+  width:600px;height:600px;
+  background:radial-gradient(circle,rgba(67,97,238,.15),transparent 65%);
+  top:-30%;left:-5%;
+}
+.hp-cta::after {
+  width:500px;height:500px;
+  background:radial-gradient(circle,rgba(247,37,133,.13),transparent 65%);
+  bottom:-30%;right:-5%;
+  animation-direction:alternate-reverse;
+}
+.hp-cta-inner { position:relative;z-index:3;text-align:center; }
+.hp-cta-title {
+  font-size:clamp(1.9rem,4vw,2.7rem);
+  font-weight:800;color:#fff;letter-spacing:-.5px;margin-bottom:14px;
+}
+.hp-cta-desc { font-size:1.05rem;color:var(--c-muted);margin-bottom:38px; }
+.hp-btn-cta {
+  display:inline-flex;align-items:center;gap:10px;
+  padding:17px 42px;border-radius:14px;
+  font-size:1.05rem;font-weight:700;text-decoration:none;
+  background:linear-gradient(135deg,var(--c-blue),var(--c-pink));
+  color:#fff;
+  box-shadow:0 0 0 1px rgba(247,37,133,.2), 0 14px 44px rgba(247,37,133,.28);
+  position:relative;overflow:hidden;
+  transition:all .4s var(--ease);
+}
+.hp-btn-cta:hover {
+  color:#fff;transform:translateY(-4px) scale(1.02);
+  box-shadow:0 0 0 1px rgba(247,37,133,.3), 0 22px 64px rgba(247,37,133,.38);
+}
+.hp-btn-cta::after {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(120deg,transparent 35%,rgba(255,255,255,.13) 50%,transparent 65%);
+  background-size:250%; background-position:200% 0;
+  border-radius:inherit;
+  animation:hp-shim 3s ease-in-out infinite;
+}
+
+
+/* ── responsive ── */
+@media(max-width:992px){
+  .hp-steps { flex-direction:column;align-items:center;gap:24px; }
+  .hp-steps-svg { display:none; }
+  .hp-arrow  { display:none; }
+  .hp-step   { max-width:340px;width:100%; padding:0; }
+  .hp-stats-grid { grid-template-columns:repeat(2,1fr); }
+  .hp-cats-grid  { grid-template-columns:repeat(2,1fr); }
+}
+@media(max-width:576px){
+  .hp-hero   { padding:105px 0 65px; min-height:auto; }
+  .hp-h1     { font-size:2.1rem; letter-spacing:-.7px; }
+  .hp-btns   { flex-direction:column;align-items:center; }
+  .hp-btn    { width:100%;justify-content:center;max-width:300px; }
+  .hp-trust  { flex-direction:column;gap:8px; }
+  .hp-trust-sep { display:none; }
+  .hp-stats-grid { grid-template-columns:repeat(2,1fr);gap:12px; }
+  .hp-stat-val   { font-size:2.2rem; }
+  .hp-cats-grid  { grid-template-columns:1fr; }
+  .hp-hiw, .hp-stats-sec { padding:70px 0; }
+  .hp-cta    { padding:80px 0; }
+  .hp-cats   { padding:70px 0; }
+}
+</style>
+
+<div class="hp-main">
+
+<!-- ════════════════════════ HERO ════════════════════════ -->
+<section class="hp-hero" id="hero">
+  <div class="hp-hero-grid"></div>
+  <div class="hp-orb hp-orb-1"></div>
+  <div class="hp-orb hp-orb-2"></div>
+  <div class="hp-orb hp-orb-3"></div>
+
+  <div class="container">
+    <div class="hp-hero-inner">
+
+      <h1 class="hp-h1">
+        Discover Your Child's<br>
+        <span class="hp-grad">Perfect Hobby</span>
+      </h1>
+
+      <p class="hp-sub">
+        Our <strong>Random Forest AI</strong> analyzes your child's interests,
+        skills &amp; activities to predict the ideal hobby for ages 5–17 —
+        with <strong>92.5% accuracy</strong>.
+      </p>
+
+      <div class="hp-btns">
         {% if user.is_authenticated %}
-            <a href="{% url 'predict' %}" class="btn btn-warning btn-lg px-5 py-3 fw-bold shadow-lg fade-in-up delay-2">
-                <i class="bi bi-magic"></i> Start Prediction
-            </a>
+          <a href="{% url 'predict' %}" class="hp-btn hp-btn-primary" id="hero-predict-btn">
+            <i class="bi bi-magic"></i> Predict Hobby Now
+          </a>
+          <a href="{% url 'history' %}" class="hp-btn hp-btn-ghost" id="hero-history-btn">
+            <i class="bi bi-clock-history"></i> View History
+          </a>
         {% else %}
-            <a href="{% url 'register' %}" class="btn btn-warning btn-lg px-5 py-3 fw-bold shadow-lg fade-in-up delay-2">
-                <i class="bi bi-rocket-takeoff"></i> Get Started for Free
-            </a>
+          <a href="{% url 'register' %}" class="hp-btn hp-btn-primary" id="hero-register-btn">
+            <i class="bi bi-rocket-takeoff"></i> Get Started Free
+          </a>
+          <a href="{% url 'login' %}" class="hp-btn hp-btn-ghost" id="hero-login-btn">
+            <i class="bi bi-box-arrow-in-right"></i> Sign In
+          </a>
         {% endif %}
+      </div>
+
+      <div class="hp-trust">
+        <div class="hp-trust-item"><i class="bi bi-shield-check"></i> 92.5% Accuracy</div>
+        <div class="hp-trust-sep"></div>
+        <div class="hp-trust-item"><i class="bi bi-database"></i> 2,500+ Records</div>
+        <div class="hp-trust-sep"></div>
+        <div class="hp-trust-item"><i class="bi bi-grid-3x3-gap"></i> 5 Categories</div>
+        <div class="hp-trust-sep"></div>
+        <div class="hp-trust-item"><i class="bi bi-gift"></i> Free to Use</div>
+      </div>
     </div>
+  </div>
+  <div class="hp-hero-fade"></div>
 </section>
 
-<!-- Scroll Animation Script -->
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Intersection Observer for scroll animations
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('animate-in');
-                observer.unobserve(entry.target);
-            }
-        });
-    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
 
-    // Observe all animated elements
-    document.querySelectorAll('.flow-card, .hobby-card, .stat-card, [data-aos]').forEach(el => {
-        observer.observe(el);
+<!-- ════════════════════════ HOW IT WORKS ════════════════════════ -->
+<section class="hp-hiw" id="how-it-works">
+  <div class="hp-hiw-shape hp-hiw-shape-1"></div>
+  <div class="hp-hiw-shape hp-hiw-shape-2"></div>
+
+  <div class="container">
+    <div class="text-center mb-5 hp-reveal">
+      <div style="width:38px;height:4px;border-radius:2px;background:#4361ee;margin:0 auto 18px;"></div>
+      <h2 class="hp-section-title" style="color:#1a1a2e;">How It Works</h2>
+      <p class="hp-section-desc">Predict your child's ideal hobby in three simple steps — powered by real data and machine learning.</p>
+    </div>
+
+    <div class="hp-steps" id="hp-steps-row">
+      <!-- Dashed arc (desktop only) -->
+      <svg class="hp-steps-svg" viewBox="0 0 960 130" fill="none" preserveAspectRatio="none">
+        <path d="M115 105 C 260 105, 200 22, 480 22 S 700 105, 845 105"
+              stroke="url(#hiwG)" stroke-width="2" stroke-dasharray="9 7"
+              fill="none" stroke-linecap="round"/>
+        <defs>
+          <linearGradient id="hiwG" x1="0" y1="60" x2="960" y2="60">
+            <stop offset="0%"   stop-color="#4361ee" stop-opacity=".55"/>
+            <stop offset="50%"  stop-color="#7c3aed" stop-opacity=".4"/>
+            <stop offset="100%" stop-color="#06d6a0" stop-opacity=".55"/>
+          </linearGradient>
+        </defs>
+      </svg>
+
+      <!-- ── Step 1: Enter Data ── -->
+      <div class="hp-step hp-reveal">
+        <div class="hp-step-card">
+          <div class="hp-step-num">01</div>
+          <div class="hp-step-icon hp-icon-blue">
+            <i class="bi bi-pencil-square"></i>
+          </div>
+          <div class="hp-mini-window">
+            <div class="hp-mini-tbar"><span></span><span></span><span></span></div>
+            <div class="hp-mini-body">
+              <div class="hp-line hp-line-sm"></div>
+              <div class="hp-line"></div>
+              <div class="hp-line hp-line-md"></div>
+              <div class="hp-mini-field"></div>
+              <div class="hp-mini-field"></div>
+              <div class="hp-mini-btn"></div>
+            </div>
+          </div>
+        </div>
+        <h4 class="hp-step-label">Enter Child's Data</h4>
+        <p class="hp-step-desc">Parents answer 19 quick questions about their child's age, interests, activities, logic skills &amp; health habits.</p>
+      </div>
+
+      <!-- connector arrow -->
+      <div class="hp-arrow hp-reveal">
+        <svg viewBox="0 0 60 24" fill="none">
+          <path d="M0 12h46m0 0l-8-7m8 7l-8 7" stroke="url(#arr1)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <defs><linearGradient id="arr1" x1="0" y1="12" x2="46" y2="12"><stop stop-color="#4361ee"/><stop offset="1" stop-color="#7c3aed"/></linearGradient></defs>
+        </svg>
+      </div>
+
+      <!-- ── Step 2: AI Analysis ── -->
+      <div class="hp-step hp-reveal">
+        <div class="hp-step-card">
+          <div class="hp-step-num">02</div>
+          <div class="hp-step-icon hp-icon-purple">
+            <i class="bi bi-cpu"></i>
+          </div>
+          <div class="hp-mini-window">
+            <div class="hp-mini-tbar"><span></span><span></span><span></span></div>
+            <div class="hp-mini-body">
+              <div class="hp-mini-chart">
+                <div class="hp-mini-bar" style="height:38%;background:#4361ee;"></div>
+                <div class="hp-mini-bar" style="height:68%;background:#06d6a0;"></div>
+                <div class="hp-mini-bar" style="height:52%;background:#7c3aed;"></div>
+                <div class="hp-mini-bar" style="height:84%;background:#4361ee;"></div>
+                <div class="hp-mini-bar" style="height:44%;background:#f72585;"></div>
+              </div>
+              <div class="hp-line hp-line-sm" style="margin-top:7px;"></div>
+            </div>
+          </div>
+          <div class="hp-step-badge"><i class="bi bi-stars"></i></div>
+        </div>
+        <h4 class="hp-step-label">AI Analysis</h4>
+        <p class="hp-step-desc">Our Random Forest model compares patterns across 2,500+ training records across 5 ML algorithms.</p>
+      </div>
+
+      <!-- connector arrow -->
+      <div class="hp-arrow hp-reveal">
+        <svg viewBox="0 0 60 24" fill="none">
+          <path d="M0 12h46m0 0l-8-7m8 7l-8 7" stroke="url(#arr2)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <defs><linearGradient id="arr2" x1="0" y1="12" x2="46" y2="12"><stop stop-color="#7c3aed"/><stop offset="1" stop-color="#06d6a0"/></linearGradient></defs>
+        </svg>
+      </div>
+
+      <!-- ── Step 3: Get Result ── -->
+      <div class="hp-step hp-reveal">
+        <div class="hp-step-card">
+          <div class="hp-step-num">03</div>
+          <div class="hp-step-icon hp-icon-teal">
+            <i class="bi bi-trophy"></i>
+          </div>
+          <div class="hp-mini-window">
+            <div class="hp-mini-tbar"><span></span><span></span><span></span></div>
+            <div class="hp-mini-body" style="align-items:center;">
+              <div style="width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#4361ee,#4cc9f0);margin:0 auto 7px;"></div>
+              <div class="hp-line hp-line-sm" style="margin:0 auto 4px;"></div>
+              <div class="hp-line hp-line-xs" style="margin:0 auto 8px;"></div>
+              <div class="hp-mini-prog-wrap" style="width:85%;"><div class="hp-mini-prog"></div></div>
+            </div>
+          </div>
+          <div class="hp-step-check"><i class="bi bi-check-lg"></i></div>
+        </div>
+        <h4 class="hp-step-label">Get Prediction</h4>
+        <p class="hp-step-desc">Instantly receive your child's predicted hobby category with a confidence score and activity breakdown.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════ CATEGORIES (image marquee) ════════════════════════ -->
+<section class="hp-cats" id="categories">
+  <style>
+  /* ── override global h2::after in dark sections ── */
+  .hp-cats .hp-section-title::after { display:none !important; }
+
+  /* ── Marquee container ── */
+  .hp-marquee-wrap {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    padding: 12px 0 28px;
+    /* fade edges */
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
+  }
+  .hp-marquee-track {
+    display: flex;
+    gap: 22px;
+    width: max-content;
+    animation: hp-marquee 55s linear infinite;
+  }
+  .hp-marquee-track:hover { animation-play-state: paused; }
+
+  @keyframes hp-marquee {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* ── Individual card ── */
+  .hp-img-card {
+    width: 300px;
+    height: 380px;
+    border-radius: 22px;
+    overflow: hidden;
+    position: relative;
+    flex-shrink: 0;
+    cursor: default;
+    transition: transform .45s cubic-bezier(.16,1,.3,1), box-shadow .45s cubic-bezier(.16,1,.3,1);
+  }
+  .hp-img-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 30px 60px rgba(0,0,0,.45);
+  }
+  .hp-img-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform .6s cubic-bezier(.16,1,.3,1);
+  }
+  .hp-img-card:hover img { transform: scale(1.06); }
+
+  /* Gradient overlay */
+  .hp-img-card__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(5,5,16,.92) 0%, rgba(5,5,16,.4) 50%, transparent 100%);
+  }
+
+  /* Color accent bar at top (per card) */
+  .hp-img-card__accent {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: 22px 22px 0 0;
+  }
+
+  /* Card text content */
+  .hp-img-card__body {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 24px 22px 22px;
+  }
+  .hp-img-card__label {
+    font-size: .68rem;
+    font-weight: 700;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--card-accent, #4cc9f0);
+    margin-bottom: 6px;
+  }
+  .hp-img-card__title {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -.3px;
+    margin-bottom: 8px;
+  }
+  .hp-img-card__desc {
+    font-size: .8rem;
+    color: rgba(255,255,255,.65);
+    line-height: 1.55;
+    margin-bottom: 14px;
+  }
+  .hp-img-card__tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .hp-img-card__tags span {
+    padding: 3px 11px;
+    border-radius: 99px;
+    font-size: .68rem;
+    font-weight: 600;
+    background: rgba(255,255,255,.1);
+    color: rgba(255,255,255,.75);
+    border: 1px solid rgba(255,255,255,.15);
+    transition: all .3s;
+  }
+  .hp-img-card:hover .hp-img-card__tags span {
+    background: rgba(255,255,255,.15);
+    color: #fff;
+  }
+  </style>
+
+  <div class="container">
+    <div class="text-center mb-5 hp-reveal">
+      <span class="hp-tag" style="border-color:rgba(76,201,240,.25);background:rgba(76,201,240,.08);color:#4cc9f0;">5 Categories</span>
+      <h2 class="hp-section-title" style="color:#fff;">Hobby Categories</h2>
+      <p class="hp-section-desc" style="color:#8888a8;">Our AI predicts your child's ideal domain across five expertly curated hobby areas.</p>
+    </div>
+  </div>
+
+  <!-- Full-width marquee (outside container for edge-to-edge) -->
+  <div class="hp-marquee-wrap">
+    <div class="hp-marquee-track" id="marqueeTrack">
+
+      <!-- ── CARD 1: Sports ── -->
+      <div class="hp-img-card" style="--card-accent:#4361ee;">
+        <img src="https://images.unsplash.com/photo-1517649763962-0c623066013b?w=600&q=80&fit=crop" alt="Sports" loading="lazy">
+        <div class="hp-img-card__overlay"></div>
+        <div class="hp-img-card__accent" style="background:linear-gradient(90deg,#4361ee,#7c3aed);"></div>
+        <div class="hp-img-card__body">
+          <div class="hp-img-card__label">Category 01</div>
+          <div class="hp-img-card__title">Sports</div>
+          <div class="hp-img-card__desc">Active, competitive and passionate about physical challenges</div>
+          <div class="hp-img-card__tags"><span>Cricket</span><span>Football</span><span>Athletics</span></div>
+        </div>
+      </div>
+
+      <!-- ── CARD 2: Arts ── -->
+      <div class="hp-img-card" style="--card-accent:#f72585;">
+        <img src="https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=600&q=80&fit=crop" alt="Arts" loading="lazy">
+        <div class="hp-img-card__overlay"></div>
+        <div class="hp-img-card__accent" style="background:linear-gradient(90deg,#f72585,#ff6b9d);"></div>
+        <div class="hp-img-card__body">
+          <div class="hp-img-card__label">Category 02</div>
+          <div class="hp-img-card__title">Arts</div>
+          <div class="hp-img-card__desc">Creative interests in drawing, painting, music and crafts</div>
+          <div class="hp-img-card__tags"><span>Drawing</span><span>Music</span><span>Crafts</span></div>
+        </div>
+      </div>
+
+      <!-- ── CARD 3: Academics ── -->
+      <div class="hp-img-card" style="--card-accent:#06d6a0;">
+        <img src="https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=600&q=80&fit=crop" alt="Academics" loading="lazy">
+        <div class="hp-img-card__overlay"></div>
+        <div class="hp-img-card__accent" style="background:linear-gradient(90deg,#06d6a0,#05a37d);"></div>
+        <div class="hp-img-card__body">
+          <div class="hp-img-card__label">Category 03</div>
+          <div class="hp-img-card__title">Academics</div>
+          <div class="hp-img-card__desc">Strong inclination toward learning, research and science</div>
+          <div class="hp-img-card__tags"><span>Science</span><span>Maths</span><span>Research</span></div>
+        </div>
+      </div>
+
+      <!-- ── CARD 4: Analytical Thinking ── -->
+      <div class="hp-img-card" style="--card-accent:#ffd166;">
+        <img src="https://images.unsplash.com/photo-1529699211952-734e80c4d42b?w=600&q=80&fit=crop" alt="Analytical Thinking" loading="lazy">
+        <div class="hp-img-card__overlay"></div>
+        <div class="hp-img-card__accent" style="background:linear-gradient(90deg,#ffd166,#f4a300);"></div>
+        <div class="hp-img-card__body">
+          <div class="hp-img-card__label">Category 04</div>
+          <div class="hp-img-card__title">Analytical Thinking</div>
+          <div class="hp-img-card__desc">Loves solving puzzles, strategy games and logical challenges</div>
+          <div class="hp-img-card__tags"><span>Chess</span><span>Coding</span><span>Robotics</span></div>
+        </div>
+      </div>
+
+      <!-- ── CARD 5: Health & Fitness ── -->
+      <div class="hp-img-card" style="--card-accent:#4cc9f0;">
+        <img src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=600&q=80&fit=crop" alt="Health and Fitness" loading="lazy">
+        <div class="hp-img-card__overlay"></div>
+        <div class="hp-img-card__accent" style="background:linear-gradient(90deg,#4cc9f0,#0096c7);"></div>
+        <div class="hp-img-card__body">
+          <div class="hp-img-card__label">Category 05</div>
+          <div class="hp-img-card__title">Health &amp; Fitness</div>
+          <div class="hp-img-card__desc">Highly active, health-conscious and values physical wellness</div>
+          <div class="hp-img-card__tags"><span>Yoga</span><span>Martial Arts</span><span>Gymnastics</span></div>
+        </div>
+      </div>
+
+      <!-- ═══ DUPLICATES for seamless loop ═══ -->
+      <div class="hp-img-card" style="--card-accent:#4361ee;">
+        <img src="https://images.unsplash.com/photo-1517649763962-0c623066013b?w=600&q=80&fit=crop" alt="Sports" loading="lazy">
+        <div class="hp-img-card__overlay"></div>
+        <div class="hp-img-card__accent" style="background:linear-gradient(90deg,#4361ee,#7c3aed);"></div>
+        <div class="hp-img-card__body">
+          <div class="hp-img-card__label">Category 01</div>
+          <div class="hp-img-card__title">Sports</div>
+          <div class="hp-img-card__desc">Active, competitive and passionate about physical challenges</div>
+          <div class="hp-img-card__tags"><span>Cricket</span><span>Football</span><span>Athletics</span></div>
+        </div>
+      </div>
+      <div class="hp-img-card" style="--card-accent:#f72585;">
+        <img src="https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=600&q=80&fit=crop" alt="Arts" loading="lazy">
+        <div class="hp-img-card__overlay"></div>
+        <div class="hp-img-card__accent" style="background:linear-gradient(90deg,#f72585,#ff6b9d);"></div>
+        <div class="hp-img-card__body">
+          <div class="hp-img-card__label">Category 02</div>
+          <div class="hp-img-card__title">Arts</div>
+          <div class="hp-img-card__desc">Creative interests in drawing, painting, music and crafts</div>
+          <div class="hp-img-card__tags"><span>Drawing</span><span>Music</span><span>Crafts</span></div>
+        </div>
+      </div>
+      <div class="hp-img-card" style="--card-accent:#06d6a0;">
+        <img src="https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=600&q=80&fit=crop" alt="Academics" loading="lazy">
+        <div class="hp-img-card__overlay"></div>
+        <div class="hp-img-card__accent" style="background:linear-gradient(90deg,#06d6a0,#05a37d);"></div>
+        <div class="hp-img-card__body">
+          <div class="hp-img-card__label">Category 03</div>
+          <div class="hp-img-card__title">Academics</div>
+          <div class="hp-img-card__desc">Strong inclination toward learning, research and science</div>
+          <div class="hp-img-card__tags"><span>Science</span><span>Maths</span><span>Research</span></div>
+        </div>
+      </div>
+      <div class="hp-img-card" style="--card-accent:#ffd166;">
+        <img src="https://images.unsplash.com/photo-1529699211952-734e80c4d42b?w=600&q=80&fit=crop" alt="Analytical" loading="lazy">
+        <div class="hp-img-card__overlay"></div>
+        <div class="hp-img-card__accent" style="background:linear-gradient(90deg,#ffd166,#f4a300);"></div>
+        <div class="hp-img-card__body">
+          <div class="hp-img-card__label">Category 04</div>
+          <div class="hp-img-card__title">Analytical Thinking</div>
+          <div class="hp-img-card__desc">Loves solving puzzles, strategy games and logical challenges</div>
+          <div class="hp-img-card__tags"><span>Chess</span><span>Coding</span><span>Robotics</span></div>
+        </div>
+      </div>
+      <div class="hp-img-card" style="--card-accent:#4cc9f0;">
+        <img src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=600&q=80&fit=crop" alt="Health" loading="lazy">
+        <div class="hp-img-card__overlay"></div>
+        <div class="hp-img-card__accent" style="background:linear-gradient(90deg,#4cc9f0,#0096c7);"></div>
+        <div class="hp-img-card__body">
+          <div class="hp-img-card__label">Category 05</div>
+          <div class="hp-img-card__title">Health &amp; Fitness</div>
+          <div class="hp-img-card__desc">Highly active, health-conscious and values physical wellness</div>
+          <div class="hp-img-card__tags"><span>Yoga</span><span>Martial Arts</span><span>Gymnastics</span></div>
+        </div>
+      </div>
+
+    </div><!-- track -->
+  </div><!-- wrap -->
+</section>
+
+
+
+<!-- ════════════════════════ STATS ════════════════════════ -->
+<section class="hp-stats-sec" id="stats">
+  <div class="container">
+    <div class="text-center mb-5 hp-reveal">
+      <span class="hp-tag">Platform Stats</span>
+      <h2 class="hp-section-title" style="color:#1a1a2e;">Built on Real Data</h2>
+      <p class="hp-section-desc">Rigorous machine learning backed by thousands of real-world data points.</p>
+    </div>
+    <div class="hp-stats-grid">
+      <div class="hp-stat hp-reveal">
+        <div class="hp-stat-ico"><i class="bi bi-database-fill"></i></div>
+        <div class="hp-stat-val" data-target="2500">0</div>
+        <div class="hp-stat-lbl">Training Records</div>
+      </div>
+      <div class="hp-stat hp-reveal">
+        <div class="hp-stat-ico"><i class="bi bi-sliders"></i></div>
+        <div class="hp-stat-val" data-target="19">0</div>
+        <div class="hp-stat-lbl">Input Parameters</div>
+      </div>
+      <div class="hp-stat hp-reveal">
+        <div class="hp-stat-ico"><i class="bi bi-gear-wide-connected"></i></div>
+        <div class="hp-stat-val" data-target="5">0</div>
+        <div class="hp-stat-lbl">ML Algorithms</div>
+      </div>
+      <div class="hp-stat hp-reveal">
+        <div class="hp-stat-ico"><i class="bi bi-bullseye"></i></div>
+        <div class="hp-stat-val hp-pct" data-target="92.5">0</div>
+        <div class="hp-stat-lbl">Prediction Accuracy</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════ CTA ════════════════════════ -->
+<section class="hp-cta" id="cta">
+  <div class="container">
+    <div class="hp-cta-inner hp-reveal">
+      <h2 class="hp-cta-title">Ready to Discover Your Child's Hobby?</h2>
+      <p class="hp-cta-desc">It takes less than 2 minutes — free, instant, and powered by AI.</p>
+      {% if user.is_authenticated %}
+        <a href="{% url 'predict' %}" class="hp-btn-cta" id="cta-predict-btn">
+          <i class="bi bi-magic"></i> Start Prediction
+        </a>
+      {% else %}
+        <a href="{% url 'register' %}" class="hp-btn-cta" id="cta-register-btn">
+          <i class="bi bi-rocket-takeoff"></i> Get Started for Free
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+</div><!-- .hp-main -->
+
+
+<script>
+(function(){
+  /* ── scroll reveal ── */
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if(e.isIntersecting){
+        const sibs = e.target.parentElement.querySelectorAll('.hp-reveal');
+        const idx  = Array.from(sibs).indexOf(e.target);
+        e.target.style.transitionDelay = idx * 0.11 + 's';
+        e.target.classList.add('hp-revealed');
+        io.unobserve(e.target);
+      }
     });
-});
+  }, {threshold:.14, rootMargin:'0px 0px -36px 0px'});
+  document.querySelectorAll('.hp-reveal').forEach(el => io.observe(el));
+
+  /* ── animated counters ── */
+  const co = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if(!e.isIntersecting) return;
+      const el  = e.target;
+      const tgt = parseFloat(el.dataset.target);
+      const pct = el.classList.contains('hp-pct');
+      const dur = 2000;
+      const t0  = performance.now();
+      const run = now => {
+        const p  = Math.min((now-t0)/dur,1);
+        const ep = 1-Math.pow(1-p,4);
+        const v  = ep*tgt;
+        el.textContent = pct ? v.toFixed(1)+'%' : Math.floor(v).toLocaleString()+(tgt>=100?'+':'');
+        if(p<1) requestAnimationFrame(run);
+      };
+      requestAnimationFrame(run);
+      co.unobserve(el);
+    });
+  },{threshold:.5});
+  document.querySelectorAll('.hp-stat-val').forEach(el => co.observe(el));
+
+  /* ── hero orb parallax ── */
+  const hero = document.querySelector('.hp-hero');
+  if(hero){
+    hero.addEventListener('mousemove', ev => {
+      const r = hero.getBoundingClientRect();
+      const x = (ev.clientX - r.left)/r.width  - 0.5;
+      const y = (ev.clientY - r.top) /r.height - 0.5;
+      document.querySelectorAll('.hp-orb').forEach((o,i)=>{
+        const s=(i+1)*18;
+        o.style.transform=`translate(${x*s}px,${y*s}px)`;
+      });
+    });
+  }
+})();
 </script>
 {% endblock %}

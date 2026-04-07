@@ -79,14 +79,15 @@ def preprocess_data(df):
 
     # 4. Encode categorical features
     # Binary columns (Yes/No)
-    binary_cols = ['Olympiad_Participation', 'Scholarship', 'School',
-                   'Projects', 'Medals', 'Career_sprt', 'Act_sprt', 'Fant_arts']
+    binary_cols = ['Olympiad_Participation', 'Scholarship', 
+                   'Projects', 'Medals', 'Career_sprt', 'Act_sprt', 'Fant_arts',
+                   'Won_arts', 'Solves_Puzzles', 'Plays_Board_Games', 'Health_Awareness']
 
     # Multi-class categorical columns
-    multi_cat_cols = ['Fav_sub', 'Won_arts']
+    multi_cat_cols = ['Fav_sub', 'Dietary_Habits']
 
     # Numerical columns (already numeric in dataset)
-    num_cols = ['Age', 'Grasp_pow', 'Time_sprt', 'Time_art']
+    num_cols = ['Age', 'Grasp_pow', 'Time_sprt', 'Time_art', 'Logical_Score', 'Daily_Exercise_Mins']
 
     # Store encoders for each column
     label_encoders = {}
