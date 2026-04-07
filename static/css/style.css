@@ -1,0 +1,306 @@
+/*
+ * Kids Hobbies Prediction System — Custom Stylesheet
+ * =====================================================
+ */
+
+/* ── Base Styles ── */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f8f9fd;
+    color: #2d3436;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+/* ── Gradient Backgrounds ── */
+.bg-primary-gradient {
+    background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+}
+
+.hero-section {
+    background: linear-gradient(135deg, #4361ee 0%, #7209b7 50%, #f72585 100%);
+    padding: 80px 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: rotate 20s linear infinite;
+}
+
+@keyframes rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* ── Navbar ── */
+.navbar {
+    padding: 12px 0;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+}
+
+.navbar-brand {
+    font-size: 1.4rem;
+    letter-spacing: -0.5px;
+}
+
+.nav-link {
+    font-weight: 500;
+    padding: 8px 16px !important;
+    border-radius: 8px;
+    transition: background 0.3s ease;
+}
+
+.nav-link:hover {
+    background: rgba(255,255,255,0.15);
+}
+
+/* ── Cards ── */
+.card {
+    border-radius: 16px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-hover:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+}
+
+.card-header.bg-primary-gradient {
+    border-radius: 16px 16px 0 0 !important;
+}
+
+/* ── Icon Circles ── */
+.icon-circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bg-primary-light {
+    background-color: rgba(67, 97, 238, 0.1);
+}
+
+.bg-success-light {
+    background-color: rgba(40, 167, 69, 0.1);
+}
+
+.bg-warning-light {
+    background-color: rgba(255, 193, 7, 0.1);
+}
+
+.bg-danger-light {
+    background-color: rgba(247, 37, 133, 0.1);
+}
+
+/* ── Result Page ── */
+.result-icon {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    animation: bounceIn 0.6s ease;
+}
+
+@keyframes bounceIn {
+    0% { transform: scale(0.3); opacity: 0; }
+    50% { transform: scale(1.08); opacity: 1; }
+    70% { transform: scale(0.95); }
+    100% { transform: scale(1); }
+}
+
+/* ── Hobby Cards ── */
+.hobby-card {
+    border-radius: 20px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hobby-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+}
+
+.hobby-sports:hover {
+    border-bottom: 4px solid #4361ee;
+}
+
+.hobby-arts:hover {
+    border-bottom: 4px solid #f72585;
+}
+
+.hobby-academics:hover {
+    border-bottom: 4px solid #28a745;
+}
+
+/* ── Form Styles ── */
+.form-control, .form-select {
+    border-radius: 10px;
+    padding: 10px 16px;
+    border: 2px solid #e9ecef;
+    font-size: 0.95rem;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #4361ee;
+    box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.15);
+}
+
+.form-label {
+    font-size: 0.9rem;
+    color: #555;
+    margin-bottom: 4px;
+}
+
+/* ── Buttons ── */
+.btn {
+    border-radius: 10px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #4361ee, #3a0ca3);
+    border: none;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #3a0ca3, #4361ee);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(67, 97, 238, 0.3);
+}
+
+.btn-outline-primary {
+    border: 2px solid #4361ee;
+    color: #4361ee;
+}
+
+.btn-outline-primary:hover {
+    background: #4361ee;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.btn-light {
+    border: none;
+}
+
+.btn-light:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* ── Tables ── */
+.table {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.table thead th {
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.table tbody td {
+    font-size: 0.9rem;
+    vertical-align: middle;
+}
+
+/* ── Badges ── */
+.badge {
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    border-radius: 8px;
+}
+
+/* ── Alerts ── */
+.alert {
+    border-radius: 12px;
+    border: none;
+    font-weight: 500;
+}
+
+/* ── Footer ── */
+footer {
+    border-top: 3px solid #4361ee;
+}
+
+/* ── Counter Animation ── */
+.counter {
+    font-size: 2.5rem;
+}
+
+/* ── Dashboard Stat Cards ── */
+.bg-primary, .bg-success, .bg-warning, .bg-info {
+    border-radius: 16px !important;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+    .hero-section {
+        padding: 50px 0;
+    }
+
+    .hero-section h1 {
+        font-size: 2rem;
+    }
+
+    .counter {
+        font-size: 1.8rem;
+    }
+
+    .icon-circle {
+        width: 60px;
+        height: 60px;
+    }
+
+    .result-icon {
+        width: 90px;
+        height: 90px;
+    }
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #4361ee;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #3a0ca3;
+}

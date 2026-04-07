@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Prediction History — Kids Hobby Predictor{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <h2 class="fw-bold mb-4"><i class="bi bi-clock-history"></i> Your Prediction History</h2>
+
+            {% if predictions %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle shadow-sm bg-white rounded">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>#</th>
+                            <th>Date</th>
+                            <th>Fav Subject</th>
+                            <th>Grasping Power</th>
+                            <th>Predicted Hobby</th>
+                            <th>Confidence</th>
+                            <th>Feedback</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pred in predictions %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ pred.predicted_at|date:"M d, Y H:i" }}</td>
+                            <td>{{ pred.input_data.fav_sub }}</td>
+                            <td>{{ pred.input_data.grasp_pow }}/6</td>
+                            <td>
+                                <span class="badge 
+                                    {% if pred.predicted_hobby == 'Sports' %}bg-primary
+                                    {% elif pred.predicted_hobby == 'Arts' %}bg-danger
+                                    {% else %}bg-success{% endif %} px-3 py-2">
+                                    {{ pred.predicted_hobby }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if pred.confidence_score %}
+                                    {{ pred.confidence_score }}%
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if pred.feedback %}
+                                    {% if pred.feedback.is_accurate %}
+                                        <span class="text-success"><i class="bi bi-check-circle-fill"></i> Accurate</span>
+                                    {% else %}
+                                        <span class="text-danger"><i class="bi bi-x-circle-fill"></i> Inaccurate</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="text-muted">Pending</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if not pred.feedback %}
+                                    <a href="{% url 'feedback' pred.id %}" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-chat-dots"></i> Feedback
+                                    </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="bi bi-inbox display-1 text-muted"></i>
+                <h4 class="text-muted mt-3">No predictions yet</h4>
+                <p class="text-muted">Make your first prediction to see it here.</p>
+                <a href="{% url 'predict' %}" class="btn btn-primary">
+                    <i class="bi bi-magic"></i> Predict Now
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
