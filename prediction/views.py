@@ -123,8 +123,9 @@ def register_view(request):
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            messages.success(request, f'Account created for {user.username}! You can now login.')
-            return redirect('login')
+            login(request, user)
+            messages.success(request, f'Welcome, {user.first_name or user.username}! Your account has been created.')
+            return redirect('home')
         else:
             messages.error(request, 'Please correct the errors below.')
     else:

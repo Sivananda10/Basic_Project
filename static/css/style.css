@@ -603,3 +603,237 @@ main {
     background: rgba(67, 97, 238, 0.2);
     color: var(--primary-dark);
 }
+
+/* ── Auth Pages (Login/Register with Illustration) ── */
+.auth-illustration {
+    animation: floatIllustration 4s ease-in-out infinite;
+    filter: drop-shadow(0 20px 40px rgba(0,0,0,0.1));
+}
+
+@keyframes floatIllustration {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+}
+
+.auth-card {
+    border-radius: 20px !important;
+    overflow: hidden;
+}
+
+.auth-card:hover {
+    box-shadow: 0 20px 60px rgba(67, 97, 238, 0.15) !important;
+}
+
+.auth-icon-wrapper {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(67, 97, 238, 0.08), rgba(67, 97, 238, 0.15));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ── Fade-in Animations ── */
+.fade-in-up {
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUpAnim 0.7s ease forwards;
+}
+
+.delay-1 { animation-delay: 0.15s; }
+.delay-2 { animation-delay: 0.3s; }
+.delay-3 { animation-delay: 0.45s; }
+.delay-4 { animation-delay: 0.6s; }
+
+@keyframes fadeInUpAnim {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ── Flow Chart Cards ── */
+.flow-card {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.flow-card.animate-in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.flow-card:nth-child(1) { transition-delay: 0s; }
+.flow-card:nth-child(2) { transition-delay: 0.2s; }
+.flow-card:nth-child(3) { transition-delay: 0.4s; }
+
+/* Step Numbers */
+.step-number {
+    position: absolute;
+    top: -12px;
+    right: 20px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    font-weight: 800;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(67, 97, 238, 0.4);
+    z-index: 5;
+}
+
+.step-number-success {
+    background: linear-gradient(135deg, var(--success), #05a37d);
+    box-shadow: 0 4px 12px rgba(6, 214, 160, 0.4);
+}
+
+.step-number-warning {
+    background: linear-gradient(135deg, #f4a300, #e67e00);
+    box-shadow: 0 4px 12px rgba(255, 209, 102, 0.4);
+}
+
+/* Flow Arrows */
+.flow-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 2rem;
+    opacity: 0.3;
+    z-index: 10;
+}
+
+.flow-arrow-left {
+    left: -20px;
+}
+
+.flow-arrow-right {
+    right: -20px;
+}
+
+/* ── Hobby Emojis ── */
+.hobby-emoji {
+    font-size: 4rem;
+    line-height: 1;
+    transition: var(--transition);
+}
+
+.hobby-card:hover .hobby-emoji {
+    transform: scale(1.2) rotate(-5deg);
+}
+
+/* ── Scroll-Triggered Animations ── */
+.hobby-card {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hobby-card.animate-in {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+.hobby-card:nth-child(1) .hobby-card { transition-delay: 0s; }
+.hobby-card:nth-child(2) .hobby-card { transition-delay: 0.15s; }
+.hobby-card:nth-child(3) .hobby-card { transition-delay: 0.3s; }
+
+/* ── Stat Cards ── */
+.stat-card {
+    border-radius: var(--radius);
+    transition: var(--transition);
+    opacity: 0;
+    transform: translateY(30px);
+}
+
+.stat-card.animate-in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.stat-card:hover {
+    background: white;
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-8px);
+}
+
+.stat-icon {
+    opacity: 0.7;
+    transition: var(--transition);
+}
+
+.stat-card:hover .stat-icon {
+    opacity: 1;
+    transform: scale(1.2);
+}
+
+/* ── Hero SVG Animations ── */
+.float-element {
+    animation: floatElement 5s ease-in-out infinite;
+}
+
+.float-element.delay-2 {
+    animation-delay: 1.5s;
+}
+
+.float-element.delay-3 {
+    animation-delay: 3s;
+}
+
+@keyframes floatElement {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(0, -12px); }
+}
+
+.pulse-slow {
+    animation: pulseSlow 3s ease-in-out infinite;
+}
+
+.pulse-slow.delay-1 {
+    animation-delay: 1s;
+}
+
+@keyframes pulseSlow {
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.05); }
+}
+
+.dash-animate {
+    stroke-dashoffset: 100;
+    animation: dashMove 3s linear infinite;
+}
+
+@keyframes dashMove {
+    to { stroke-dashoffset: 0; }
+}
+
+/* ── Warning Button ── */
+.btn-warning {
+    background: linear-gradient(135deg, #ffd166, #f4a300);
+    border: none;
+    color: #1a1a2e;
+    box-shadow: 0 4px 15px rgba(255, 209, 102, 0.4);
+}
+
+.btn-warning:hover {
+    background: linear-gradient(135deg, #f4a300, #e67e00);
+    color: #1a1a2e;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(255, 209, 102, 0.5);
+}
+
+/* ── Hero z-index fix ── */
+.hero-section * {
+    position: relative;
+    z-index: 2;
+}
+
+.hero-section::before,
+.hero-section::after {
+    z-index: 1;
+}

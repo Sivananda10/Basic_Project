@@ -1,22 +1,36 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Login — Kids Hobby Predictor{% endblock %}
 
 {% block content %}
 <div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-5 col-lg-4">
-            <div class="card border-0 shadow-lg">
+    <div class="row justify-content-center align-items-center g-5">
+        <!-- Illustration Side -->
+        <div class="col-lg-6 d-none d-lg-block text-center">
+            <img src="{% static 'images/login_illustration.png' %}" 
+                 alt="Login Illustration" 
+                 class="img-fluid auth-illustration"
+                 style="max-height: 480px;">
+            <h4 class="fw-bold text-primary mt-4">Discover Your Child's Potential</h4>
+            <p class="text-muted">Our AI-powered system helps parents identify the best hobby for their child based on behavioral patterns.</p>
+        </div>
+
+        <!-- Login Form Side -->
+        <div class="col-md-7 col-lg-5">
+            <div class="card border-0 shadow-lg auth-card">
                 <div class="card-body p-5">
                     <div class="text-center mb-4">
-                        <i class="bi bi-box-arrow-in-right display-4 text-primary"></i>
-                        <h3 class="fw-bold mt-2">Welcome Back</h3>
-                        <p class="text-muted">Login to predict hobbies</p>
+                        <div class="auth-icon-wrapper mx-auto mb-3">
+                            <i class="bi bi-box-arrow-in-right display-5 text-primary"></i>
+                        </div>
+                        <h3 class="fw-bold">Welcome Back</h3>
+                        <p class="text-muted">Login to predict your child's hobby</p>
                     </div>
 
                     {% if messages %}
                     {% for message in messages %}
-                    <div class="alert alert-danger alert-dismissible fade show py-2 small" role="alert">
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show py-2 small" role="alert">
                         <i class="bi bi-exclamation-circle"></i> {{ message }}
                         <button type="button" class="btn-close btn-close-sm" data-bs-dismiss="alert"></button>
                     </div>
@@ -27,25 +41,29 @@
                         {% csrf_token %}
 
                         <div class="mb-3">
-                            <label for="username" class="form-label fw-semibold">Username</label>
-                            <input type="text" name="username" id="username" class="form-control"
+                            <label for="username" class="form-label fw-semibold">
+                                <i class="bi bi-person text-primary"></i> Username
+                            </label>
+                            <input type="text" name="username" id="username" class="form-control form-control-lg"
                                    placeholder="Enter your username" required autofocus>
                         </div>
 
                         <div class="mb-4">
-                            <label for="password" class="form-label fw-semibold">Password</label>
-                            <input type="password" name="password" id="password" class="form-control"
+                            <label for="password" class="form-label fw-semibold">
+                                <i class="bi bi-lock text-primary"></i> Password
+                            </label>
+                            <input type="password" name="password" id="password" class="form-control form-control-lg"
                                    placeholder="Enter your password" required>
                         </div>
 
-                        <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">
+                        <button type="submit" class="btn btn-primary w-100 py-3 fw-bold btn-lg">
                             <i class="bi bi-box-arrow-in-right"></i> Login
                         </button>
                     </form>
 
                     <div class="text-center mt-4">
-                        <p class="text-muted">Don't have an account?
-                            <a href="{% url 'register' %}" class="text-primary fw-semibold">Register here</a>
+                        <p class="text-muted mb-0">Don't have an account?
+                            <a href="{% url 'register' %}" class="text-primary fw-semibold text-decoration-none">Register here</a>
                         </p>
                     </div>
                 </div>
