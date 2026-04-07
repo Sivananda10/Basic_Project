@@ -15,6 +15,21 @@
                     <form method="POST" novalidate>
                         {% csrf_token %}
 
+                        <h5 class="fw-bold text-info mb-3"><i class="bi bi-person-badge"></i> Child Information</h5>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label for="{{ form.age.id_for_label }}" class="form-label fw-semibold">
+                                    Child's Age <small class="text-muted">(5-17 years)</small>
+                                </label>
+                                {{ form.age }}
+                                {% if form.age.errors %}
+                                    <div class="text-danger small">{{ form.age.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
                         <h5 class="fw-bold text-primary mb-3"><i class="bi bi-book"></i> Academic Details</h5>
                         <div class="row g-3 mb-4">
                             <div class="col-md-6">

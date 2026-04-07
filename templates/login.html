@@ -14,6 +14,15 @@
                         <p class="text-muted">Login to predict hobbies</p>
                     </div>
 
+                    {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-danger alert-dismissible fade show py-2 small" role="alert">
+                        <i class="bi bi-exclamation-circle"></i> {{ message }}
+                        <button type="button" class="btn-close btn-close-sm" data-bs-dismiss="alert"></button>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+
                     <form method="POST">
                         {% csrf_token %}
 

@@ -7,7 +7,7 @@ from .models import InputData, Prediction, Feedback
 
 @admin.register(InputData)
 class InputDataAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'fav_sub', 'grasp_pow', 'time_sprt', 'time_art', 'submitted_at')
+    list_display = ('id', 'user', 'age', 'fav_sub', 'grasp_pow', 'time_sprt', 'time_art', 'submitted_at')
     list_filter = ('fav_sub', 'submitted_at')
     search_fields = ('user__username',)
 

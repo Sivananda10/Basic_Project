@@ -46,7 +46,7 @@ def train_and_evaluate_models(X_train, X_test, y_train, y_test, target_names):
         ),
         'Decision Tree': DecisionTreeClassifier(random_state=42),
         'Logistic Regression': LogisticRegression(
-            max_iter=1000, random_state=42, multi_class='multinomial'
+            max_iter=1000, random_state=42
         ),
         'Naive Bayes': GaussianNB(),
         'SVM': SVC(kernel='rbf', random_state=42, probability=True),

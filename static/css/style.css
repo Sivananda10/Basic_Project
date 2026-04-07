@@ -1,7 +1,33 @@
 /*
  * Kids Hobbies Prediction System — Custom Stylesheet
  * =====================================================
+ * Premium design with gradients, animations, glassmorphism
  */
+
+/* ── Google Fonts Import ── */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+/* ── CSS Variables ── */
+:root {
+    --primary: #4361ee;
+    --primary-dark: #3a0ca3;
+    --accent: #f72585;
+    --accent-light: #ff6b9d;
+    --success: #06d6a0;
+    --warning: #ffd166;
+    --info: #4cc9f0;
+    --dark: #1a1a2e;
+    --light-bg: #f0f2f8;
+    --card-bg: #ffffff;
+    --text-primary: #2d3436;
+    --text-muted: #636e72;
+    --shadow-sm: 0 2px 10px rgba(0,0,0,0.06);
+    --shadow-md: 0 8px 30px rgba(0,0,0,0.1);
+    --shadow-lg: 0 15px 50px rgba(0,0,0,0.15);
+    --radius: 16px;
+    --radius-sm: 10px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
 /* ── Base Styles ── */
 * {
@@ -12,11 +38,12 @@
 
 body {
     font-family: 'Poppins', sans-serif;
-    background-color: #f8f9fd;
-    color: #2d3436;
+    background-color: var(--light-bg);
+    color: var(--text-primary);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    overflow-x: hidden;
 }
 
 main {
@@ -25,12 +52,13 @@ main {
 
 /* ── Gradient Backgrounds ── */
 .bg-primary-gradient {
-    background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
 }
 
+/* ── Hero Section ── */
 .hero-section {
-    background: linear-gradient(135deg, #4361ee 0%, #7209b7 50%, #f72585 100%);
-    padding: 80px 0;
+    background: linear-gradient(135deg, #4361ee 0%, #7209b7 40%, #f72585 100%);
+    padding: 100px 0 80px;
     position: relative;
     overflow: hidden;
 }
@@ -38,27 +66,60 @@ main {
 .hero-section::before {
     content: '';
     position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-    animation: rotate 20s linear infinite;
+    top: -40%;
+    left: -20%;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+    animation: float 8s ease-in-out infinite;
 }
 
-@keyframes rotate {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+.hero-section::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    right: -10%;
+    width: 500px;
+    height: 500px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+    animation: float 10s ease-in-out infinite reverse;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-30px) rotate(5deg); }
+}
+
+/* ── Floating Shapes (decorative) ── */
+.hero-section .display-3 {
+    position: relative;
+    z-index: 2;
+    text-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+.hero-section .lead {
+    position: relative;
+    z-index: 2;
+    opacity: 0.9;
+}
+
+.hero-section .btn {
+    position: relative;
+    z-index: 2;
 }
 
 /* ── Navbar ── */
 .navbar {
-    padding: 12px 0;
-    box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+    padding: 14px 0;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+    backdrop-filter: blur(10px);
 }
 
 .navbar-brand {
     font-size: 1.4rem;
+    font-weight: 700;
     letter-spacing: -0.5px;
 }
 
@@ -66,26 +127,30 @@ main {
     font-weight: 500;
     padding: 8px 16px !important;
     border-radius: 8px;
-    transition: background 0.3s ease;
+    transition: var(--transition);
+    font-size: 0.95rem;
 }
 
 .nav-link:hover {
     background: rgba(255,255,255,0.15);
+    transform: translateY(-1px);
 }
 
 /* ── Cards ── */
 .card {
-    border-radius: 16px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-radius: var(--radius);
+    transition: var(--transition);
+    border: 1px solid rgba(0,0,0,0.04);
+    background: var(--card-bg);
 }
 
 .card-hover:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+    transform: translateY(-10px);
+    box-shadow: var(--shadow-lg);
 }
 
 .card-header.bg-primary-gradient {
-    border-radius: 16px 16px 0 0 !important;
+    border-radius: var(--radius) var(--radius) 0 0 !important;
 }
 
 /* ── Icon Circles ── */
@@ -96,40 +161,46 @@ main {
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: var(--transition);
+}
+
+.card-hover:hover .icon-circle {
+    transform: scale(1.1) rotate(5deg);
 }
 
 .bg-primary-light {
-    background-color: rgba(67, 97, 238, 0.1);
+    background: linear-gradient(135deg, rgba(67, 97, 238, 0.08), rgba(67, 97, 238, 0.15));
 }
 
 .bg-success-light {
-    background-color: rgba(40, 167, 69, 0.1);
+    background: linear-gradient(135deg, rgba(6, 214, 160, 0.08), rgba(6, 214, 160, 0.15));
 }
 
 .bg-warning-light {
-    background-color: rgba(255, 193, 7, 0.1);
+    background: linear-gradient(135deg, rgba(255, 209, 102, 0.1), rgba(255, 209, 102, 0.2));
 }
 
 .bg-danger-light {
-    background-color: rgba(247, 37, 133, 0.1);
+    background: linear-gradient(135deg, rgba(247, 37, 133, 0.08), rgba(247, 37, 133, 0.15));
 }
 
 /* ── Result Page ── */
 .result-icon {
-    width: 120px;
-    height: 120px;
+    width: 130px;
+    height: 130px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     margin: 0 auto;
-    animation: bounceIn 0.6s ease;
+    animation: bounceIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    box-shadow: var(--shadow-md);
 }
 
 @keyframes bounceIn {
-    0% { transform: scale(0.3); opacity: 0; }
-    50% { transform: scale(1.08); opacity: 1; }
-    70% { transform: scale(0.95); }
+    0% { transform: scale(0); opacity: 0; }
+    50% { transform: scale(1.12); opacity: 1; }
+    70% { transform: scale(0.92); }
     100% { transform: scale(1); }
 }
 
@@ -137,82 +208,107 @@ main {
 .hobby-card {
     border-radius: 20px;
     overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: var(--transition);
+    position: relative;
 }
+
+.hobby-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    transform: scaleX(0);
+    transition: transform 0.4s ease;
+}
+
+.hobby-sports::after { background: var(--primary); }
+.hobby-arts::after { background: var(--accent); }
+.hobby-academics::after { background: var(--success); }
 
 .hobby-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+    transform: translateY(-12px);
+    box-shadow: var(--shadow-lg);
 }
 
-.hobby-sports:hover {
-    border-bottom: 4px solid #4361ee;
+.hobby-card:hover::after {
+    transform: scaleX(1);
 }
 
-.hobby-arts:hover {
-    border-bottom: 4px solid #f72585;
-}
-
-.hobby-academics:hover {
-    border-bottom: 4px solid #28a745;
+.hobby-card:hover i {
+    transform: scale(1.15);
+    transition: var(--transition);
 }
 
 /* ── Form Styles ── */
 .form-control, .form-select {
-    border-radius: 10px;
-    padding: 10px 16px;
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
     border: 2px solid #e9ecef;
     font-size: 0.95rem;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    transition: var(--transition);
+    background: #fafbfc;
 }
 
 .form-control:focus, .form-select:focus {
-    border-color: #4361ee;
-    box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.15);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.1);
+    background: white;
 }
 
 .form-label {
-    font-size: 0.9rem;
+    font-size: 0.88rem;
     color: #555;
-    margin-bottom: 4px;
+    margin-bottom: 6px;
+    font-weight: 600;
 }
 
 /* ── Buttons ── */
 .btn {
-    border-radius: 10px;
+    border-radius: var(--radius-sm);
     font-weight: 600;
-    transition: all 0.3s ease;
+    transition: var(--transition);
+    letter-spacing: 0.3px;
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #4361ee, #3a0ca3);
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
     border: none;
+    box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
 }
 
 .btn-primary:hover {
-    background: linear-gradient(135deg, #3a0ca3, #4361ee);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(67, 97, 238, 0.3);
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(67, 97, 238, 0.4);
 }
 
 .btn-outline-primary {
-    border: 2px solid #4361ee;
-    color: #4361ee;
+    border: 2px solid var(--primary);
+    color: var(--primary);
 }
 
 .btn-outline-primary:hover {
-    background: #4361ee;
+    background: var(--primary);
     color: white;
-    transform: translateY(-2px);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(67, 97, 238, 0.3);
 }
 
 .btn-light {
     border: none;
+    box-shadow: var(--shadow-sm);
 }
 
 .btn-light:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-lg {
+    padding: 14px 32px;
+    font-size: 1.05rem;
 }
 
 /* ── Tables ── */
@@ -223,14 +319,24 @@ main {
 
 .table thead th {
     font-weight: 600;
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.8px;
+    border-bottom: none;
 }
 
 .table tbody td {
     font-size: 0.9rem;
     vertical-align: middle;
+    padding: 14px 16px;
+}
+
+.table tbody tr {
+    transition: var(--transition);
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(67, 97, 238, 0.04);
 }
 
 /* ── Badges ── */
@@ -238,6 +344,7 @@ main {
     font-weight: 600;
     letter-spacing: 0.3px;
     border-radius: 8px;
+    font-size: 0.8rem;
 }
 
 /* ── Alerts ── */
@@ -245,35 +352,202 @@ main {
     border-radius: 12px;
     border: none;
     font-weight: 500;
+    backdrop-filter: blur(10px);
+}
+
+.alert-error, .alert-danger {
+    background: linear-gradient(135deg, #fee2e2, #fecaca);
+    color: #b91c1c;
+}
+
+.alert-success {
+    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+    color: #065f46;
+}
+
+.alert-info {
+    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+    color: #1e40af;
 }
 
 /* ── Footer ── */
 footer {
-    border-top: 3px solid #4361ee;
+    background: var(--dark) !important;
+    border-top: 3px solid var(--primary);
+    position: relative;
+}
+
+footer::before {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary), var(--accent), var(--info));
 }
 
 /* ── Counter Animation ── */
 .counter {
-    font-size: 2.5rem;
+    font-size: 2.8rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Set specific colors for counters */
+.text-primary.counter {
+    background: linear-gradient(135deg, #4361ee, #3a0ca3);
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+
+.text-success.counter {
+    background: linear-gradient(135deg, #06d6a0, #05a37d);
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+
+.text-warning.counter {
+    background: linear-gradient(135deg, #ffd166, #f4a300);
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+
+.text-danger.counter {
+    background: linear-gradient(135deg, #f72585, #d10056);
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+
+/* ── Stats Section ── */
+.stats-section .p-3 {
+    transition: var(--transition);
+    border-radius: var(--radius);
+}
+
+.stats-section .p-3:hover {
+    background: white;
+    box-shadow: var(--shadow-md);
+    transform: translateY(-5px);
 }
 
 /* ── Dashboard Stat Cards ── */
-.bg-primary, .bg-success, .bg-warning, .bg-info {
-    border-radius: 16px !important;
+.card.bg-primary,
+.card.bg-success,
+.card.bg-warning,
+.card.bg-info {
+    border-radius: var(--radius) !important;
+    border: none !important;
+    transition: var(--transition);
+}
+
+.card.bg-primary:hover,
+.card.bg-success:hover,
+.card.bg-warning:hover,
+.card.bg-info:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+
+.card.bg-primary { background: linear-gradient(135deg, #4361ee, #3a0ca3) !important; }
+.card.bg-success { background: linear-gradient(135deg, #06d6a0, #05a37d) !important; }
+.card.bg-warning { background: linear-gradient(135deg, #ffd166, #f4a300) !important; }
+.card.bg-info { background: linear-gradient(135deg, #4cc9f0, #0096c7) !important; }
+
+/* ── Auth Cards (Login/Register) ── */
+.container > .row > [class*="col-"] > .card.shadow-lg {
+    transition: var(--transition);
+}
+
+.container > .row > [class*="col-"] > .card.shadow-lg:hover {
+    box-shadow: var(--shadow-lg);
+}
+
+/* ── Section Headings ── */
+section h2 {
+    position: relative;
+    display: inline-block;
+}
+
+section h2::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 4px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+}
+
+.text-center h2::after {
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* ── Input Form Sections ── */
+.input-section-header {
+    padding: 8px 16px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+}
+
+/* ── Prediction Form Card ── */
+.card-header.bg-primary-gradient {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%) !important;
+}
+
+/* ── Dropdown Style ── */
+.dropdown-menu {
+    border-radius: var(--radius-sm);
+    border: none;
+    box-shadow: var(--shadow-md);
+    padding: 8px;
+}
+
+.dropdown-item {
+    border-radius: 6px;
+    padding: 8px 16px;
+    transition: var(--transition);
+}
+
+.dropdown-item:hover {
+    background: rgba(67, 97, 238, 0.08);
+    color: var(--primary);
+}
+
+/* ── Page Transition ── */
+main {
+    animation: fadeInUp 0.5s ease;
+}
+
+@keyframes fadeInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* ── Responsive ── */
 @media (max-width: 768px) {
     .hero-section {
-        padding: 50px 0;
+        padding: 60px 0 50px;
     }
 
-    .hero-section h1 {
-        font-size: 2rem;
+    .hero-section h1, .hero-section .display-3 {
+        font-size: 2.2rem;
     }
 
     .counter {
-        font-size: 1.8rem;
+        font-size: 2rem;
     }
 
     .icon-circle {
@@ -282,25 +556,50 @@ footer {
     }
 
     .result-icon {
-        width: 90px;
-        height: 90px;
+        width: 100px;
+        height: 100px;
+    }
+
+    .btn-lg {
+        padding: 12px 24px;
+        font-size: 0.95rem;
     }
 }
 
-/* ── Scrollbar ── */
+@media (max-width: 576px) {
+    .hero-section {
+        padding: 40px 0 30px;
+    }
+
+    .hero-section .display-3 {
+        font-size: 1.8rem;
+    }
+
+    .card-body.p-5 {
+        padding: 1.5rem !important;
+    }
+}
+
+/* ── Custom Scrollbar ── */
 ::-webkit-scrollbar {
     width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-    background: #f1f1f1;
+    background: var(--light-bg);
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #4361ee;
+    background: linear-gradient(180deg, var(--primary), var(--accent));
     border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #3a0ca3;
+    background: var(--primary-dark);
+}
+
+/* ── Selection Color ── */
+::selection {
+    background: rgba(67, 97, 238, 0.2);
+    color: var(--primary-dark);
 }

@@ -49,10 +49,11 @@ def preprocess_input(form_data, label_encoders, scaler):
     # Multi-class categorical columns
     multi_cat_cols = ['Fav_sub', 'Won_arts']
     # Numerical columns
-    num_cols = ['Grasp_pow', 'Time_sprt', 'Time_art']
+    num_cols = ['Age', 'Grasp_pow', 'Time_sprt', 'Time_art']
 
     # Map form field names to dataset column names
     field_map = {
+        'age': 'Age',
         'olympiad_participation': 'Olympiad_Participation',
         'scholarship': 'Scholarship',
         'school': 'School',
@@ -184,6 +185,7 @@ def predict_hobby(request):
 
             # Preprocess input
             form_data = {
+                'age': input_data.age,
                 'olympiad_participation': input_data.olympiad_participation,
                 'scholarship': input_data.scholarship,
                 'school': input_data.school,

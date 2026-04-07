@@ -85,8 +85,8 @@ def preprocess_data(df):
     # Multi-class categorical columns
     multi_cat_cols = ['Fav_sub', 'Won_arts']
 
-    # Numerical columns (already numeric in dataset but stored as strings)
-    num_cols = ['Grasp_pow', 'Time_sprt', 'Time_art']
+    # Numerical columns (already numeric in dataset)
+    num_cols = ['Age', 'Grasp_pow', 'Time_sprt', 'Time_art']
 
     # Store encoders for each column
     label_encoders = {}

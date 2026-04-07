@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 
 
 class InputData(models.Model):
-    """Stores the 13 input parameters entered by a user for prediction."""
+    """Stores the 14 input parameters entered by a parent for their child's hobby prediction."""
 
     YESNO = [('Yes', 'Yes'), ('No', 'No')]
     WON_ARTS_CHOICES = [('Yes', 'Yes'), ('No', 'No'), ('Maybe', 'Maybe')]
@@ -20,9 +20,11 @@ class InputData(models.Model):
         ('Any language', 'Any language'),
     ]
     SCALE_CHOICES = [(i, str(i)) for i in range(1, 7)]
+    AGE_CHOICES = [(i, str(i)) for i in range(5, 18)]  # Ages 5 to 17
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='inputs')
 
+    age = models.IntegerField(choices=AGE_CHOICES, verbose_name="Child's Age")
     olympiad_participation = models.CharField(max_length=5, choices=YESNO, verbose_name='Olympiad Participation')
     scholarship = models.CharField(max_length=5, choices=YESNO, verbose_name='Scholarship')
     school = models.CharField(max_length=5, choices=YESNO, verbose_name='School Involvement')
