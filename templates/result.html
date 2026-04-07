@@ -1,121 +1,352 @@
 {% extends 'base.html' %}
-
-{% block title %}Prediction Result — Kids Hobby Predictor{% endblock %}
+{% load static %}
+{% block title %}Your Result — Kids Hobby Predictor{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-7">
-            <!-- Result Card -->
-            <div class="card border-0 shadow-lg text-center overflow-hidden">
-                <div class="card-body p-5">
-                    <div class="mb-4">
-                        {% if prediction.predicted_hobby == 'Sports' %}
-                            <div class="result-icon bg-primary-light">
-                                <i class="bi bi-trophy-fill display-1 text-primary"></i>
-                            </div>
-                        {% elif prediction.predicted_hobby == 'Arts' %}
-                            <div class="result-icon bg-danger-light">
-                                <i class="bi bi-palette-fill display-1 text-danger"></i>
-                            </div>
-                        {% elif prediction.predicted_hobby == 'Analytical Thinking' %}
-                            <div class="result-icon bg-warning-light">
-                                <i class="bi bi-puzzle-fill display-1 text-warning"></i>
-                            </div>
-                        {% elif prediction.predicted_hobby == 'Health & Fitness' %}
-                            <div class="result-icon bg-info-light">
-                                <i class="bi bi-heart-pulse-fill display-1 text-info"></i>
-                            </div>
-                        {% else %}
-                            <div class="result-icon bg-success-light">
-                                <i class="bi bi-book-fill display-1 text-success"></i>
-                            </div>
-                        {% endif %}
-                    </div>
+<style>
+{% with h=prediction.predicted_hobby %}
+/* ── Theme colors per hobby ── */
+{% if h == "Sports" %}
+:root { --rc:#4361ee; --rc2:#7c3aed; --rc-glow:rgba(67,97,238,.25); --rc-ico:bi-trophy-fill; }
+{% elif h == "Arts" %}
+:root { --rc:#f72585; --rc2:#ff6b9d; --rc-glow:rgba(247,37,133,.22); }
+{% elif h == "Analytical Thinking" %}
+:root { --rc:#ffd166; --rc2:#f4a300; --rc-glow:rgba(255,209,102,.25); }
+{% elif h == "Health & Fitness" %}
+:root { --rc:#4cc9f0; --rc2:#0096c7; --rc-glow:rgba(76,201,240,.22); }
+{% else %}
+:root { --rc:#06d6a0; --rc2:#05a37d; --rc-glow:rgba(6,214,160,.22); }
+{% endif %}
+{% endwith %}
 
-                    <h2 class="fw-bold mb-2">Predicted Hobby</h2>
-                    <h1 class="display-4 fw-bold
-                        {% if prediction.predicted_hobby == 'Sports' %}text-primary
-                        {% elif prediction.predicted_hobby == 'Arts' %}text-danger
-                        {% elif prediction.predicted_hobby == 'Analytical Thinking' %}text-warning
-                        {% elif prediction.predicted_hobby == 'Health & Fitness' %}text-info
-                        {% else %}text-success{% endif %}">
-                        {{ prediction.predicted_hobby }}
-                    </h1>
+/* ── Page ── */
+.rs-page {
+  min-height:100vh; background:#f4f6fb;
+  padding:48px 16px 80px;
+  display:flex; flex-direction:column; align-items:center;
+}
 
-                    {% if prediction.confidence_score %}
-                    <div class="mt-3 mb-4">
-                        <span class="badge bg-dark fs-6 px-4 py-2">
-                            <i class="bi bi-graph-up"></i> Confidence: {{ prediction.confidence_score }}%
-                        </span>
-                    </div>
-                    {% endif %}
+/* ── Confetti canvas ── */
+#confettiCanvas {
+  position:fixed; inset:0; pointer-events:none; z-index:999;
+}
 
-                    <p class="text-muted mt-3">
-                        {% if prediction.predicted_hobby == 'Sports' %}
-                            Your child shows strong inclination towards physical activities, competition, and athletic pursuits.
-                            Consider enrolling them in cricket, football, swimming, or athletics.
-                        {% elif prediction.predicted_hobby == 'Arts' %}
-                            Your child has a creative mind with passion for artistic expression.
-                            Consider enrolling them in drawing, painting, music, dance, or craft classes.
-                        {% elif prediction.predicted_hobby == 'Analytical Thinking' %}
-                            Your child enjoys solving puzzles and logical challenges.
-                            Consider chess clubs, robotics, coding, or strategy games.
-                        {% elif prediction.predicted_hobby == 'Health & Fitness' %}
-                            Your child is highly active and values a healthy lifestyle.
-                            Consider martial arts, yoga, gymnastics, or outdoor adventure sports.
-                        {% else %}
-                            Your child has a strong academic inclination with love for learning and intellectual challenges.
-                            Consider enrolling them in science clubs, math olympiads, coding, or quiz competitions.
-                        {% endif %}
-                    </p>
-                </div>
+/* ── Result hero card ── */
+.rs-hero {
+  width:100%; max-width:700px;
+  background:#fff;
+  border-radius:28px;
+  overflow:hidden;
+  box-shadow:0 12px 48px rgba(0,0,0,.1), 0 2px 8px rgba(0,0,0,.05);
+  border:1px solid rgba(0,0,0,.06);
+  margin-bottom:24px;
+}
 
-                <!-- Input Summary -->
-                <div class="card-footer bg-light p-4">
-                    <h6 class="fw-bold mb-3"><i class="bi bi-list-check"></i> Input Summary</h6>
-                    <div class="row text-start small">
-                        <div class="col-md-3">
-                            <p><strong>Age:</strong> {{ input_data.age }} years</p>
-                            <p><strong>Olympiad:</strong> {{ input_data.olympiad_participation }}</p>
-                            <p><strong>Scholarship:</strong> {{ input_data.scholarship }}</p>
-                            <p><strong>Fav Subject:</strong> {{ input_data.fav_sub }}</p>
-                            <p><strong>Projects:</strong> {{ input_data.projects }}</p>
-                        </div>
-                        <div class="col-md-3">
-                            <p><strong>Grasping Power:</strong> {{ input_data.grasp_pow }}/6</p>
-                            <p><strong>Sports Time:</strong> {{ input_data.time_sprt }} hrs/day</p>
-                            <p><strong>Medals:</strong> {{ input_data.medals }}</p>
-                            <p><strong>Career in Sports:</strong> {{ input_data.career_sprt }}</p>
-                            <p><strong>Active Sports:</strong> {{ input_data.act_sprt }}</p>
-                        </div>
-                        <div class="col-md-3">
-                            <p><strong>Arts Fascination:</strong> {{ input_data.fant_arts }}</p>
-                            <p><strong>Won Arts:</strong> {{ input_data.won_arts }}</p>
-                            <p><strong>Arts Time:</strong> {{ input_data.time_art }} hrs/day</p>
-                            <p><strong>Solves Puzzles:</strong> {{ input_data.solves_puzzles }}</p>
-                            <p><strong>Logical Score:</strong> {{ input_data.logical_score }}/10</p>
-                        </div>
-                        <div class="col-md-3">
-                            <p><strong>Plays Board Games:</strong> {{ input_data.plays_board_games }}</p>
-                            <p><strong>Daily Exercise:</strong> {{ input_data.daily_exercise }} mins</p>
-                            <p><strong>Dietary Habits:</strong> {{ input_data.dietary_habits }}</p>
-                            <p><strong>Health Awareness:</strong> {{ input_data.health_awareness }}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+/* gradient top banner */
+.rs-banner {
+  background:linear-gradient(135deg, var(--rc), var(--rc2));
+  padding:48px 32px 80px;
+  text-align:center; position:relative; overflow:hidden;
+}
+.rs-banner::before {
+  content:''; position:absolute;
+  width:300px; height:300px; border-radius:50%;
+  background:rgba(255,255,255,.07);
+  top:-80px; right:-60px;
+}
+.rs-banner::after {
+  content:''; position:absolute;
+  width:200px; height:200px; border-radius:50%;
+  background:rgba(255,255,255,.05);
+  bottom:-60px; left:-40px;
+}
+.rs-badge-label {
+  display:inline-block; padding:5px 16px; border-radius:99px;
+  background:rgba(255,255,255,.18); color:rgba(255,255,255,.9);
+  font-size:.7rem; font-weight:700; letter-spacing:1.4px;
+  text-transform:uppercase; margin-bottom:18px;
+}
+.rs-hobby-name {
+  font-size:clamp(2rem,6vw,3rem); font-weight:900;
+  color:#fff; letter-spacing:-.5px;
+  margin-bottom:10px; position:relative; z-index:2;
+}
+.rs-conf-pill {
+  display:inline-flex; align-items:center; gap:8px;
+  background:rgba(255,255,255,.18);
+  border:1px solid rgba(255,255,255,.25);
+  border-radius:99px; padding:7px 18px;
+  color:#fff; font-size:.85rem; font-weight:700;
+  backdrop-filter:blur(6px);
+  position:relative; z-index:2;
+}
 
-            <!-- Action Buttons -->
-            <div class="text-center mt-4">
-                <a href="{% url 'feedback' prediction.id %}" class="btn btn-outline-primary btn-lg me-2">
-                    <i class="bi bi-chat-dots"></i> Give Feedback
-                </a>
-                <a href="{% url 'predict' %}" class="btn btn-primary btn-lg">
-                    <i class="bi bi-arrow-repeat"></i> Predict Again
-                </a>
-            </div>
-        </div>
+/* floating icon circle — overlapping banner and body */
+.rs-ico-wrap {
+  display:flex; justify-content:center;
+  margin-top:-52px; position:relative; z-index:5;
+}
+.rs-ico {
+  width:90px; height:90px; border-radius:26px;
+  background:#fff;
+  box-shadow:0 12px 40px var(--rc-glow), 0 2px 8px rgba(0,0,0,.08);
+  display:flex; align-items:center; justify-content:center;
+  font-size:2.5rem;
+  border:4px solid rgba(255,255,255,.9);
+}
+
+/* body of hero card */
+.rs-body {
+  padding:20px 36px 36px;
+  text-align:center;
+}
+.rs-desc {
+  font-size:.97rem; color:#6b7280; line-height:1.75;
+  max-width:520px; margin:0 auto 28px;
+}
+
+/* activities row */
+.rs-activities {
+  display:flex; gap:10px; flex-wrap:wrap; justify-content:center;
+  margin-bottom:28px;
+}
+.rs-act {
+  padding:7px 16px; border-radius:99px;
+  font-size:.78rem; font-weight:700;
+  background:rgba(0,0,0,.04); color:#374151;
+  border:1px solid rgba(0,0,0,.07);
+  transition:all .25s;
+}
+.rs-act:hover { background:var(--rc); color:#fff; border-color:var(--rc); transform:translateY(-2px); }
+
+/* action buttons */
+.rs-actions {
+  display:flex; gap:12px; justify-content:center; flex-wrap:wrap;
+}
+.rs-btn {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:13px 28px; border-radius:13px; border:none;
+  font-family:'Poppins',sans-serif; font-size:.91rem; font-weight:700;
+  cursor:pointer; text-decoration:none;
+  transition:all .3s cubic-bezier(.16,1,.3,1);
+}
+.rs-btn-primary {
+  background:linear-gradient(135deg,var(--rc),var(--rc2));
+  color:#fff;
+  box-shadow:0 6px 24px var(--rc-glow);
+}
+.rs-btn-primary:hover { transform:translateY(-3px); color:#fff; box-shadow:0 12px 36px var(--rc-glow); }
+.rs-btn-ghost {
+  background:#f4f6fb; color:#374151;
+  border:1.5px solid #e5e7eb;
+}
+.rs-btn-ghost:hover { background:#fff; border-color:#c7d2fc; color:#4361ee; transform:translateY(-2px); }
+
+/* ── Summary card ── */
+.rs-summary {
+  width:100%; max-width:700px;
+  background:#fff;
+  border-radius:24px;
+  padding:28px 32px;
+  box-shadow:0 4px 24px rgba(0,0,0,.05);
+  border:1px solid rgba(0,0,0,.06);
+}
+.rs-sum-title {
+  font-size:.88rem; font-weight:800; color:#1a1a2e;
+  letter-spacing:-.1px; margin-bottom:18px;
+  display:flex; align-items:center; gap:8px;
+}
+.rs-sum-title i { color:var(--rc); }
+.rs-sum-grid {
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+  gap:10px;
+}
+.rs-sum-item {
+  background:#f9fafb; border-radius:12px;
+  padding:11px 13px; border:1px solid #f0f2f8;
+}
+.rs-sum-key { font-size:.65rem; font-weight:700; color:#9ca3af; text-transform:uppercase; letter-spacing:.8px; margin-bottom:3px; }
+.rs-sum-val { font-size:.86rem; font-weight:700; color:#1a1a2e; }
+
+@media(max-width:500px){
+  .rs-banner { padding:36px 20px 70px; }
+  .rs-body, .rs-summary { padding:20px; }
+  .rs-actions { flex-direction:column; align-items:center; }
+  .rs-btn { width:100%; justify-content:center; }
+}
+</style>
+
+<canvas id="confettiCanvas"></canvas>
+
+<div class="rs-page">
+
+  <!-- ── Hero Result Card ── -->
+  <div class="rs-hero">
+
+    <div class="rs-banner">
+      <div class="rs-badge-label">✨ AI Prediction Complete</div>
+      <div class="rs-hobby-name">{{ prediction.predicted_hobby }}</div>
+      {% if prediction.confidence_score %}
+      <div class="rs-conf-pill">
+        <i class="bi bi-graph-up-arrow"></i>
+        {{ prediction.confidence_score }}% Confidence
+      </div>
+      {% endif %}
     </div>
-</div>
+
+    <!-- floating icon -->
+    <div class="rs-ico-wrap">
+      <div class="rs-ico">
+        {% with h=prediction.predicted_hobby %}
+        {% if h == "Sports" %}🏆
+        {% elif h == "Arts" %}🎨
+        {% elif h == "Analytical Thinking" %}🧩
+        {% elif h == "Health & Fitness" %}💪
+        {% else %}📚
+        {% endif %}
+        {% endwith %}
+      </div>
+    </div>
+
+    <div class="rs-body">
+      <p class="rs-desc" style="margin-top:20px;">
+        {% with h=prediction.predicted_hobby %}
+        {% if h == "Sports" %}
+          Your child shows a strong natural inclination towards physical activity, competition, and athletic challenges. They thrive in team environments and love being on the move!
+        {% elif h == "Arts" %}
+          Your child has a wonderfully creative mind with a passion for artistic expression. They see the world differently and can channel emotions into beautiful creations.
+        {% elif h == "Analytical Thinking" %}
+          Your child excels at logical reasoning and loves the satisfaction of solving complex problems. They are natural strategists and critical thinkers.
+        {% elif h == "Health & Fitness" %}
+          Your child is deeply health-conscious and values an active, balanced lifestyle. They are motivated by personal growth and physical well-being.
+        {% else %}
+          Your child has strong academic curiosity and a genuine love for learning. They thrive in intellectual environments and enjoy exploring ideas deeply.
+        {% endif %}
+        {% endwith %}
+      </p>
+
+      <div class="rs-activities">
+        {% with h=prediction.predicted_hobby %}
+        {% if h == "Sports" %}
+          <span class="rs-act">🏏 Cricket</span>
+          <span class="rs-act">⚽ Football</span>
+          <span class="rs-act">🏊 Swimming</span>
+          <span class="rs-act">🏃 Athletics</span>
+          <span class="rs-act">🎾 Tennis</span>
+        {% elif h == "Arts" %}
+          <span class="rs-act">🎨 Drawing</span>
+          <span class="rs-act">🎵 Music</span>
+          <span class="rs-act">💃 Dance</span>
+          <span class="rs-act">✂️ Crafts</span>
+          <span class="rs-act">📸 Photography</span>
+        {% elif h == "Analytical Thinking" %}
+          <span class="rs-act">♟️ Chess</span>
+          <span class="rs-act">💻 Coding</span>
+          <span class="rs-act">🤖 Robotics</span>
+          <span class="rs-act">🧮 Math Olympiad</span>
+          <span class="rs-act">🎯 Strategy Games</span>
+        {% elif h == "Health & Fitness" %}
+          <span class="rs-act">🥋 Martial Arts</span>
+          <span class="rs-act">🧘 Yoga</span>
+          <span class="rs-act">🤸 Gymnastics</span>
+          <span class="rs-act">🚴 Cycling</span>
+          <span class="rs-act">🏕️ Outdoor Sports</span>
+        {% else %}
+          <span class="rs-act">🔬 Science Club</span>
+          <span class="rs-act">📐 Maths Olympiad</span>
+          <span class="rs-act">📖 Reading</span>
+          <span class="rs-act">💻 Programming</span>
+          <span class="rs-act">🏆 Quiz Competitions</span>
+        {% endif %}
+        {% endwith %}
+      </div>
+
+      <div class="rs-actions">
+        {% if not prediction.feedback %}
+        <a href="{% url 'feedback' prediction.id %}" class="rs-btn rs-btn-ghost">
+          <i class="bi bi-chat-dots"></i> Give Feedback
+        </a>
+        {% endif %}
+        <a href="{% url 'predict' %}" class="rs-btn rs-btn-ghost">
+          <i class="bi bi-arrow-repeat"></i> Predict Again
+        </a>
+        <a href="{% url 'history' %}" class="rs-btn rs-btn-primary">
+          <i class="bi bi-clock-history"></i> View History
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Input Summary Card ── -->
+  <div class="rs-summary">
+    <div class="rs-sum-title"><i class="bi bi-list-check"></i> Your Answers at a Glance</div>
+    <div class="rs-sum-grid">
+      <div class="rs-sum-item"><div class="rs-sum-key">Age</div><div class="rs-sum-val">{{ input_data.age }} yrs</div></div>
+      <div class="rs-sum-item"><div class="rs-sum-key">Fav. Subject</div><div class="rs-sum-val">{{ input_data.fav_sub }}</div></div>
+      <div class="rs-sum-item"><div class="rs-sum-key">Grasping Power</div><div class="rs-sum-val">{{ input_data.grasp_pow }}/6</div></div>
+      <div class="rs-sum-item"><div class="rs-sum-key">Olympiad</div><div class="rs-sum-val">{{ input_data.olympiad_participation }}</div></div>
+      <div class="rs-sum-item"><div class="rs-sum-key">Scholarship</div><div class="rs-sum-val">{{ input_data.scholarship }}</div></div>
+      <div class="rs-sum-item"><div class="rs-sum-key">Projects</div><div class="rs-sum-val">{{ input_data.projects }}</div></div>
+      <div class="rs-sum-item"><div class="rs-sum-key">Sports (hrs)</div><div class="rs-sum-val">{{ input_data.time_sprt }}h/day</div></div>
+      <div class="rs-sum-item"><div class="rs-sum-key">Medals</div><div class="rs-sum-val">{{ input_data.medals }}</div></div>
+      <div class="rs-sum-item"><div class="rs-sum-key">Sports Career</div><div class="rs-sum-val">{{ input_data.career_sprt }}</div></div>
+      <div class="rs-sum-item"><div class="rs-sum-key">Active Sports</div><div class="rs-sum-val">{{ input_data.act_sprt }}</div></div>
+      <div class="rs-sum-item"><div class="rs-sum-key">Arts (hrs)</div><div class="rs-sum-val">{{ input_data.time_art }}h/day</div></div>
+      <div class="rs-sum-item"><div class="rs-sum-key">Arts Fan</div><div class="rs-sum-val">{{ input_data.fant_arts }}</div></div>
+      <div class="rs-sum-item"><div class="rs-sum-key">Won Arts</div><div class="rs-sum-val">{{ input_data.won_arts }}</div></div>
+      <div class="rs-sum-item"><div class="rs-sum-key">Logic Score</div><div class="rs-sum-val">{{ input_data.logical_score }}/10</div></div>
+      <div class="rs-sum-item"><div class="rs-sum-key">Puzzles</div><div class="rs-sum-val">{{ input_data.solves_puzzles }}</div></div>
+      <div class="rs-sum-item"><div class="rs-sum-key">Board Games</div><div class="rs-sum-val">{{ input_data.plays_board_games }}</div></div>
+      <div class="rs-sum-item"><div class="rs-sum-key">Exercise</div><div class="rs-sum-val">{{ input_data.daily_exercise }} mins</div></div>
+      <div class="rs-sum-item"><div class="rs-sum-key">Diet</div><div class="rs-sum-val">{{ input_data.dietary_habits }}</div></div>
+      <div class="rs-sum-item"><div class="rs-sum-key">Health Aware</div><div class="rs-sum-val">{{ input_data.health_awareness }}</div></div>
+    </div>
+  </div>
+
+</div><!-- /rs-page -->
+
+<!-- Confetti burst on load -->
+<script>
+(function(){
+  const canvas  = document.getElementById('confettiCanvas');
+  const ctx     = canvas.getContext('2d');
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const colors = ['#4361ee','#7c3aed','#f72585','#06d6a0','#ffd166','#4cc9f0','#fff'];
+  const particles = Array.from({length:120},()=>({
+    x: Math.random()*canvas.width,
+    y: Math.random()*canvas.height - canvas.height,
+    r: Math.random()*7+3,
+    d: Math.random()*120+80,
+    color: colors[Math.floor(Math.random()*colors.length)],
+    tilt: Math.random()*10-10,
+    tiltAngle:0,
+    tiltAngleInc: Math.random()*.07+.05,
+  }));
+
+  let angle=0, frame=0;
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    angle += .01;
+    particles.forEach((p,i) => {
+      p.tiltAngle += p.tiltAngleInc;
+      p.y += (Math.cos(angle+p.d)+3+p.r/2)*.8;
+      p.x += Math.sin(angle);
+      p.tilt = Math.sin(p.tiltAngle)*15;
+      ctx.beginPath();
+      ctx.lineWidth = p.r;
+      ctx.strokeStyle = p.color;
+      ctx.moveTo(p.x+p.tilt+p.r/3, p.y);
+      ctx.lineTo(p.x+p.tilt, p.y+p.tilt+p.r/5);
+      ctx.stroke();
+      if(p.y > canvas.height){ p.y=-10; p.x=Math.random()*canvas.width; }
+    });
+    frame++;
+    if(frame < 220) requestAnimationFrame(draw);
+    else ctx.clearRect(0,0,canvas.width,canvas.height);
+  }
+  draw();
+})();
+</script>
 {% endblock %}

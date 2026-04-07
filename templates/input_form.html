@@ -1,183 +1,676 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {% block title %}Predict Hobby — Kids Hobby Predictor{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-lg">
-                <div class="card-header bg-primary-gradient text-white text-center py-4">
-                    <h3 class="fw-bold mb-1"><i class="bi bi-magic"></i> Predict Your Child's Hobby</h3>
-                    <p class="mb-0 opacity-75">Fill in the details below to get an AI-powered prediction</p>
-                </div>
-                <div class="card-body p-4 p-md-5">
-                    <form method="POST" novalidate>
-                        {% csrf_token %}
+<style>
+/* ── Page shell ── */
+.qz-page {
+  min-height:100vh;
+  background:#f4f6fb;
+  display:flex; flex-direction:column; align-items:center;
+  padding:48px 16px 80px;
+}
 
-                        <h5 class="fw-bold text-info mb-3"><i class="bi bi-person-badge"></i> Child Information</h5>
-                        <div class="row g-3 mb-4">
-                            <div class="col-md-6">
-                                <label for="{{ form.age.id_for_label }}" class="form-label fw-semibold">
-                                    Child's Age <small class="text-muted">(5-17 years)</small>
-                                </label>
-                                {{ form.age }}
-                                {% if form.age.errors %}
-                                    <div class="text-danger small">{{ form.age.errors.0 }}</div>
-                                {% endif %}
-                            </div>
-                        </div>
+/* ── Outer card ── */
+.qz-card {
+  width:100%; max-width:680px;
+  background:#fff;
+  border-radius:24px;
+  box-shadow:0 8px 40px rgba(0,0,0,.08), 0 1px 4px rgba(0,0,0,.05);
+  overflow:hidden;
+  border:1px solid rgba(0,0,0,.06);
+}
 
-                        <hr class="my-4">
+/* ── Progress bar header ── */
+.qz-header {
+  padding:24px 32px 0;
+}
+.qz-steps-row {
+  display:flex; gap:6px; margin-bottom:20px;
+}
+.qz-steps-row span {
+  flex:1; height:4px; border-radius:2px;
+  background:#e9ecf5;
+  transition:background .4s;
+}
+.qz-steps-row span.done  { background:#4361ee; }
+.qz-steps-row span.active{ background:linear-gradient(90deg,#4361ee,#7c3aed); }
 
-                        <h5 class="fw-bold text-primary mb-3"><i class="bi bi-book"></i> Academic Details</h5>
-                        <div class="row g-3 mb-4">
-                            <div class="col-md-6">
-                                <label for="{{ form.olympiad_participation.id_for_label }}" class="form-label fw-semibold">
-                                    Olympiad Participation
-                                </label>
-                                {{ form.olympiad_participation }}
-                                {% if form.olympiad_participation.errors %}
-                                    <div class="text-danger small">{{ form.olympiad_participation.errors.0 }}</div>
-                                {% endif %}
-                            </div>
-                            <div class="col-md-6">
-                                <label for="{{ form.scholarship.id_for_label }}" class="form-label fw-semibold">
-                                    Scholarship
-                                </label>
-                                {{ form.scholarship }}
-                            </div>
-                            <div class="col-md-6">
-                                <label for="{{ form.fav_sub.id_for_label }}" class="form-label fw-semibold">
-                                    Favourite Subject
-                                </label>
-                                {{ form.fav_sub }}
-                            </div>
-                            <div class="col-md-6">
-                                <label for="{{ form.projects.id_for_label }}" class="form-label fw-semibold">
-                                    Works on Projects
-                                </label>
-                                {{ form.projects }}
-                            </div>
-                            <div class="col-md-6">
-                                <label for="{{ form.grasp_pow.id_for_label }}" class="form-label fw-semibold">
-                                    Grasping Power <small class="text-muted">(1=Low, 6=High)</small>
-                                </label>
-                                {{ form.grasp_pow }}
-                            </div>
-                        </div>
+.qz-step-label {
+  font-size:.68rem; font-weight:700; color:#9ca3af;
+  text-transform:uppercase; letter-spacing:1.2px;
+  display:flex; align-items:center; gap:8px;
+  margin-bottom:6px;
+}
+.qz-step-label .qz-step-ico {
+  width:26px; height:26px; border-radius:8px;
+  background:rgba(67,97,238,.1); color:#4361ee;
+  display:flex; align-items:center; justify-content:center;
+  font-size:.78rem;
+}
+.qz-step-counter { margin-left:auto; font-size:.72rem; color:#d1d5db; font-weight:500; }
 
-                        <hr class="my-4">
+/* ── Question area ── */
+.qz-body {
+  padding:20px 32px 28px;
+}
+.qz-question {
+  font-size:1.18rem; font-weight:800; color:#111827;
+  line-height:1.45; margin-bottom:24px;
+  letter-spacing:-.2px;
+}
+.qz-hint {
+  font-size:.78rem; color:#9ca3af; font-weight:500;
+  margin-bottom:20px; margin-top:-18px;
+}
 
-                        <h5 class="fw-bold text-success mb-3"><i class="bi bi-trophy"></i> Sports Details</h5>
-                        <div class="row g-3 mb-4">
-                            <div class="col-md-6">
-                                <label for="{{ form.time_sprt.id_for_label }}" class="form-label fw-semibold">
-                                    Time on Sports <small class="text-muted">(hrs/day, 1-6)</small>
-                                </label>
-                                {{ form.time_sprt }}
-                            </div>
-                            <div class="col-md-6">
-                                <label for="{{ form.medals.id_for_label }}" class="form-label fw-semibold">
-                                    Has Won Medals
-                                </label>
-                                {{ form.medals }}
-                            </div>
-                            <div class="col-md-6">
-                                <label for="{{ form.career_sprt.id_for_label }}" class="form-label fw-semibold">
-                                    Interest in Sports Career
-                                </label>
-                                {{ form.career_sprt }}
-                            </div>
-                            <div class="col-md-6">
-                                <label for="{{ form.act_sprt.id_for_label }}" class="form-label fw-semibold">
-                                    Actively Plays Sports
-                                </label>
-                                {{ form.act_sprt }}
-                            </div>
-                        </div>
+/* ── Option pill (radio / checkbox style) ── */
+.qz-options { display:flex; flex-direction:column; gap:10px; }
+.qz-opt {
+  display:flex; align-items:center; gap:14px;
+  padding:14px 18px;
+  border-radius:14px;
+  border:1.5px solid #e5e7eb;
+  background:#fafbff;
+  cursor:pointer;
+  transition:all .22s cubic-bezier(.16,1,.3,1);
+  position:relative;
+  user-select:none;
+}
+.qz-opt:hover { border-color:#c7d2fc; background:#f0f3ff; }
+.qz-opt.selected {
+  border-color:#4361ee;
+  background:linear-gradient(135deg,rgba(67,97,238,.07),rgba(124,58,237,.05));
+  box-shadow:0 0 0 3px rgba(67,97,238,.1);
+}
+.qz-bubble {
+  width:20px; height:20px; border-radius:50%; flex-shrink:0;
+  border:2px solid #d1d5db;
+  background:#fff;
+  transition:all .2s;
+  display:flex; align-items:center; justify-content:center;
+}
+.qz-opt.selected .qz-bubble {
+  border-color:#4361ee;
+  background:#4361ee;
+}
+.qz-opt.selected .qz-bubble::after {
+  content:''; width:7px; height:7px;
+  border-radius:50%; background:#fff;
+}
+.qz-opt-text { font-size:.92rem; font-weight:600; color:#374151; }
+.qz-opt.selected .qz-opt-text { color:#1e40af; }
 
-                        <hr class="my-4">
+/* hidden real inputs */
+.qz-real { display:none !important; }
 
-                        <h5 class="fw-bold text-danger mb-3"><i class="bi bi-palette"></i> Arts Details</h5>
-                        <div class="row g-3 mb-4">
-                            <div class="col-md-6">
-                                <label for="{{ form.fant_arts.id_for_label }}" class="form-label fw-semibold">
-                                    Fascination for Arts
-                                </label>
-                                {{ form.fant_arts }}
-                            </div>
-                            <div class="col-md-6">
-                                <label for="{{ form.won_arts.id_for_label }}" class="form-label fw-semibold">
-                                    Won Art Competitions
-                                </label>
-                                {{ form.won_arts }}
-                            </div>
-                            <div class="col-md-6">
-                                <label for="{{ form.time_art.id_for_label }}" class="form-label fw-semibold">
-                                    Time on Arts <small class="text-muted">(hrs/day, 1-6)</small>
-                                </label>
-                                {{ form.time_art }}
-                            </div>
-                        </div>
+/* ── Scale row (1–6 or 1–10) ── */
+.qz-scale { display:flex; gap:8px; flex-wrap:wrap; }
+.qz-scale-btn {
+  width:48px; height:48px; border-radius:12px;
+  border:1.5px solid #e5e7eb; background:#fafbff;
+  font-size:.92rem; font-weight:700; color:#6b7280;
+  cursor:pointer; transition:all .22s; display:flex;
+  align-items:center; justify-content:center;
+}
+.qz-scale-btn:hover { border-color:#c7d2fc; color:#4361ee; background:#f0f3ff; }
+.qz-scale-btn.selected {
+  background:linear-gradient(135deg,#4361ee,#7c3aed);
+  border-color:#4361ee; color:#fff;
+  box-shadow:0 4px 14px rgba(67,97,238,.3);
+}
 
-                        <hr class="my-4">
+/* ── Number input (exercise) ── */
+.qz-number-wrap { display:flex; align-items:center; gap:12px; }
+.qz-number {
+  width:110px; padding:13px 16px; border-radius:13px;
+  border:1.5px solid #e5e7eb; background:#fafbff;
+  font-size:1.1rem; font-weight:700; color:#111827;
+  font-family:'Poppins',sans-serif; text-align:center;
+  transition:all .22s; outline:none;
+}
+.qz-number:focus { border-color:#4361ee; box-shadow:0 0 0 3px rgba(67,97,238,.1); background:#fff; }
+.qz-num-unit { font-size:.88rem; font-weight:600; color:#9ca3af; }
 
-                        <h5 class="fw-bold text-warning mb-3"><i class="bi bi-puzzle"></i> Analytical Thinking Details</h5>
-                        <div class="row g-3 mb-4">
-                            <div class="col-md-6">
-                                <label for="{{ form.solves_puzzles.id_for_label }}" class="form-label fw-semibold">
-                                    Solves Puzzles
-                                </label>
-                                {{ form.solves_puzzles }}
-                            </div>
-                            <div class="col-md-6">
-                                <label for="{{ form.logical_score.id_for_label }}" class="form-label fw-semibold">
-                                    Logical Reasoning Score <small class="text-muted">(1-10)</small>
-                                </label>
-                                {{ form.logical_score }}
-                            </div>
-                            <div class="col-md-6">
-                                <label for="{{ form.plays_board_games.id_for_label }}" class="form-label fw-semibold">
-                                    Plays Board Games (e.g., Chess)
-                                </label>
-                                {{ form.plays_board_games }}
-                            </div>
-                        </div>
+/* ── Nav footer ── */
+.qz-nav {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:20px 32px 28px;
+  border-top:1px solid #f0f2f8;
+}
+.qz-btn-back {
+  display:inline-flex; align-items:center; gap:7px;
+  font-size:.88rem; font-weight:700; color:#6b7280;
+  background:none; border:none; cursor:pointer;
+  padding:10px 6px; border-radius:10px;
+  transition:color .2s;
+}
+.qz-btn-back:hover { color:#1a1a2e; }
+.qz-btn-back[disabled] { opacity:0; pointer-events:none; }
+.qz-btn-next {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:13px 32px; border-radius:13px; border:none;
+  background:linear-gradient(135deg,#4361ee,#7c3aed);
+  color:#fff; font-family:'Poppins',sans-serif;
+  font-size:.93rem; font-weight:700; cursor:pointer;
+  box-shadow:0 6px 24px rgba(67,97,238,.3);
+  transition:all .25s cubic-bezier(.16,1,.3,1);
+}
+.qz-btn-next:hover { transform:translateY(-2px); box-shadow:0 10px 32px rgba(67,97,238,.4); }
+.qz-btn-next[disabled] { opacity:.45; cursor:not-allowed; transform:none; }
 
-                        <hr class="my-4">
+/* Review step */
+.qz-review-grid {
+  display:grid; grid-template-columns:1fr 1fr; gap:10px;
+}
+.qz-review-item {
+  background:#fafbff; border-radius:12px; padding:12px 14px;
+  border:1px solid #e9ecf5;
+}
+.qz-review-key { font-size:.68rem; font-weight:700; color:#9ca3af; text-transform:uppercase; letter-spacing:.8px; margin-bottom:3px; }
+.qz-review-val { font-size:.88rem; font-weight:700; color:#1a1a2e; }
 
-                        <h5 class="fw-bold text-secondary mb-3"><i class="bi bi-heart-pulse"></i> Health Details</h5>
-                        <div class="row g-3 mb-4">
-                            <div class="col-md-6">
-                                <label for="{{ form.daily_exercise.id_for_label }}" class="form-label fw-semibold">
-                                    Daily Exercise <small class="text-muted">(minutes)</small>
-                                </label>
-                                {{ form.daily_exercise }}
-                            </div>
-                            <div class="col-md-6">
-                                <label for="{{ form.dietary_habits.id_for_label }}" class="form-label fw-semibold">
-                                    Dietary Habits
-                                </label>
-                                {{ form.dietary_habits }}
-                            </div>
-                            <div class="col-md-6">
-                                <label for="{{ form.health_awareness.id_for_label }}" class="form-label fw-semibold">
-                                    Health Awareness
-                                </label>
-                                {{ form.health_awareness }}
-                            </div>
-                        </div>
+@media(max-width:500px){
+  .qz-body, .qz-nav, .qz-header { padding-left:20px; padding-right:20px; }
+  .qz-steps-row span { height:3px; }
+  .qz-review-grid { grid-template-columns:1fr; }
+}
+</style>
 
-                        <div class="text-center mt-4">
-                            <button type="submit" class="btn btn-primary btn-lg px-5 py-3 fw-bold shadow">
-                                <i class="bi bi-magic"></i> Predict Hobby
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+<div class="qz-page">
+
+<form method="POST" id="qzForm">
+{% csrf_token %}
+
+<!-- All real inputs hidden — JS fills them -->
+<div class="qz-real">
+  {{ form.age }}
+  {{ form.fav_sub }}
+  {{ form.olympiad_participation }}
+  {{ form.scholarship }}
+  {{ form.projects }}
+  {{ form.grasp_pow }}
+  {{ form.time_sprt }}
+  {{ form.medals }}
+  {{ form.career_sprt }}
+  {{ form.act_sprt }}
+  {{ form.fant_arts }}
+  {{ form.won_arts }}
+  {{ form.time_art }}
+  {{ form.solves_puzzles }}
+  {{ form.plays_board_games }}
+  {{ form.logical_score }}
+  {{ form.daily_exercise }}
+  {{ form.dietary_habits }}
+  {{ form.health_awareness }}
 </div>
+
+<div class="qz-card">
+
+  <!-- ════ STEP 1: Age ════ -->
+  <div class="qz-step" data-step="1">
+    <div class="qz-header">
+      <div class="qz-steps-row" id="progressBar"></div>
+      <div class="qz-step-label">
+        <div class="qz-step-ico"><i class="bi bi-person"></i></div>
+        Child Information
+        <span class="qz-step-counter">Step 1 of 7</span>
+      </div>
+    </div>
+    <div class="qz-body">
+      <div class="qz-question">How old is your child?</div>
+      <p class="qz-hint">Our model is trained for ages 5–17 years.</p>
+      <div class="qz-scale" id="ageScale">
+        <div class="qz-scale-btn" data-field="age" data-val="5">5</div>
+        <div class="qz-scale-btn" data-field="age" data-val="6">6</div>
+        <div class="qz-scale-btn" data-field="age" data-val="7">7</div>
+        <div class="qz-scale-btn" data-field="age" data-val="8">8</div>
+        <div class="qz-scale-btn" data-field="age" data-val="9">9</div>
+        <div class="qz-scale-btn" data-field="age" data-val="10">10</div>
+        <div class="qz-scale-btn" data-field="age" data-val="11">11</div>
+        <div class="qz-scale-btn" data-field="age" data-val="12">12</div>
+        <div class="qz-scale-btn" data-field="age" data-val="13">13</div>
+        <div class="qz-scale-btn" data-field="age" data-val="14">14</div>
+        <div class="qz-scale-btn" data-field="age" data-val="15">15</div>
+        <div class="qz-scale-btn" data-field="age" data-val="16">16</div>
+        <div class="qz-scale-btn" data-field="age" data-val="17">17</div>
+      </div>
+    </div>
+    <div class="qz-nav">
+      <button type="button" class="qz-btn-back" disabled><i class="bi bi-arrow-left"></i> Back</button>
+      <button type="button" class="qz-btn-next" id="next1" disabled>Next <i class="bi bi-arrow-right"></i></button>
+    </div>
+  </div>
+
+  <!-- ════ STEP 2: Academics ════ -->
+  <div class="qz-step" data-step="2" style="display:none;">
+    <div class="qz-header">
+      <div class="qz-steps-row" id="progressBar2"></div>
+      <div class="qz-step-label">
+        <div class="qz-step-ico"><i class="bi bi-book"></i></div>
+        Academic Profile
+        <span class="qz-step-counter">Step 2 of 7</span>
+      </div>
+    </div>
+    <div class="qz-body">
+
+      <div class="qz-question">What is your child's favourite subject?</div>
+      <div class="qz-options">
+        {% for val, label in form.fav_sub.field.choices %}
+        <div class="qz-opt" data-field="fav_sub" data-val="{{ val }}">
+          <div class="qz-bubble"></div>
+          <span class="qz-opt-text">{{ label }}</span>
+        </div>
+        {% endfor %}
+      </div>
+      <br>
+
+      <div class="qz-question" style="margin-top:8px;">How quickly does your child grasp new concepts?</div>
+      <p class="qz-hint">1 = Needs a lot of help, 6 = Picks up instantly</p>
+      <div class="qz-scale">
+        <div class="qz-scale-btn" data-field="grasp_pow" data-val="1">1</div>
+        <div class="qz-scale-btn" data-field="grasp_pow" data-val="2">2</div>
+        <div class="qz-scale-btn" data-field="grasp_pow" data-val="3">3</div>
+        <div class="qz-scale-btn" data-field="grasp_pow" data-val="4">4</div>
+        <div class="qz-scale-btn" data-field="grasp_pow" data-val="5">5</div>
+        <div class="qz-scale-btn" data-field="grasp_pow" data-val="6">6</div>
+      </div>
+      <br>
+
+      <div class="qz-question" style="margin-top:8px;">Tell us more about your child's academic activities:</div>
+      <div class="qz-options">
+        <label class="qz-opt" style="cursor:pointer;">
+          <input type="checkbox" id="chk_olympiad" style="accent-color:#4361ee;width:18px;height:18px;flex-shrink:0;">
+          <span class="qz-opt-text">Has participated in Olympiad competitions</span>
+        </label>
+        <label class="qz-opt" style="cursor:pointer;">
+          <input type="checkbox" id="chk_scholarship" style="accent-color:#4361ee;width:18px;height:18px;flex-shrink:0;">
+          <span class="qz-opt-text">Holds or has applied for a scholarship</span>
+        </label>
+        <label class="qz-opt" style="cursor:pointer;">
+          <input type="checkbox" id="chk_projects" style="accent-color:#4361ee;width:18px;height:18px;flex-shrink:0;">
+          <span class="qz-opt-text">Regularly works on school or personal projects</span>
+        </label>
+      </div>
+    </div>
+    <div class="qz-nav">
+      <button type="button" class="qz-btn-back" onclick="goStep(1)"><i class="bi bi-arrow-left"></i> Back</button>
+      <button type="button" class="qz-btn-next" onclick="goStep(3)">Next <i class="bi bi-arrow-right"></i></button>
+    </div>
+  </div>
+
+  <!-- ════ STEP 3: Sports ════ -->
+  <div class="qz-step" data-step="3" style="display:none;">
+    <div class="qz-header">
+      <div class="qz-steps-row"></div>
+      <div class="qz-step-label">
+        <div class="qz-step-ico"><i class="bi bi-trophy"></i></div>
+        Sports & Physical Activity
+        <span class="qz-step-counter">Step 3 of 7</span>
+      </div>
+    </div>
+    <div class="qz-body">
+
+      <div class="qz-question">How many hours per day does your child spend on sports?</div>
+      <p class="qz-hint">1 = Less than 1 hour, 6 = More than 5 hours</p>
+      <div class="qz-scale">
+        <div class="qz-scale-btn" data-field="time_sprt" data-val="1">1h</div>
+        <div class="qz-scale-btn" data-field="time_sprt" data-val="2">2h</div>
+        <div class="qz-scale-btn" data-field="time_sprt" data-val="3">3h</div>
+        <div class="qz-scale-btn" data-field="time_sprt" data-val="4">4h</div>
+        <div class="qz-scale-btn" data-field="time_sprt" data-val="5">5h</div>
+        <div class="qz-scale-btn" data-field="time_sprt" data-val="6">6h</div>
+      </div>
+      <br>
+
+      <div class="qz-question" style="margin-top:8px;">Tell us about sports involvement:</div>
+      <div class="qz-options">
+        <label class="qz-opt" style="cursor:pointer;">
+          <input type="checkbox" id="chk_medals" style="accent-color:#4361ee;width:18px;height:18px;flex-shrink:0;">
+          <span class="qz-opt-text">Has won medals or trophies in sports</span>
+        </label>
+        <label class="qz-opt" style="cursor:pointer;">
+          <input type="checkbox" id="chk_career_sprt" style="accent-color:#4361ee;width:18px;height:18px;flex-shrink:0;">
+          <span class="qz-opt-text">Interested in pursuing a career in sports</span>
+        </label>
+        <label class="qz-opt" style="cursor:pointer;">
+          <input type="checkbox" id="chk_act_sprt" style="accent-color:#4361ee;width:18px;height:18px;flex-shrink:0;">
+          <span class="qz-opt-text">Actively plays in a team or sports club</span>
+        </label>
+      </div>
+    </div>
+    <div class="qz-nav">
+      <button type="button" class="qz-btn-back" onclick="goStep(2)"><i class="bi bi-arrow-left"></i> Back</button>
+      <button type="button" class="qz-btn-next" onclick="goStep(4)">Next <i class="bi bi-arrow-right"></i></button>
+    </div>
+  </div>
+
+  <!-- ════ STEP 4: Arts ════ -->
+  <div class="qz-step" data-step="4" style="display:none;">
+    <div class="qz-header">
+      <div class="qz-steps-row"></div>
+      <div class="qz-step-label">
+        <div class="qz-step-ico"><i class="bi bi-palette"></i></div>
+        Arts & Creativity
+        <span class="qz-step-counter">Step 4 of 7</span>
+      </div>
+    </div>
+    <div class="qz-body">
+
+      <div class="qz-question">How many hours per day does your child spend on arts or creative activities?</div>
+      <p class="qz-hint">1 = Rarely, 6 = Several hours every day</p>
+      <div class="qz-scale">
+        <div class="qz-scale-btn" data-field="time_art" data-val="1">1h</div>
+        <div class="qz-scale-btn" data-field="time_art" data-val="2">2h</div>
+        <div class="qz-scale-btn" data-field="time_art" data-val="3">3h</div>
+        <div class="qz-scale-btn" data-field="time_art" data-val="4">4h</div>
+        <div class="qz-scale-btn" data-field="time_art" data-val="5">5h</div>
+        <div class="qz-scale-btn" data-field="time_art" data-val="6">6h</div>
+      </div>
+      <br>
+
+      <div class="qz-question" style="margin-top:8px;">Tell us about arts involvement:</div>
+      <div class="qz-options">
+        <label class="qz-opt" style="cursor:pointer;">
+          <input type="checkbox" id="chk_fant_arts" style="accent-color:#f72585;width:18px;height:18px;flex-shrink:0;">
+          <span class="qz-opt-text">Has a strong fascination for arts (drawing, painting, music, etc.)</span>
+        </label>
+        <label class="qz-opt" style="cursor:pointer;">
+          <input type="checkbox" id="chk_won_arts" style="accent-color:#f72585;width:18px;height:18px;flex-shrink:0;">
+          <span class="qz-opt-text">Has won prizes or recognition in arts competitions</span>
+        </label>
+      </div>
+    </div>
+    <div class="qz-nav">
+      <button type="button" class="qz-btn-back" onclick="goStep(3)"><i class="bi bi-arrow-left"></i> Back</button>
+      <button type="button" class="qz-btn-next" onclick="goStep(5)">Next <i class="bi bi-arrow-right"></i></button>
+    </div>
+  </div>
+
+  <!-- ════ STEP 5: Analytical ════ -->
+  <div class="qz-step" data-step="5" style="display:none;">
+    <div class="qz-header">
+      <div class="qz-steps-row"></div>
+      <div class="qz-step-label">
+        <div class="qz-step-ico"><i class="bi bi-cpu"></i></div>
+        Analytical & Logic Skills
+        <span class="qz-step-counter">Step 5 of 7</span>
+      </div>
+    </div>
+    <div class="qz-body">
+
+      <div class="qz-question">Rate your child's logical reasoning ability:</div>
+      <p class="qz-hint">1 = Struggles with logic, 10 = Solves complex problems easily</p>
+      <div class="qz-scale">
+        <div class="qz-scale-btn" data-field="logical_score" data-val="1">1</div>
+        <div class="qz-scale-btn" data-field="logical_score" data-val="2">2</div>
+        <div class="qz-scale-btn" data-field="logical_score" data-val="3">3</div>
+        <div class="qz-scale-btn" data-field="logical_score" data-val="4">4</div>
+        <div class="qz-scale-btn" data-field="logical_score" data-val="5">5</div>
+        <div class="qz-scale-btn" data-field="logical_score" data-val="6">6</div>
+        <div class="qz-scale-btn" data-field="logical_score" data-val="7">7</div>
+        <div class="qz-scale-btn" data-field="logical_score" data-val="8">8</div>
+        <div class="qz-scale-btn" data-field="logical_score" data-val="9">9</div>
+        <div class="qz-scale-btn" data-field="logical_score" data-val="10">10</div>
+      </div>
+      <br>
+
+      <div class="qz-question" style="margin-top:8px;">Analytical activities your child enjoys:</div>
+      <div class="qz-options">
+        <label class="qz-opt" style="cursor:pointer;">
+          <input type="checkbox" id="chk_solves_puzzles" style="accent-color:#ffd166;width:18px;height:18px;flex-shrink:0;">
+          <span class="qz-opt-text">Loves solving puzzles, riddles, or brain teasers</span>
+        </label>
+        <label class="qz-opt" style="cursor:pointer;">
+          <input type="checkbox" id="chk_board_games" style="accent-color:#ffd166;width:18px;height:18px;flex-shrink:0;">
+          <span class="qz-opt-text">Plays chess, strategy board games, or coding</span>
+        </label>
+      </div>
+    </div>
+    <div class="qz-nav">
+      <button type="button" class="qz-btn-back" onclick="goStep(4)"><i class="bi bi-arrow-left"></i> Back</button>
+      <button type="button" class="qz-btn-next" onclick="goStep(6)">Next <i class="bi bi-arrow-right"></i></button>
+    </div>
+  </div>
+
+  <!-- ════ STEP 6: Health ════ -->
+  <div class="qz-step" data-step="6" style="display:none;">
+    <div class="qz-header">
+      <div class="qz-steps-row"></div>
+      <div class="qz-step-label">
+        <div class="qz-step-ico"><i class="bi bi-heart-pulse"></i></div>
+        Health & Fitness
+        <span class="qz-step-counter">Step 6 of 7</span>
+      </div>
+    </div>
+    <div class="qz-body">
+
+      <div class="qz-question">How many minutes per day does your child exercise?</div>
+      <p class="qz-hint">Include any physical activity — walking, PE, sports, yoga, etc.</p>
+      <div class="qz-number-wrap">
+        <input type="number" class="qz-number" id="exerciseInput" min="0" max="480" placeholder="30">
+        <span class="qz-num-unit">minutes / day</span>
+      </div>
+      <br>
+
+      <div class="qz-question" style="margin-top:16px;">What best describes your child's dietary habits?</div>
+      <div class="qz-options">
+        <div class="qz-opt" data-field="dietary_habits" data-val="Healthy">
+          <div class="qz-bubble"></div>
+          <span class="qz-opt-text">🥗 Healthy — mostly fruits, vegetables, balanced meals</span>
+        </div>
+        <div class="qz-opt" data-field="dietary_habits" data-val="Average">
+          <div class="qz-bubble"></div>
+          <span class="qz-opt-text">🍱 Average — a mix of healthy and processed foods</span>
+        </div>
+        <div class="qz-opt" data-field="dietary_habits" data-val="Junk">
+          <div class="qz-bubble"></div>
+          <span class="qz-opt-text">🍟 Junk — mostly fast food, snacks, sugary drinks</span>
+        </div>
+      </div>
+      <br>
+
+      <div class="qz-question" style="margin-top:4px;">Is your child aware of health and fitness topics?</div>
+      <div class="qz-options">
+        <label class="qz-opt" style="cursor:pointer;">
+          <input type="checkbox" id="chk_health" style="accent-color:#4cc9f0;width:18px;height:18px;flex-shrink:0;">
+          <span class="qz-opt-text">Yes — actively follows health tips, tracks wellness, etc.</span>
+        </label>
+      </div>
+    </div>
+    <div class="qz-nav">
+      <button type="button" class="qz-btn-back" onclick="goStep(5)"><i class="bi bi-arrow-left"></i> Back</button>
+      <button type="button" class="qz-btn-next" onclick="goStep(7)">Review <i class="bi bi-arrow-right"></i></button>
+    </div>
+  </div>
+
+  <!-- ════ STEP 7: Review & Submit ════ -->
+  <div class="qz-step" data-step="7" style="display:none;">
+    <div class="qz-header">
+      <div class="qz-steps-row"></div>
+      <div class="qz-step-label">
+        <div class="qz-step-ico"><i class="bi bi-check2-all"></i></div>
+        Review & Predict
+        <span class="qz-step-counter">Step 7 of 7</span>
+      </div>
+    </div>
+    <div class="qz-body">
+      <div class="qz-question">Almost done! Here's a summary of your answers:</div>
+      <div class="qz-review-grid" id="reviewGrid"></div>
+    </div>
+    <div class="qz-nav">
+      <button type="button" class="qz-btn-back" onclick="goStep(6)"><i class="bi bi-arrow-left"></i> Back</button>
+      <button type="submit" class="qz-btn-next" style="background:linear-gradient(135deg,#06d6a0,#4361ee);">
+        <i class="bi bi-magic"></i> Predict Hobby
+      </button>
+    </div>
+  </div>
+
+</div><!-- /qz-card -->
+</form>
+</div><!-- /qz-page -->
+
+<script>
+(function(){
+  // ── State ──
+  const state = {
+    age: null, fav_sub: null, grasp_pow: null,
+    olympiad: false, scholarship: false, projects: false,
+    time_sprt: null, medals: false, career_sprt: false, act_sprt: false,
+    time_art: null, fant_arts: false, won_arts: false,
+    logical_score: null, solves_puzzles: false, board_games: false,
+    daily_exercise: 30, dietary_habits: null, health_awareness: false
+  };
+
+  let currentStep = 1;
+  const TOTAL = 7;
+
+  // ── Progress bar render ──
+  function renderProgress(){
+    document.querySelectorAll('.qz-steps-row').forEach(bar => {
+      bar.innerHTML = '';
+      for(let i=1;i<=TOTAL;i++){
+        const s = document.createElement('span');
+        if(i < currentStep)  s.className = 'done';
+        if(i === currentStep) s.className = 'active';
+        bar.appendChild(s);
+      }
+    });
+  }
+
+  // ── Step navigation ──
+  window.goStep = function(n){
+    syncToForm();
+    document.querySelector(`.qz-step[data-step="${currentStep}"]`).style.display='none';
+    currentStep = n;
+    document.querySelector(`.qz-step[data-step="${n}"]`).style.display='block';
+    renderProgress();
+    if(n === 7) buildReview();
+    window.scrollTo({top:0, behavior:'smooth'});
+  };
+
+  renderProgress();
+
+  // Step 1 Next button — wire click listener (it starts disabled)
+  const next1 = document.getElementById('next1');
+  if(next1) next1.addEventListener('click', function(){ goStep(2); });
+
+  // ── Scale button clicks ──
+  document.querySelectorAll('.qz-scale-btn').forEach(btn => {
+    btn.addEventListener('click', function(){
+      const field = this.dataset.field;
+      const val   = this.dataset.val;
+      document.querySelectorAll(`.qz-scale-btn[data-field="${field}"]`).forEach(b=>b.classList.remove('selected'));
+      this.classList.add('selected');
+      if(field === 'age')          { state.age = val; document.getElementById('id_age').value = val; document.getElementById('next1').disabled = false; }
+      if(field === 'grasp_pow')    { state.grasp_pow = val; }
+      if(field === 'time_sprt')    { state.time_sprt = val; }
+      if(field === 'time_art')     { state.time_art = val; }
+      if(field === 'logical_score'){ state.logical_score = val; }
+    });
+  });
+
+  // ── Radio option clicks ──
+  document.querySelectorAll('.qz-opt[data-field]').forEach(opt => {
+    opt.addEventListener('click', function(){
+      const field = this.dataset.field;
+      const val   = this.dataset.val;
+      document.querySelectorAll(`.qz-opt[data-field="${field}"]`).forEach(o=>o.classList.remove('selected'));
+      this.classList.add('selected');
+      if(field === 'fav_sub')         state.fav_sub = val;
+      if(field === 'dietary_habits')  state.dietary_habits = val;
+    });
+  });
+
+  // ── Checkbox listeners ──
+  const chkMap = {
+    'chk_olympiad'    : 'olympiad',
+    'chk_scholarship' : 'scholarship',
+    'chk_projects'    : 'projects',
+    'chk_medals'      : 'medals',
+    'chk_career_sprt' : 'career_sprt',
+    'chk_act_sprt'    : 'act_sprt',
+    'chk_fant_arts'   : 'fant_arts',
+    'chk_won_arts'    : 'won_arts',
+    'chk_solves_puzzles':'solves_puzzles',
+    'chk_board_games' : 'board_games',
+    'chk_health'      : 'health_awareness',
+  };
+  Object.entries(chkMap).forEach(([id, key]) => {
+    const el = document.getElementById(id);
+    if(el) el.addEventListener('change', () => { state[key] = el.checked; });
+  });
+
+  // Exercise input
+  const exInput = document.getElementById('exerciseInput');
+  if(exInput){
+    exInput.value = state.daily_exercise;
+    exInput.addEventListener('input', () => { state.daily_exercise = parseInt(exInput.value)||0; });
+  }
+
+  // ── Sync state → hidden Django form fields ──
+  function yesno(v){ return v ? 'Yes' : 'No'; }
+  function syncToForm(){
+    setField('id_age',                    state.age||'5');
+    setField('id_fav_sub',               state.fav_sub||'Mathematics');
+    setField('id_grasp_pow',             state.grasp_pow||'3');
+    setField('id_olympiad_participation',yesno(state.olympiad));
+    setField('id_scholarship',           yesno(state.scholarship));
+    setField('id_projects',              yesno(state.projects));
+    setField('id_time_sprt',             state.time_sprt||'1');
+    setField('id_medals',                yesno(state.medals));
+    setField('id_career_sprt',           yesno(state.career_sprt));
+    setField('id_act_sprt',              yesno(state.act_sprt));
+    setField('id_time_art',              state.time_art||'1');
+    setField('id_fant_arts',             yesno(state.fant_arts));
+    setField('id_won_arts',              yesno(state.won_arts));
+    setField('id_logical_score',         state.logical_score||'5');
+    setField('id_solves_puzzles',        yesno(state.solves_puzzles));
+    setField('id_plays_board_games',     yesno(state.board_games));
+    setField('id_daily_exercise',        state.daily_exercise||30);
+    setField('id_dietary_habits',        state.dietary_habits||'Average');
+    setField('id_health_awareness',      yesno(state.health_awareness));
+  }
+  function setField(id, val){
+    const el = document.getElementById(id);
+    if(el){ el.value = val; }
+  }
+
+  // Sync on submit
+  document.getElementById('qzForm').addEventListener('submit', syncToForm);
+
+  // ── Build review grid ──
+  function buildReview(){
+    const grid = document.getElementById('reviewGrid');
+    if(!grid) return;
+    const rows = [
+      ['Age',           state.age || '—'],
+      ['Fav. Subject',  state.fav_sub || '—'],
+      ['Grasping Power',state.grasp_pow ? state.grasp_pow+'/6' : '—'],
+      ['Olympiad',      yesno(state.olympiad)],
+      ['Scholarship',   yesno(state.scholarship)],
+      ['Projects',      yesno(state.projects)],
+      ['Sports (hrs)',  state.time_sprt ? state.time_sprt+'h/day' : '—'],
+      ['Medals',        yesno(state.medals)],
+      ['Sports Career', yesno(state.career_sprt)],
+      ['Active Sports', yesno(state.act_sprt)],
+      ['Arts (hrs)',    state.time_art ? state.time_art+'h/day' : '—'],
+      ['Arts Fan',      yesno(state.fant_arts)],
+      ['Won Arts',      yesno(state.won_arts)],
+      ['Logic Score',   state.logical_score ? state.logical_score+'/10' : '—'],
+      ['Puzzles',       yesno(state.solves_puzzles)],
+      ['Board Games',   yesno(state.board_games)],
+      ['Exercise',      (state.daily_exercise||30)+' mins/day'],
+      ['Diet',          state.dietary_habits || '—'],
+      ['Health Aware',  yesno(state.health_awareness)],
+    ];
+    grid.innerHTML = rows.map(([k,v]) => `
+      <div class="qz-review-item">
+        <div class="qz-review-key">${k}</div>
+        <div class="qz-review-val">${v}</div>
+      </div>`).join('');
+  }
+})();
+</script>
 {% endblock %}
