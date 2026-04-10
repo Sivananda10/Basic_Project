@@ -1,0 +1,195 @@
+/* ── Unified Auth Page ── */
+.ap-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f0f2fb 0%, #e8ecf8 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+/* Main card — two columns */
+.ap-card {
+  display: flex;
+  width: 100%;
+  max-width: 980px;
+  min-height: 600px;
+  background: #fff;
+  border-radius: 28px;
+  overflow: hidden;
+  box-shadow: 0 24px 80px rgba(67,97,238,.14), 0 4px 20px rgba(0,0,0,.06);
+}
+
+/* ── LEFT: Illustration ── */
+.ap-left {
+  flex: 1;
+  background: linear-gradient(145deg, #4361ee 0%, #7c3aed 60%, #f72585 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 32px;
+  position: relative;
+  overflow: hidden;
+  min-height: 520px;
+}
+
+.ap-blob {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(50px);
+}
+.ap-blob-1 {
+  width: 280px; height: 280px;
+  background: rgba(255,255,255,.12);
+  top: -60px; left: -60px;
+}
+.ap-blob-2 {
+  width: 220px; height: 220px;
+  background: rgba(255,255,255,.08);
+  bottom: -40px; right: -40px;
+}
+
+.ap-illus-wrap {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 380px;
+  animation: ap-float 4s ease-in-out infinite;
+  filter: drop-shadow(0 20px 36px rgba(0,0,0,.25));
+}
+.ap-illus-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 20px;
+}
+
+@keyframes ap-float {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-14px); }
+}
+
+/* ── RIGHT: Form panel ── */
+.ap-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 44px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* The sliding panel */
+.ap-form-panel {
+  width: 100%;
+  transition: opacity .32s ease, transform .32s cubic-bezier(.4,0,.2,1);
+  opacity: 1;
+  transform: translateY(0);
+}
+.ap-form-panel.ap-exit-up {
+  opacity: 0;
+  transform: translateY(-28px);
+}
+.ap-form-panel.ap-exit-down {
+  opacity: 0;
+  transform: translateY(28px);
+}
+
+.ap-form-inner { width: 100%; }
+
+/* Head */
+.ap-form-head { text-align: center; margin-bottom: 28px; }
+.ap-head-icon {
+  width: 68px; height: 68px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 14px;
+  font-size: 1.8rem;
+}
+.ap-form-title { font-size: 1.5rem; font-weight: 800; color: #1a1a2e; letter-spacing: -.4px; margin-bottom: 5px; }
+.ap-form-sub   { font-size: .88rem; color: #9ca3af; margin: 0; }
+
+/* Alert */
+.ap-alert {
+  border-radius: 12px; padding: 11px 14px;
+  font-size: .86rem; font-weight: 500; margin-bottom: 18px;
+  display: flex; align-items: center; gap: 8px;
+}
+.ap-alert-err { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+
+/* Fields */
+.ap-field { margin-bottom: 14px; }
+.ap-label {
+  display: block; font-size: .78rem; font-weight: 700;
+  color: #374151; text-transform: uppercase; letter-spacing: .7px; margin-bottom: 6px;
+}
+.ap-label i { color: #4361ee; margin-right: 4px; }
+.ap-input {
+  width: 100%; padding: 12px 14px; border-radius: 11px;
+  border: 1.5px solid #e5e7eb; background: #fafbff;
+  font-family: 'Poppins', sans-serif; font-size: .9rem; color: #1a1a2e;
+  transition: all .22s; outline: none;
+}
+.ap-input:focus {
+  border-color: #4361ee;
+  box-shadow: 0 0 0 4px rgba(67,97,238,.1);
+  background: #fff;
+}
+.ap-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.ap-field-err { font-size: .73rem; color: #b91c1c; margin-top: 4px; }
+
+/* Submit button */
+.ap-btn {
+  width: 100%; padding: 14px;
+  border-radius: 12px; border: none; cursor: pointer;
+  font-family: 'Poppins', sans-serif; font-size: .95rem; font-weight: 700;
+  background: linear-gradient(135deg, #4361ee, #7c3aed); color: #fff;
+  box-shadow: 0 6px 24px rgba(67,97,238,.28);
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: all .3s cubic-bezier(.16,1,.3,1);
+  margin-top: 4px;
+}
+.ap-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 12px 36px rgba(67,97,238,.38); }
+.ap-btn:disabled { opacity: .65; cursor: not-allowed; transform: none; }
+
+/* Register button — pink gradient */
+.ap-btn-pink {
+  background: linear-gradient(135deg, #f72585, #7c3aed);
+  box-shadow: 0 6px 24px rgba(247,37,133,.25);
+}
+.ap-btn-pink:hover:not(:disabled) { box-shadow: 0 12px 36px rgba(247,37,133,.36); }
+
+/* Switch link */
+.ap-switch-text {
+  text-align: center; margin-top: 20px; font-size: .88rem; color: #9ca3af;
+}
+.ap-switch-btn {
+  background: none; border: none; cursor: pointer; padding: 0;
+  color: #4361ee; font-weight: 700; font-size: .88rem;
+  font-family: 'Poppins', sans-serif; text-decoration: none;
+  transition: color .2s;
+}
+.ap-switch-btn:hover { color: #7c3aed; text-decoration: underline; }
+
+/* Spinner */
+.ap-spinner {
+  display: inline-block; width: 16px; height: 16px; border-radius: 50%;
+  border: 2px solid rgba(255,255,255,.35); border-top-color: #fff;
+  animation: ap-spin .6s linear infinite; vertical-align: middle;
+}
+@keyframes ap-spin { to { transform: rotate(360deg); } }
+
+/* ── Responsive ── */
+@media (max-width: 840px) {
+  .ap-card { flex-direction: column; max-width: 500px; }
+  .ap-left  { min-height: 260px; padding: 30px; }
+  .ap-illus-wrap { max-width: 220px; }
+  .ap-right { padding: 32px 28px; }
+}
+@media (max-width: 480px) {
+  .ap-page  { padding: 20px 12px; }
+  .ap-right { padding: 28px 18px; }
+  .ap-row-2 { grid-template-columns: 1fr; }
+  .ap-card  { border-radius: 20px; }
+}

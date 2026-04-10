@@ -1,0 +1,319 @@
+/* ── ResultPage.css ──────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+.rp-root {
+  min-height: 100vh;
+  background: #0a0a1a;
+  display: flex;
+  justify-content: center;
+  padding: 40px 24px 80px;
+  font-family: 'Inter', sans-serif;
+  position: relative;
+}
+
+.rp-confetti {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.rp-container {
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Hero card */
+.rp-hero {
+  border-radius: 24px;
+  border: 1px solid;
+  padding: 48px 36px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  animation: heroFadeIn 0.6s cubic-bezier(.23,1,.32,1) forwards;
+}
+@keyframes heroFadeIn {
+  from { opacity: 0; transform: translateY(30px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+
+.rp-icon-wrap {
+  width: 100px; height: 100px;
+  border-radius: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  animation: iconPop 0.5s 0.3s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes iconPop {
+  from { transform: scale(0); }
+  to   { transform: scale(1); }
+}
+.rp-icon { font-size: 3rem; }
+
+.rp-category-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 5px 16px;
+  border-radius: 99px;
+  margin-bottom: 16px;
+}
+
+/* "Your Main Hobby" label */
+.rp-main-label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #94a3b8;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+/* Health warning banner */
+.rp-health-warning {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  background: rgba(251, 191, 36, 0.08);
+  border: 1px solid rgba(251, 191, 36, 0.35);
+  border-radius: 18px;
+  padding: 20px 22px;
+  animation: heroFadeIn 0.4s both;
+}
+.rp-hw-icon {
+  font-size: 1.6rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.rp-hw-content h4 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fbbf24;
+  margin: 0 0 8px;
+}
+.rp-hw-override {
+  font-size: 0.88rem;
+  color: rgba(255,255,255,0.8);
+  margin: 0 0 8px;
+  line-height: 1.5;
+}
+.rp-hw-content p {
+  font-size: 0.84rem;
+  color: rgba(255,255,255,0.65);
+  margin: 0 0 6px;
+  line-height: 1.6;
+}
+.rp-hw-note {
+  font-size: 0.78rem !important;
+  color: rgba(255,255,255,0.4) !important;
+  font-style: italic;
+}
+
+/* Health flag on secondary card */
+.rp-sec-health-flag {
+  font-size: 0.7rem;
+  color: #fbbf24;
+  font-weight: 600;
+}
+
+.rp-hobby-name {
+  font-size: 2.4rem;
+  font-weight: 900;
+  color: #f0f0ff;
+  margin: 0 0 12px;
+  animation: slideUp 0.5s 0.4s both;
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.rp-desc {
+  color: rgba(255,255,255,0.55);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  max-width: 400px;
+  margin: 0 0 28px;
+}
+
+/* Confidence bar */
+.rp-conf-wrap { width: 100%; }
+.rp-conf-label {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.5);
+}
+.rp-conf-pct { font-weight: 700; }
+.rp-conf-bar-wrap {
+  height: 8px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.rp-conf-bar {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 1s cubic-bezier(.23,1,.32,1);
+  animation: growBar 1s 0.7s cubic-bezier(.23,1,.32,1) both;
+  transform-origin: left;
+}
+@keyframes growBar {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+/* Secondary interests */
+.rp-secondary {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px;
+  padding: 28px;
+  animation: heroFadeIn 0.5s 0.5s both;
+}
+.rp-secondary-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #f0f0ff;
+  margin: 0 0 6px;
+}
+.rp-secondary-subtitle {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.4);
+  margin: 0 0 20px;
+}
+.rp-secondary-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.rp-sec-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  border-radius: 16px;
+  border: 1px solid;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.rp-sec-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+}
+.rp-sec-icon {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+.rp-sec-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+.rp-sec-hobby {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #f0f0ff;
+}
+.rp-sec-cat {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.rp-sec-desc {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.4);
+  line-height: 1.4;
+}
+.rp-sec-prob {
+  font-size: 0.88rem;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+/* Action buttons */
+.rp-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.rp-btn {
+  flex: 1;
+  min-width: 120px;
+  padding: 14px 20px;
+  border-radius: 14px;
+  border: none;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.rp-btn-primary {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(99,102,241,0.4);
+}
+.rp-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(99,102,241,0.5);
+}
+.rp-btn-secondary {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.8);
+}
+.rp-btn-secondary:hover {
+  background: rgba(255,255,255,0.1);
+  transform: translateY(-2px);
+}
+
+/* Tips */
+.rp-tips {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 20px;
+  padding: 24px 28px;
+}
+.rp-tips h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #f0f0ff;
+  margin: 0 0 16px;
+}
+.rp-tips ul {
+  list-style: none;
+  padding: 0; margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.rp-tips li {
+  font-size: 0.88rem;
+  color: rgba(255,255,255,0.55);
+  padding-left: 20px;
+  position: relative;
+  line-height: 1.5;
+}
+.rp-tips li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: #6366f1;
+}

@@ -6,5 +6,7 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('prediction.urls')),
+    # React SPA handles all frontend routes
+    # Django only serves the REST API
+    path('api/', include('prediction.api_urls')),
 ]
