@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import './AuthPage.css';
 
 export default function AuthPage() {
   const location  = useLocation();
   const navigate  = useNavigate();
   const { login, register } = useAuth();
+  const { addToast } = useToast();
 
   // Determine initial mode from URL
   const [mode, setMode]       = useState(location.pathname === '/register' ? 'register' : 'login');
@@ -39,7 +41,8 @@ export default function AuthPage() {
     setLoginError('');
     setLoginLoad(true);
     try {
-      await login(loginForm);
+      const u = await login(loginForm);
+      addToast(`Welcome back, ${u.first_name || u.username}! 👋`, 'success');
       navigate('/');
     } catch (err) {
       setLoginError(err.response?.data?.error || 'Login failed. Please check your credentials.');
@@ -56,7 +59,8 @@ export default function AuthPage() {
     setRegErrors({});
     setRegLoad(true);
     try {
-      await register(regForm);
+      const u = await register(regForm);
+      addToast(`Account created successfully! Welcome, ${u.first_name || u.username} 🎉`, 'success');
       navigate('/');
     } catch (err) {
       const data = err.response?.data || {};

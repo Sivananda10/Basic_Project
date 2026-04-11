@@ -41,8 +41,8 @@ export default function Footer() {
           <div>
             <div className="sb-footer-heading">Platform</div>
             <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'10px'}}>
-              <div className="sb-footer-stat"><div className="sb-footer-stat-val" style={{color:'#7da3ff'}}>92.5%</div><div className="sb-footer-stat-lbl">Accuracy</div></div>
-              <div className="sb-footer-stat"><div className="sb-footer-stat-val" style={{color:'#5ef0c0'}}>2500+</div><div className="sb-footer-stat-lbl">Records</div></div>
+              <div className="sb-footer-stat"><div className="sb-footer-stat-val" style={{color:'#7da3ff'}}>93.5%</div><div className="sb-footer-stat-lbl">Accuracy</div></div>
+              <div className="sb-footer-stat"><div className="sb-footer-stat-val" style={{color:'#5ef0c0'}}>8000+</div><div className="sb-footer-stat-lbl">Records</div></div>
               <div className="sb-footer-stat"><div className="sb-footer-stat-val" style={{color:'#ffa77d'}}>19</div><div className="sb-footer-stat-lbl">Parameters</div></div>
               <div className="sb-footer-stat"><div className="sb-footer-stat-val" style={{color:'#d49fff'}}>5</div><div className="sb-footer-stat-lbl">Categories</div></div>
             </div>

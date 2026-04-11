@@ -8,13 +8,13 @@
 
 Make sure you have the following installed before starting:
 
-| Tool | Minimum Version | Check Command |
-|---|---|---|
-| Python | 3.10+ | `python3 --version` |
-| pip | latest | `pip --version` |
-| Node.js | 18+ | `node --version` |
-| npm | 9+ | `npm --version` |
-| Git | any | `git --version` |
+| Tool    | Minimum Version | Check Command       |
+| ------- | --------------- | ------------------- |
+| Python  | 3.10+           | `python3 --version` |
+| pip     | latest          | `pip --version`     |
+| Node.js | 18+             | `node --version`    |
+| npm     | 9+              | `npm --version`     |
+| Git     | any             | `git --version`     |
 
 > **Windows users:** Use **Git Bash** or **WSL2** for all terminal commands below.
 
@@ -59,6 +59,7 @@ pip install -r requirements.txt
 ```
 
 This installs:
+
 - `django`, `djangorestframework`, `djangorestframework-simplejwt`, `django-cors-headers`
 - `scikit-learn`, `pandas`, `numpy`, `joblib`
 - `matplotlib`, `seaborn`
@@ -84,6 +85,7 @@ python ml_scripts/train_model_v4.py
 ```
 
 After this, the `saved_models/` folder should contain:
+
 ```
 saved_models/
 ├── model_v4.pkl
@@ -119,6 +121,7 @@ python manage.py runserver
 The API server will start at: **http://localhost:8000**
 
 You should see output like:
+
 ```
 System check identified no issues.
 April 11, 2026 - 10:30:00
@@ -159,9 +162,9 @@ You should see the KidHobbyAI homepage. 🎉
 
 ## Quick Summary of Both Servers
 
-| Server | Command | URL |
-|---|---|---|
-| Django Backend | `python manage.py runserver` | http://localhost:8000 |
+| Server         | Command                            | URL                   |
+| -------------- | ---------------------------------- | --------------------- |
+| Django Backend | `python manage.py runserver`       | http://localhost:8000 |
 | React Frontend | `npm run dev` (inside `frontend/`) | http://localhost:5173 |
 
 Both servers must be running at the same time for the app to work.
@@ -193,32 +196,43 @@ Log in with your superuser credentials to directly view and manage `InputData`, 
 ## Common Issues & Fixes
 
 ### ❌ `Error: That port is already in use` (Django)
+
 Another process is using port 8000. Kill it or run on a different port:
+
 ```bash
 python manage.py runserver 8001
 ```
+
 Then update the frontend API URL in `frontend/src/api/axiosInstance.js`:
+
 ```js
-const BASE_URL = 'http://localhost:8001/api';
+const BASE_URL = "http://localhost:8001/api";
 ```
 
 ### ❌ `CORS error` in browser console
+
 Make sure Django is running (`http://localhost:8000`) and that `DEBUG = True` is set in `settings.py` (CORS is open in dev mode).
 
 ### ❌ `ModuleNotFoundError: No module named 'sklearn'`
+
 You forgot to activate the virtual environment. Run:
+
 ```bash
 source venv/bin/activate   # Linux/macOS
 ```
+
 Then try again.
 
 ### ❌ `ML model is not available` error after predicting
+
 The model `.pkl` files are missing. Run all three commands in Step 4 again.
 
 ### ❌ `npm: command not found`
+
 Node.js is not installed. Download it from https://nodejs.org and choose the LTS version.
 
 ### ❌ `mysqlclient` install fails (Windows)
+
 Remove `mysqlclient` from `requirements.txt` — it's only needed for MySQL (production). The project uses SQLite by default.
 
 ---
@@ -296,4 +310,4 @@ kids_hobby_project/
 
 ---
 
-*For the full technical explanation of every file, see `PROJECT_REFERENCE.md`.*
+_For the full technical explanation of every file, see `PROJECT_REFERENCE.md`._

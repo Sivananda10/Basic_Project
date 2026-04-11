@@ -1,12 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 
 export default function Sidebar() {
   const { user, logout } = useAuth();
+  const { addToast } = useToast();
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(() => localStorage.getItem('sb_collapsed') === '1');
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const overlayRef = useRef(null);
 
   const toggleDesktop = () => {
@@ -30,9 +33,19 @@ export default function Sidebar() {
   const closeMobile = () => setMobileOpen(false);
   const openMobile  = () => setMobileOpen(true);
 
-  const handleLogout = async () => {
+  const handleLogoutClick = () => {
+    setShowLogoutModal(true);
+  };
+
+  const handleLogoutConfirm = async () => {
+    setShowLogoutModal(false);
     await logout();
+    addToast('You have been logged out successfully', 'success');
     navigate('/login');
+  };
+
+  const handleLogoutCancel = () => {
+    setShowLogoutModal(false);
   };
 
   const initial = (user?.first_name?.[0] || user?.username?.[0] || 'U').toUpperCase();
@@ -98,7 +111,7 @@ export default function Sidebar() {
             <Link to="/profile" className="sb-avatar" title="My Profile">{initial}</Link>
             <span className="sb-user-name">{displayName}</span>
             <Link to="/profile" className="sb-logout" title="Profile" style={{marginRight:'2px'}}><i className="bi bi-person-circle" /></Link>
-            <button className="sb-logout" title="Logout" onClick={handleLogout} style={{background:'none',border:'none',cursor:'pointer',padding:0}}>
+            <button className="sb-logout" title="Logout" onClick={handleLogoutClick} style={{background:'none',border:'none',cursor:'pointer',padding:0}}>
               <i className="bi bi-box-arrow-right" />
             </button>
           </div>
@@ -115,6 +128,27 @@ export default function Sidebar() {
         </button>
         <Link to="/" className="sb-topbar-brand"><i className="bi bi-stars" /> HobbyPredictor</Link>
       </div>
+
+      {/* ── Logout Confirmation Modal ── */}
+      {showLogoutModal && (
+        <div className="logout-overlay" onClick={handleLogoutCancel}>
+          <div className="logout-modal" onClick={e => e.stopPropagation()}>
+            <div className="logout-modal-icon">
+              <i className="bi bi-box-arrow-right" />
+            </div>
+            <h3>Logout Confirmation</h3>
+            <p>Are you sure you want to log out of your account?</p>
+            <div className="logout-modal-btns">
+              <button className="logout-btn-cancel" onClick={handleLogoutCancel}>
+                Cancel
+              </button>
+              <button className="logout-btn-confirm" onClick={handleLogoutConfirm}>
+                <i className="bi bi-box-arrow-right" /> Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
