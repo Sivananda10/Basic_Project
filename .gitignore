@@ -15,10 +15,6 @@ __pycache__/
 db.sqlite3
 *.log
 
-# ML model files (generated on training laptop)
-saved_models/*.pkl
-saved_models/*.csv
-
 # IDE
 .vscode/
 .idea/

@@ -119,6 +119,17 @@
 .hp-arrow { display:flex;align-items:center;padding-top:80px;flex-shrink:0;opacity:.6; }
 .hp-arrow svg { width:60px;height:24px; }
 
+/* ── Section shared styles ── */
+.hp-tag {
+  display:inline-block;padding:5px 16px;border-radius:99px;font-size:.72rem;
+  font-weight:700;letter-spacing:1.2px;text-transform:uppercase;
+  border:1px solid rgba(67,97,238,.25);background:rgba(67,97,238,.08);color:#7da3ff;
+  margin-bottom:14px;
+}
+.hp-section-title { font-size:clamp(1.6rem,3.5vw,2.2rem);font-weight:800;letter-spacing:-.5px;line-height:1.2;margin-bottom:10px; }
+.hp-section-desc  { font-size:.95rem;color:#6b7280;max-width:560px;margin:0 auto;line-height:1.7; }
+.mb-5 { margin-bottom:3rem; }
+
 /* ── CATEGORIES ── */
 .hp-cats { background:var(--c-dark);padding:100px 0;overflow-x:hidden; }
 

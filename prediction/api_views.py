@@ -269,7 +269,20 @@ def api_history(request):
     )
 
     total       = predictions.count()
+
+    # Map specific hobbies → parent category for the distribution chart
+    from .ml_helpers_v3 import HOBBY_META
+    CATEGORY_MAP = {
+        'Sports': 'Sports', 'Arts': 'Arts', 'Academics': 'Academics',
+        'Analytical': 'Analytical Thinking', 'Health': 'Health & Fitness',
+    }
+    def _get_category(hobby):
+        meta = HOBBY_META.get(hobby, {})
+        raw_cat = meta.get('category', hobby)
+        return CATEGORY_MAP.get(raw_cat, raw_cat)
+
     hobby_counts = Counter(p.predicted_hobby for p in predictions)
+    cat_counts   = Counter(_get_category(p.predicted_hobby) for p in predictions)
     all_categories = ['Sports', 'Arts', 'Academics', 'Analytical Thinking', 'Health & Fitness']
     cat_colors     = ['#4361ee', '#f72585', '#06d6a0', '#ffd166', '#4cc9f0']
 
@@ -294,7 +307,7 @@ def api_history(request):
         'charts': {
             'categories': {
                 'labels': all_categories,
-                'data':   [hobby_counts.get(c, 0) for c in all_categories],
+                'data':   [cat_counts.get(c, 0) for c in all_categories],
                 'colors': cat_colors,
             },
             'confidence': {

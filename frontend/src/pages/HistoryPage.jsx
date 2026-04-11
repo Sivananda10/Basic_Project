@@ -176,7 +176,7 @@ export default function HistoryPage() {
                   <table className="hy-table">
                     <thead>
                       <tr>
-                        <th>#</th><th>Date</th><th>Fav. Subject</th><th>Predicted Hobby</th><th>Confidence</th><th>Feedback</th><th>Action</th>
+                        <th>#</th><th>Date</th><th>Fav. Subject</th><th>Predicted Hobby</th><th>Feedback</th><th>Action</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -193,14 +193,7 @@ export default function HistoryPage() {
                                 {pred.predicted_hobby}
                               </span>
                             </td>
-                            <td>
-                              {pred.confidence_score != null ? (
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                  <div className="hy-conf-wrap"><div className="hy-conf-bar" style={{ width: `${pred.confidence_score}%` }} /></div>
-                                  <span style={{ fontSize: '.8rem', fontWeight: 700, color: '#4361ee' }}>{pred.confidence_score}%</span>
-                                </div>
-                              ) : <span style={{ color: '#d1d5db' }}>—</span>}
-                            </td>
+
                             <td>
                               {pred.has_feedback != null ? (
                                 pred.has_feedback
