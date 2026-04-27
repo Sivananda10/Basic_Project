@@ -17,7 +17,7 @@ const STEP_DEFS = [
         feature: 'age', text: "How old is your child?",
         hint: "Tap your child's age",
         type: 'scale',
-        options: Array.from({ length: 13 }, (_, i) => ({ label: `${i + 5}`, value: i + 5 })),
+        options: Array.from({ length: 8 }, (_, i) => ({ label: `${i + 5}`, value: i + 5 })),
       },
     ],
   },

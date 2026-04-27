@@ -206,7 +206,7 @@ def build_feature_vector(answers, label_encs):
             try:
                 encoded.append(float(raw_val))
             except (ValueError, TypeError):
-                encoded.append(10.0)   # default age
+                encoded.append(8.0)   # default age (midpoint of 5–12)
             continue
 
         le = label_encs.get(col)

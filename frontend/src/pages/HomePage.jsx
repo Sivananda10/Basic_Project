@@ -123,7 +123,7 @@ export default function HomePage() {
 
             <p className="hp-sub">
               Our <strong>Random Forest AI</strong> analyzes your child's interests,
-              skills &amp; activities to predict the ideal hobby for ages 5–17 —
+              skills &amp; activities to predict the ideal hobby for ages 5–12 —
               with <strong>92.5% accuracy</strong>.
             </p>
 

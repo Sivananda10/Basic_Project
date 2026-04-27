@@ -23,7 +23,7 @@ export default function ContactPage() {
     { q: 'Is the service really free?', a: 'Yes, 100%. HobbyPredictor is an academic project and is completely free to use. No credit card required.' },
     { q: "Is my child's data stored?", a: 'Input data is stored only to show your prediction history. It is never shared with third parties.' },
     { q: 'How accurate is the prediction?', a: 'Our Random Forest model achieves 92.5% accuracy on the test set. Confidence scores are shown with each result.' },
-    { q: 'What age range is supported?', a: 'The model is trained on children aged 5 to 17 years and works best within that range.' },
+    { q: 'What age range is supported?', a: 'The model is trained on children aged 5 to 12 years and works best within that range.' },
   ];
 
   return (

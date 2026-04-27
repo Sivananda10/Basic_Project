@@ -6,6 +6,7 @@ KEY ACCURACY IMPROVEMENTS vs earlier version:
   2. Secondary categories only appear 10% of the time (was 25%)
   3. Secondary categories get WEAK signals (Low hours, Low activity)
   4. 8000 rows for better generalisation
+  5. Age range updated to 5–12 (primary/elementary school kids only)
 """
 import os, random, csv
 
@@ -55,7 +56,7 @@ def _weak_level():
 
 
 def gen_row():
-    age = random.randint(5, 17)
+    age = random.randint(5, 12)
     primary = random.choices(
         ['Sports', 'Arts', 'Academics', 'Analytical', 'Health'],
         weights=[30, 20, 20, 15, 15],
