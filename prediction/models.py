@@ -72,28 +72,26 @@ class InputData(models.Model):
 
 
 class Prediction(models.Model):
-    """Stores the ML model's prediction result."""
+    """Stores the ML model's prediction result (v5: includes role, reason, improvement, career)."""
 
-    HOBBY_CHOICES = [
-        ('Academics', 'Academics'),
-        ('Sports', 'Sports'),
-        ('Arts', 'Arts'),
-        ('Analytical Thinking', 'Analytical Thinking'),
-        ('Health & Fitness', 'Health & Fitness'),
-    ]
-
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='predictions')
-    input_data = models.OneToOneField(InputData, on_delete=models.CASCADE, related_name='prediction')
-    predicted_hobby = models.CharField(max_length=20, choices=HOBBY_CHOICES)
+    user             = models.ForeignKey(User, on_delete=models.CASCADE, related_name='predictions')
+    input_data       = models.OneToOneField(InputData, on_delete=models.SET_NULL, null=True, blank=True, related_name='prediction')
+    predicted_hobby  = models.CharField(max_length=100)
     confidence_score = models.FloatField(null=True, blank=True)
-    predicted_at = models.DateTimeField(auto_now_add=True)
+    predicted_at     = models.DateTimeField(auto_now_add=True)
+
+    # v5 enriched fields
+    hobby_role             = models.CharField(max_length=100, blank=True, null=True)
+    recommendation_reason  = models.TextField(blank=True, null=True)
+    improvement_suggestions= models.JSONField(blank=True, null=True)
+    career_paths           = models.JSONField(blank=True, null=True)
 
     class Meta:
         ordering = ['-predicted_at']
         verbose_name = 'Prediction'
 
     def __str__(self):
-        return f"{self.predicted_hobby} for {self.user.username} ({self.confidence_score:.0%})"
+        return f"{self.predicted_hobby} ({self.hobby_role}) for {self.user.username}"
 
 
 class Feedback(models.Model):

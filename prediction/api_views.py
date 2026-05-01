@@ -193,44 +193,40 @@ def api_change_password(request):
 def api_predict(request):
     """
     POST /api/predict/
-    v3: Branching 25-question questionnaire with health-condition filtering.
-    Accepts all v3 feature fields from the React frontend.
+    v5: Full branching questionnaire with roles, reasons, improvement and career paths.
     """
-    from .ml_helpers_v3 import predict_hobby
+    from .ml_helpers_v5 import predict_hobby_v5
 
     data    = request.data
     answers = dict(data)
 
     try:
-        result = predict_hobby(answers)
+        result = predict_hobby_v5(answers)
         if result is None:
             return Response({'error': 'ML model is not available.'},
                             status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
-        # ── Persist to DB (map v3 fields → existing InputData model) ────────
+        # Persist to DB
         try:
-            fav_sub_raw = answers.get('fav_subject', 'Math')
-            fav_sub     = fav_sub_raw if fav_sub_raw not in ('None', None, '') else 'Math'
-
             input_record = InputData.objects.create(
                 user               = request.user,
                 age                = int(answers.get('age', 10)),
-                olympiad_participation = 'Yes' if answers.get('acad_competitions') == 'Yes' else 'No',
+                olympiad_participation = 'Yes' if answers.get('acad_competitions') in ('Yes', 'High', 'Medium') else 'No',
                 scholarship        = 'No',
-                fav_sub            = fav_sub,
+                fav_sub            = answers.get('fav_subject', 'Math') or 'Math',
                 projects           = 'No',
                 grasp_pow          = 5,
-                time_sprt          = 2 if answers.get('sport_hours_per_day') == 'High' else 1,
+                time_sprt          = 2 if answers.get('sport_hours_per_day') in ('High',) else 1,
                 medals             = 'No',
                 career_sprt        = 'No',
-                act_sprt           = 'Yes' if answers.get('sport_activity_level') == 'High' else 'No',
-                fant_arts          = 'Yes' if answers.get('art_creativity') == 'High' else 'No',
-                won_arts           = 'Yes' if answers.get('art_performance') == 'Yes' else 'No',
-                time_art           = 2 if answers.get('art_hours') == 'High' else 1,
-                solves_puzzles     = 'Yes' if answers.get('acad_problem_solving') == 'Yes' else 'No',
-                logical_score      = 7 if answers.get('analy_logic_level') == 'High' else 5,
+                act_sprt           = 'Yes' if answers.get('sport_activity_level') in ('High', 'Yes') else 'No',
+                fant_arts          = 'Yes' if answers.get('art_creativity') in ('High',) else 'No',
+                won_arts           = 'Yes' if answers.get('art_performance') in ('Yes', 'High', 'Medium') else 'No',
+                time_art           = 2 if answers.get('art_hours') in ('High',) else 1,
+                solves_puzzles     = 'Yes' if answers.get('acad_problem_solving') in ('Yes', 'High', 'Medium') else 'No',
+                logical_score      = 7 if answers.get('analy_logic_level') in ('High',) else 5,
                 plays_board_games  = 'Yes' if answers.get('analy_puzzle_type') in ('Puzzles', 'Logical Games') else 'No',
-                daily_exercise     = 60 if answers.get('health_hours') == 'High' else 30,
+                daily_exercise     = 60 if answers.get('health_hours') in ('High',) else 30,
                 dietary_habits     = 'Average',
                 health_awareness   = 'Yes' if answers.get('health_condition', 'None') != 'None' else 'No',
             )
@@ -241,10 +237,14 @@ def api_predict(request):
             input_record = None
 
         prediction_obj = Prediction.objects.create(
-            user             = request.user,
-            input_data       = input_record,
-            predicted_hobby  = result['predicted_hobby'],
-            confidence_score = result['confidence_score'],
+            user                    = request.user,
+            input_data              = input_record,
+            predicted_hobby         = result['predicted_hobby'],
+            confidence_score        = result['confidence_score'],
+            hobby_role              = result.get('hobby_role'),
+            recommendation_reason   = result.get('recommendation_reason'),
+            improvement_suggestions = result.get('improvement_suggestions'),
+            career_paths            = result.get('career_paths'),
         )
 
         result['id']           = prediction_obj.id
@@ -271,10 +271,11 @@ def api_history(request):
     total       = predictions.count()
 
     # Map specific hobbies → parent category for the distribution chart
-    from .ml_helpers_v3 import HOBBY_META
+    from .ml_helpers_v5 import HOBBY_META
     CATEGORY_MAP = {
         'Sports': 'Sports', 'Arts': 'Arts', 'Academics': 'Academics',
-        'Analytical': 'Analytical Thinking', 'Health': 'Health & Fitness',
+        'Analytical': 'Analytical', 'Health': 'Health',
+        'Cooking': 'Cooking', 'Gardening': 'Gardening', 'Digital': 'Digital',
     }
     def _get_category(hobby):
         meta = HOBBY_META.get(hobby, {})
@@ -283,12 +284,10 @@ def api_history(request):
 
     hobby_counts = Counter(p.predicted_hobby for p in predictions)
     cat_counts   = Counter(_get_category(p.predicted_hobby) for p in predictions)
-    all_categories = ['Sports', 'Arts', 'Academics', 'Analytical Thinking', 'Health & Fitness']
-    cat_colors     = ['#4361ee', '#f72585', '#06d6a0', '#ffd166', '#4cc9f0']
+    all_categories = ['Sports', 'Arts', 'Academics', 'Analytical', 'Health', 'Cooking', 'Gardening', 'Digital']
+    cat_colors     = ['#06d6a0', '#f72585', '#4361ee', '#7209b7', '#f97316', '#22c55e', '#14b8a6', '#8b5cf6']
 
     recent      = list(predictions[:10])[::-1]
-    conf_labels = [p.predicted_at.strftime('%b %d') for p in recent]
-    conf_data   = [float(p.confidence_score) if p.confidence_score else 0 for p in recent]
 
     feedback_preds = [p for p in predictions if hasattr(p, 'feedback') and p.feedback]
     accurate       = sum(1 for p in feedback_preds if p.feedback.is_accurate)
@@ -309,10 +308,6 @@ def api_history(request):
                 'labels': all_categories,
                 'data':   [cat_counts.get(c, 0) for c in all_categories],
                 'colors': cat_colors,
-            },
-            'confidence': {
-                'labels': conf_labels,
-                'data':   conf_data,
             },
         },
     })
@@ -370,19 +365,88 @@ def api_contact(request):
 @permission_classes([IsAuthenticated, IsAdminUser])
 def api_admin_dashboard(request):
     """GET /api/admin/dashboard/  →  site-wide stats for admin."""
+    from .ml_helpers_v5 import HOBBY_META
+    from django.db.models import Count, Q
+
     total_users       = User.objects.count()
     total_predictions = Prediction.objects.count()
     total_feedback    = Feedback.objects.count()
 
-    hobby_stats = {}
-    for hobby in ['Academics', 'Sports', 'Arts', 'Analytical Thinking', 'Health & Fitness']:
-        hobby_stats[hobby] = Prediction.objects.filter(predicted_hobby=hobby).count()
+    # v5 category distribution — map each predicted hobby to its parent category
+    CATEGORY_MAP = {
+        'Sports': 'Sports', 'Arts': 'Arts', 'Academics': 'Academics',
+        'Analytical': 'Analytical', 'Health': 'Health',
+        'Cooking': 'Cooking', 'Gardening': 'Gardening', 'Digital': 'Digital',
+    }
+    all_categories = ['Sports', 'Arts', 'Academics', 'Analytical', 'Health', 'Cooking', 'Gardening', 'Digital']
+    cat_colors     = ['#06d6a0', '#f72585', '#4361ee', '#7209b7', '#f97316', '#22c55e', '#14b8a6', '#8b5cf6']
+    cat_icons      = ['🏅', '🎨', '📚', '🧩', '💪', '🍳', '🌱', '🎮']
 
-    accurate         = Feedback.objects.filter(is_accurate=True).count()
+    cat_counts = Counter()
+    for p in Prediction.objects.all():
+        meta = HOBBY_META.get(p.predicted_hobby, {})
+        raw_cat = meta.get('category', p.predicted_hobby)
+        cat_counts[CATEGORY_MAP.get(raw_cat, raw_cat)] += 1
+
+    hobby_stats = []
+    for i, cat in enumerate(all_categories):
+        hobby_stats.append({
+            'name': cat,
+            'count': cat_counts.get(cat, 0),
+            'color': cat_colors[i],
+            'icon': cat_icons[i],
+        })
+
+    accurate          = Feedback.objects.filter(is_accurate=True).count()
+    inaccurate        = total_feedback - accurate
     feedback_accuracy = round((accurate / total_feedback * 100), 1) if total_feedback > 0 else 0
 
-    recent_predictions = Prediction.objects.select_related('user', 'input_data').order_by('-predicted_at')[:10]
+    # Per-user stats
+    users = User.objects.annotate(
+        prediction_count=Count('predictions'),
+        feedback_count=Count('feedbacks'),
+    ).order_by('-date_joined')[:20]
 
+    user_list = [{
+        'id': u.id,
+        'username': u.username,
+        'full_name': f"{u.first_name} {u.last_name}".strip() or u.username,
+        'email': u.email,
+        'is_staff': u.is_staff,
+        'date_joined': u.date_joined,
+        'prediction_count': u.prediction_count,
+        'feedback_count': u.feedback_count,
+    } for u in users]
+
+    # Recent predictions with username
+    recent_predictions = Prediction.objects.select_related('user', 'input_data').order_by('-predicted_at')[:15]
+    pred_list = []
+    for p in recent_predictions:
+        meta = HOBBY_META.get(p.predicted_hobby, {})
+        pred_list.append({
+            'id': p.id,
+            'username': p.user.username,
+            'full_name': f"{p.user.first_name} {p.user.last_name}".strip() or p.user.username,
+            'predicted_hobby': p.predicted_hobby,
+            'hobby_role': p.hobby_role or '—',
+            'category': meta.get('category', p.predicted_hobby),
+            'predicted_at': p.predicted_at,
+            'has_feedback': hasattr(p, 'feedback') and p.feedback is not None,
+        })
+
+    # Recent feedbacks
+    recent_feedbacks = Feedback.objects.select_related('user', 'prediction').order_by('-submitted_at')[:10]
+    fb_list = [{
+        'id': f.id,
+        'username': f.user.username,
+        'full_name': f"{f.user.first_name} {f.user.last_name}".strip() or f.user.username,
+        'hobby': f.prediction.predicted_hobby,
+        'is_accurate': f.is_accurate,
+        'comments': f.comments or '',
+        'submitted_at': f.submitted_at,
+    } for f in recent_feedbacks]
+
+    # ML chart flags
     img_dir = os.path.join(settings.BASE_DIR, 'static', 'images')
     chart_flags = {
         'accuracy_comparison': os.path.exists(os.path.join(img_dir, 'accuracy_comparison.png')),
@@ -397,8 +461,12 @@ def api_admin_dashboard(request):
         'total_users':        total_users,
         'total_predictions':  total_predictions,
         'total_feedback':     total_feedback,
-        'hobby_stats':        hobby_stats,
+        'accurate':           accurate,
+        'inaccurate':         inaccurate,
         'feedback_accuracy':  feedback_accuracy,
+        'hobby_stats':        hobby_stats,
+        'user_list':          user_list,
+        'recent_predictions': pred_list,
+        'recent_feedbacks':   fb_list,
         'charts':             chart_flags,
-        'recent_predictions': PredictionSerializer(recent_predictions, many=True).data,
     })

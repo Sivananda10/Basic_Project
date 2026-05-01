@@ -65,7 +65,7 @@ export default function Sidebar() {
               <div className="sb-brand-icon"><i className="bi bi-stars" /></div>
               <div>
                 <div className="sb-brand-text">HobbyPredictor</div>
-                <div className="sb-brand-sub">Kids · Ages 5–17</div>
+                <div className="sb-brand-sub">Kids · Ages 5–12</div>
               </div>
             </Link>
           )}

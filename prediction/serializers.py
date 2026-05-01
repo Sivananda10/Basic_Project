@@ -77,19 +77,26 @@ class InputDataSerializer(serializers.ModelSerializer):
 # ──────────────────────────────────────────────
 
 class PredictionSerializer(serializers.ModelSerializer):
-    """Serializer for prediction results — includes nested input data."""
+    """Serializer for prediction results — v5 includes role, reason, improvement, career."""
     input_data   = InputDataSerializer(read_only=True)
     has_feedback = serializers.SerializerMethodField()
+    category     = serializers.SerializerMethodField()
 
     class Meta:
         model  = Prediction
         fields = [
-            'id', 'predicted_hobby', 'confidence_score',
+            'id', 'predicted_hobby', 'hobby_role', 'category',
+            'recommendation_reason', 'improvement_suggestions', 'career_paths',
             'predicted_at', 'input_data', 'has_feedback',
         ]
 
     def get_has_feedback(self, obj):
         return hasattr(obj, 'feedback') and obj.feedback is not None
+
+    def get_category(self, obj):
+        from .ml_helpers_v5 import HOBBY_META
+        meta = HOBBY_META.get(obj.predicted_hobby, {})
+        return meta.get('category', obj.predicted_hobby)
 
 
 # ──────────────────────────────────────────────

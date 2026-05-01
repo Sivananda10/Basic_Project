@@ -1,319 +1,427 @@
-/* ── ResultPage.css ──────────────────────────────────────────────────── */
+/* ── ResultPage v5 — Premium Results UI ──────────────────────────────────── */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
 .rp-root {
   min-height: 100vh;
-  background: #0a0a1a;
-  display: flex;
-  justify-content: center;
-  padding: 40px 24px 80px;
+  background: #0a0c18;
+  padding: 2.5rem 1rem 5rem;
+  position: relative;
+  overflow-x: hidden;
   font-family: 'Inter', sans-serif;
-  position: relative;
 }
 
-.rp-confetti {
+/* Ambient gradient backdrop */
+.rp-root::before {
+  content: '';
   position: fixed;
-  inset: 0;
+  top: -20%; right: -15%;
+  width: 700px; height: 700px;
+  background: radial-gradient(circle, rgba(99,102,241,0.08), transparent 70%);
+  border-radius: 50%;
   pointer-events: none;
-  z-index: 0;
+  animation: ambientDrift 25s ease-in-out infinite;
+}
+.rp-root::after {
+  content: '';
+  position: fixed;
+  bottom: -25%; left: -10%;
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(247,37,133,0.06), transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: ambientDrift 30s ease-in-out infinite reverse;
 }
 
+@keyframes ambientDrift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%      { transform: translate(30px, -20px) scale(1.1); }
+}
+
+.rp-confetti { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
 .rp-container {
-  width: 100%;
-  max-width: 600px;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  position: relative;
-  z-index: 1;
+  max-width: 760px; margin: 0 auto; position: relative; z-index: 1;
+  display: flex; flex-direction: column; gap: 1.8rem;
 }
 
-/* Hero card */
-.rp-hero {
-  border-radius: 24px;
-  border: 1px solid;
-  padding: 48px 36px 40px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  animation: heroFadeIn 0.6s cubic-bezier(.23,1,.32,1) forwards;
-}
-@keyframes heroFadeIn {
-  from { opacity: 0; transform: translateY(30px) scale(0.96); }
-  to   { opacity: 1; transform: translateY(0)    scale(1); }
-}
-
-.rp-icon-wrap {
-  width: 100px; height: 100px;
-  border-radius: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 20px;
-  animation: iconPop 0.5s 0.3s cubic-bezier(.34,1.56,.64,1) both;
-}
-@keyframes iconPop {
-  from { transform: scale(0); }
-  to   { transform: scale(1); }
-}
-.rp-icon { font-size: 3rem; }
-
-.rp-category-badge {
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  padding: 5px 16px;
-  border-radius: 99px;
-  margin-bottom: 16px;
-}
-
-/* "Your Main Hobby" label */
-.rp-main-label {
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: #94a3b8;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  margin-bottom: 12px;
-}
-
-/* Health warning banner */
+/* ── Health warning ───────────────────────────────────────────────────── */
 .rp-health-warning {
-  display: flex;
-  gap: 16px;
-  align-items: flex-start;
-  background: rgba(251, 191, 36, 0.08);
-  border: 1px solid rgba(251, 191, 36, 0.35);
-  border-radius: 18px;
-  padding: 20px 22px;
-  animation: heroFadeIn 0.4s both;
+  display: flex; gap: 1rem; padding: 1.4rem 1.6rem;
+  background: rgba(251, 191, 36, 0.06);
+  border: 1px solid rgba(251, 191, 36, 0.18);
+  border-radius: 20px;
+  backdrop-filter: blur(16px);
+  animation: fadeSlideUp 0.5s ease both;
 }
-.rp-hw-icon {
-  font-size: 1.6rem;
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-.rp-hw-content h4 {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #fbbf24;
-  margin: 0 0 8px;
-}
-.rp-hw-override {
-  font-size: 0.88rem;
-  color: rgba(255,255,255,0.8);
-  margin: 0 0 8px;
-  line-height: 1.5;
-}
-.rp-hw-content p {
-  font-size: 0.84rem;
-  color: rgba(255,255,255,0.65);
-  margin: 0 0 6px;
-  line-height: 1.6;
-}
-.rp-hw-note {
-  font-size: 0.78rem !important;
-  color: rgba(255,255,255,0.4) !important;
-  font-style: italic;
+.rp-hw-icon { font-size: 2.2rem; flex-shrink: 0; }
+.rp-hw-content h4 { color: #fbbf24; margin: 0 0 .5rem; font-size: 1rem; font-weight: 700; }
+.rp-hw-content p { color: rgba(255,255,255,0.75); font-size: .9rem; margin: 0 0 .3rem; line-height: 1.6; }
+.rp-hw-note { font-size: .78rem; color: rgba(255,255,255,0.4); font-style: italic; }
+
+/* ── Shared animation ─────────────────────────────────────────────────── */
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-/* Health flag on secondary card */
-.rp-sec-health-flag {
-  font-size: 0.7rem;
-  color: #fbbf24;
+/* ── Hero card ────────────────────────────────────────────────────────── */
+.rp-hero {
+  text-align: center;
+  padding: 3rem 2.5rem 2.5rem;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 28px;
+  backdrop-filter: blur(20px);
+  position: relative;
+  overflow: hidden;
+  animation: fadeSlideUp 0.5s ease both;
+}
+
+/* Decorative glow behind hero */
+.rp-hero::before {
+  content: '';
+  position: absolute;
+  top: -60%; left: 50%; transform: translateX(-50%);
+  width: 400px; height: 300px;
+  background: radial-gradient(ellipse, rgba(99,102,241,0.08), transparent 70%);
+  pointer-events: none;
+}
+
+/* Subtle grid pattern */
+.rp-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 24px 24px;
+  pointer-events: none;
+}
+
+.rp-hero-icon {
+  font-size: 4rem;
+  margin-bottom: .6rem;
+  position: relative;
+  display: inline-block;
+  animation: iconBounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s both;
+}
+
+@keyframes iconBounce {
+  from { opacity: 0; transform: scale(0) rotate(-20deg); }
+  to   { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+.rp-main-label {
+  font-size: .8rem;
+  color: rgba(255,255,255,0.4);
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  margin: 0 0 1rem;
   font-weight: 600;
+  position: relative;
+}
+
+.rp-badges {
+  display: flex; justify-content: center; gap: .6rem; flex-wrap: wrap;
+  margin-bottom: 1rem; position: relative;
+}
+
+.rp-category-badge, .rp-role-badge {
+  padding: .4rem 1.2rem;
+  border-radius: 100px;
+  font-size: .78rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  backdrop-filter: blur(10px);
 }
 
 .rp-hobby-name {
-  font-size: 2.4rem;
+  font-size: 2.6rem;
   font-weight: 900;
-  color: #f0f0ff;
-  margin: 0 0 12px;
-  animation: slideUp 0.5s 0.4s both;
-}
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(16px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-.rp-desc {
-  color: rgba(255,255,255,0.55);
-  font-size: 0.95rem;
-  line-height: 1.6;
-  max-width: 400px;
-  margin: 0 0 28px;
+  color: #fff;
+  margin: .6rem 0;
+  letter-spacing: -1px;
+  background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.65) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  position: relative;
 }
 
-/* Confidence bar */
-.rp-conf-wrap { width: 100%; }
-.rp-conf-label {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 8px;
-  font-size: 0.82rem;
+.rp-desc {
   color: rgba(255,255,255,0.5);
+  font-size: .95rem;
+  max-width: 480px;
+  margin: 0 auto 1.5rem;
+  line-height: 1.6;
+  position: relative;
 }
-.rp-conf-pct { font-weight: 700; }
-.rp-conf-bar-wrap {
-  height: 8px;
-  background: rgba(255,255,255,0.08);
-  border-radius: 99px;
+
+/* Confidence meter */
+.rp-confidence { max-width: 320px; margin: 0 auto; position: relative; }
+
+.rp-conf-bar {
+  height: 6px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 100px;
+  overflow: hidden;
+  position: relative;
+}
+
+.rp-conf-fill {
+  height: 100%;
+  border-radius: 100px;
+  transition: width 1.2s cubic-bezier(0.4,0,0.2,1);
+  position: relative;
+}
+
+/* Shimmer on confidence fill */
+.rp-conf-fill::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  animation: confShimmer 2.5s infinite;
+}
+
+@keyframes confShimmer {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
+.rp-conf-label {
+  font-size: .78rem;
+  color: rgba(255,255,255,0.4);
+  margin-top: .5rem;
+  display: block;
+  text-align: center;
+  font-weight: 500;
+}
+
+/* ── Shared section card ──────────────────────────────────────────────── */
+.rp-section {
+  padding: 2rem 2.2rem;
+  background: rgba(255,255,255,0.025);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 24px;
+  backdrop-filter: blur(16px);
+  position: relative;
   overflow: hidden;
 }
-.rp-conf-bar {
-  height: 100%;
-  border-radius: 99px;
-  transition: width 1s cubic-bezier(.23,1,.32,1);
-  animation: growBar 1s 0.7s cubic-bezier(.23,1,.32,1) both;
-  transform-origin: left;
+
+/* Stagger animation for sections */
+.rp-reason-section  { animation: fadeSlideUp 0.5s ease 0.15s both; }
+.rp-improve-section { animation: fadeSlideUp 0.5s ease 0.3s both; }
+.rp-career-section  { animation: fadeSlideUp 0.5s ease 0.45s both; }
+.rp-secondary       { animation: fadeSlideUp 0.5s ease 0.6s both; }
+
+.rp-section-header {
+  display: flex; align-items: center; gap: .8rem; margin-bottom: 1.2rem;
 }
-@keyframes growBar {
-  from { transform: scaleX(0); }
-  to   { transform: scaleX(1); }
+.rp-section-icon { font-size: 1.6rem; }
+.rp-section-header h3 {
+  color: #fff; font-size: 1.15rem; margin: 0;
+  font-weight: 700; letter-spacing: -0.2px;
 }
 
-/* Secondary interests */
-.rp-secondary {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 20px;
-  padding: 28px;
-  animation: heroFadeIn 0.5s 0.5s both;
-}
-.rp-secondary-title {
-  font-size: 1.05rem;
-  font-weight: 800;
-  color: #f0f0ff;
-  margin: 0 0 6px;
-}
-.rp-secondary-subtitle {
-  font-size: 0.8rem;
-  color: rgba(255,255,255,0.4);
-  margin: 0 0 20px;
-}
-.rp-secondary-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.rp-sec-card {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 16px 18px;
-  border-radius: 16px;
-  border: 1px solid;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-.rp-sec-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
-}
-.rp-sec-icon {
-  width: 44px; height: 44px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.3rem;
-  flex-shrink: 0;
-}
-.rp-sec-info {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  flex: 1;
-}
-.rp-sec-hobby {
-  font-size: 0.92rem;
-  font-weight: 700;
-  color: #f0f0ff;
-}
-.rp-sec-cat {
-  font-size: 0.7rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-.rp-sec-desc {
-  font-size: 0.75rem;
-  color: rgba(255,255,255,0.4);
-  line-height: 1.4;
-}
-.rp-sec-prob {
-  font-size: 0.88rem;
-  font-weight: 800;
-  flex-shrink: 0;
-}
-
-/* Action buttons */
-.rp-actions {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-.rp-btn {
-  flex: 1;
-  min-width: 120px;
-  padding: 14px 20px;
-  border-radius: 14px;
-  border: none;
-  font-family: 'Inter', sans-serif;
-  font-size: 0.88rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.rp-btn-primary {
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
-  color: #fff;
-  box-shadow: 0 8px 24px rgba(99,102,241,0.4);
-}
-.rp-btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 32px rgba(99,102,241,0.5);
-}
-.rp-btn-secondary {
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.1);
-  color: rgba(255,255,255,0.8);
-}
-.rp-btn-secondary:hover {
-  background: rgba(255,255,255,0.1);
-  transform: translateY(-2px);
-}
-
-/* Tips */
-.rp-tips {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 20px;
-  padding: 24px 28px;
-}
-.rp-tips h3 {
+/* ── Reason section ───────────────────────────────────────────────────── */
+.rp-reason-text {
+  color: rgba(255,255,255,0.7);
   font-size: 1rem;
-  font-weight: 700;
-  color: #f0f0ff;
-  margin: 0 0 16px;
+  line-height: 1.8;
+  margin: 0;
+  padding-left: 1rem;
+  border-left: 3px solid rgba(99,102,241,0.3);
 }
-.rp-tips ul {
-  list-style: none;
-  padding: 0; margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+
+/* ── Improvement section ──────────────────────────────────────────────── */
+.rp-improve-list {
+  list-style: none; padding: 0; margin: 0;
+  display: flex; flex-direction: column; gap: .6rem;
 }
-.rp-tips li {
-  font-size: 0.88rem;
-  color: rgba(255,255,255,0.55);
-  padding-left: 20px;
+
+.rp-improve-list li {
+  display: flex; align-items: flex-start; gap: 1rem;
+  padding: 1rem 1.2rem;
+  background: rgba(255,255,255,0.025);
+  border: 1px solid rgba(255,255,255,0.04);
+  border-radius: 16px;
+  color: rgba(255,255,255,0.75);
+  font-size: .9rem;
+  line-height: 1.55;
+  transition: all 0.2s ease;
+}
+
+.rp-improve-list li:hover {
+  background: rgba(255,255,255,0.04);
+  border-color: rgba(255,255,255,0.08);
+  transform: translateX(4px);
+}
+
+.rp-improve-num {
+  flex-shrink: 0;
+  width: 30px; height: 30px;
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .75rem; font-weight: 700; color: #fff;
+  box-shadow: 0 4px 12px rgba(99,102,241,0.2);
+}
+
+/* ── Career section ───────────────────────────────────────────────────── */
+.rp-career-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.rp-career-card {
+  padding: 1.4rem;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 20px;
+  background: rgba(255,255,255,0.02);
+  transition: all .25s cubic-bezier(0.4,0,0.2,1);
   position: relative;
+  overflow: hidden;
+}
+
+/* Hover glow on career cards */
+.rp-career-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: radial-gradient(circle at 50% 0%, rgba(255,255,255,0.03), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.rp-career-card:hover::before { opacity: 1; }
+
+.rp-career-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255,255,255,0.12);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.2);
+}
+
+.rp-career-title {
+  font-size: 1rem; font-weight: 700; margin: 0 0 .7rem;
+  position: relative;
+}
+
+.rp-career-path {
+  display: flex; flex-wrap: wrap; gap: .25rem; align-items: center;
+}
+
+.rp-career-step {
+  color: rgba(255,255,255,0.55);
+  font-size: .8rem;
   line-height: 1.5;
 }
-.rp-tips li::before {
-  content: '→';
+
+.rp-career-arrow {
+  color: rgba(99,102,241,0.5);
+  margin: 0 .3rem;
+  font-weight: 700;
+}
+
+/* ── Secondary hobbies ────────────────────────────────────────────────── */
+.rp-secondary-subtitle {
+  color: rgba(255,255,255,0.35);
+  font-size: .85rem;
+  margin: -0.6rem 0 1.2rem;
+}
+
+.rp-secondary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: .8rem;
+}
+
+.rp-sec-card {
+  display: flex; align-items: center; gap: 1rem;
+  padding: 1.1rem 1.2rem;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 18px;
+  background: rgba(255,255,255,0.02);
+  transition: all .25s ease;
+}
+
+.rp-sec-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255,255,255,0.1);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}
+
+.rp-sec-icon { font-size: 1.8rem; flex-shrink: 0; }
+.rp-sec-info { display: flex; flex-direction: column; gap: .2rem; }
+.rp-sec-hobby { color: #fff; font-weight: 700; font-size: .95rem; letter-spacing: -0.2px; }
+.rp-sec-cat { font-size: .75rem; font-weight: 600; }
+.rp-sec-conf { font-size: .7rem; color: rgba(255,255,255,0.35); }
+.rp-sec-health-flag { font-size: .7rem; color: #fbbf24; }
+
+/* ── Actions ──────────────────────────────────────────────────────────── */
+.rp-actions {
+  display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
+  padding-top: 1rem;
+  animation: fadeSlideUp 0.5s ease 0.75s both;
+}
+
+.rp-btn {
+  padding: .8rem 2rem;
+  border-radius: 16px;
+  border: none;
+  font-weight: 600;
+  font-size: .93rem;
+  cursor: pointer;
+  transition: all .25s cubic-bezier(0.4,0,0.2,1);
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 0.2px;
+  position: relative;
+  overflow: hidden;
+}
+
+.rp-btn-primary {
+  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  color: #fff;
+  box-shadow: 0 6px 24px rgba(99,102,241,0.25);
+}
+
+/* Shine on primary button */
+.rp-btn-primary::before {
+  content: '';
   position: absolute;
-  left: 0;
-  color: #6366f1;
+  top: 0; left: -100%; width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+  animation: btnShine 3.5s infinite;
+}
+
+@keyframes btnShine {
+  0%   { left: -100%; }
+  40%  { left: 120%; }
+  100% { left: 120%; }
+}
+
+.rp-btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 32px rgba(99,102,241,0.35);
+}
+
+.rp-btn-secondary {
+  background: rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.65);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.rp-btn-secondary:hover {
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+/* ── Responsive ───────────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .rp-root { padding: 1.5rem .8rem 3rem; }
+  .rp-hero { padding: 2rem 1.4rem 1.8rem; border-radius: 22px; }
+  .rp-hobby-name { font-size: 1.8rem; }
+  .rp-section { padding: 1.4rem 1.2rem; border-radius: 18px; }
+  .rp-career-grid { grid-template-columns: 1fr; }
+  .rp-secondary-grid { grid-template-columns: 1fr; }
+  .rp-actions { flex-direction: column; }
+  .rp-btn { width: 100%; text-align: center; }
 }
