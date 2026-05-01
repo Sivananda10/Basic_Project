@@ -22,7 +22,7 @@ export default function ResultPage() {
   useEffect(() => {
     if (!prediction) navigate('/predict');
     createConfetti();
-  }, []);
+  }, [navigate, prediction]);
 
   function createConfetti() {
     const canvas = canvasRef.current;

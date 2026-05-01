@@ -12,7 +12,10 @@ export function AuthProvider({ children }) {
     const token = localStorage.getItem('access_token');
     const stored = localStorage.getItem('user');
     if (token && stored) {
-      try { setUser(JSON.parse(stored)); } catch { /* ignore */ }
+      try {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setUser(JSON.parse(stored));
+      } catch { /* ignore */ }
     }
     setLoading(false);
   }, []);
@@ -57,6 +60,7 @@ export function AuthProvider({ children }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
   return useContext(AuthContext);
 }
