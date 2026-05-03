@@ -14,13 +14,20 @@ export const AGREE_SET = new Set(['Strongly Agree', 'Agree']);
 const SPORT_POOL = {
   outdoor: ['Cricket','Football','Basketball','Athletics','Swimming'],
   indoor:  ['Badminton','Table Tennis','Carrom','Chess','Swimming'],
-  both:    ['Cricket','Football','Badminton','Table Tennis','Swimming','Basketball'],
 };
 
 function sportOpts(ans) {
   const io = ans.sport_indoor_outdoor || 'both';
-  return [...(SPORT_POOL[io] || SPORT_POOL.both).map(s => ({ label: s, value: s })), { label: 'Other', value: 'Other' }];
+  let sports;
+  if (io === 'both') {
+    // Combine both pools, deduplicate while preserving order
+    sports = [...new Set([...SPORT_POOL.outdoor, ...SPORT_POOL.indoor])];
+  } else {
+    sports = SPORT_POOL[io] || SPORT_POOL.outdoor;
+  }
+  return [...sports.map(s => ({ label: s, value: s })), { label: 'Other', value: 'Other' }];
 }
+
 
 export const STEP_DEFS = [
   // ── BASICS ────────────────────────────────────────────────────────
@@ -95,42 +102,16 @@ export const STEP_DEFS = [
       type:'likert', options: LIKERT_OPTS },
   ]},
 
-  // ── ACADEMICS ─────────────────────────────────────────────────────
-  { id:'acad_gate', title:'Academics & Learning', color:'#4361ee', questions:[
-    { feature:'likes_academics',
-      text:'"My child enjoys studying, learning new subjects, and solving academic problems."',
-      hint:'Rate how strongly this describes your child',
-      type:'likert', options: LIKERT_OPTS },
-  ]},
-  { id:'acad_subject', section:'academics', title:'Favourite Subject', color:'#4361ee', questions:[
-    { feature:'fav_subject', text:'Which subject does your child enjoy the most?', allowOther:true,
-      options:[{label:'🔢 Mathematics',value:'Math'},{label:'🔬 Science',value:'Science'},{label:'📝 Language / English',value:'Language'},{label:'Other',value:'Other'}] },
-  ]},
-  { id:'acad_ps', section:'academics', title:'Problem Solving', color:'#4361ee', questions:[
-    { feature:'acad_problem_solving',
-      text:'"My child loves solving difficult problems and always asks \'why?\'"',
-      type:'likert', options: LIKERT_OPTS },
-  ]},
-  { id:'acad_study', section:'academics', title:'Study Style', color:'#4361ee', questions:[
-    { feature:'acad_study_type', text:'How does your child study best?',
-      options:[{label:'📖 Alone / independently',value:'Individual'},{label:'👥 In a group',value:'Group'}] },
-  ]},
-  { id:'acad_comp', section:'academics', title:'Competitions', color:'#4361ee', questions:[
-    { feature:'acad_competitions',
-      text:'"My child enjoys academic competitions and olympiads."',
-      type:'likert', options: LIKERT_OPTS },
-  ]},
-
   // ── ANALYTICAL ────────────────────────────────────────────────────
   { id:'analy_gate', title:'Thinking & Puzzles', color:'#7209b7', questions:[
     { feature:'likes_analytical',
-      text:'"My child enjoys puzzles, brain games, coding, or strategic thinking."',
+      text:'"My child enjoys puzzles, brain games, or strategic thinking."',
       hint:'Rate how strongly this describes your child',
       type:'likert', options: LIKERT_OPTS },
   ]},
   { id:'analy_type', section:'analytical', title:'Puzzle Type', color:'#7209b7', questions:[
     { feature:'analy_puzzle_type', text:'What kind of thinking activity does your child enjoy?', allowOther:true,
-      options:[{label:'♟️ Chess / Board games',value:'Puzzles'},{label:'💻 Coding / Programming',value:'Coding'},
+      options:[{label:'♟️ Chess / Board games',value:'Puzzles'},{label:'💻 Technology / Computers',value:'Coding'},
               {label:'🧩 Logical games / Strategy',value:'Logical Games'},{label:'🤖 Robots / Electronics',value:'Robotics'},{label:'Other',value:'Other'}] },
   ]},
   { id:'analy_logic', section:'analytical', title:'Logical Thinking', color:'#7209b7', questions:[
@@ -138,9 +119,9 @@ export const STEP_DEFS = [
       text:'"My child has strong logical reasoning skills and thinks things through carefully."',
       type:'likert', options: LIKERT_OPTS },
   ]},
-  { id:'analy_coding', section:'analytical', title:'Coding Interest', color:'#7209b7', questions:[
+  { id:'analy_tech', section:'analytical', title:'Technology Interest', color:'#7209b7', questions:[
     { feature:'analy_coding_interest',
-      text:'"My child is interested in computers, programming, or technology."',
+      text:'"My child is interested in computers, digital tools, or technology."',
       type:'likert', options: LIKERT_OPTS },
   ]},
   { id:'analy_patience', section:'analytical', title:'Patience & Persistence', color:'#7209b7', questions:[
@@ -253,8 +234,7 @@ export const STEP_DEFS = [
 export const SECTION_STEPS = {
   sports:     ['sports_io','sports_which','sports_hours','sports_team','sports_freq'],
   arts:       ['arts_which','arts_subtype','arts_creativity','arts_perf'],
-  academics:  ['acad_subject','acad_ps','acad_study','acad_comp'],
-  analytical: ['analy_type','analy_logic','analy_coding','analy_patience'],
+  analytical: ['analy_type','analy_logic','analy_tech','analy_patience'],
   cooking:    ['cook_type'],
   gardening:  ['gard_type'],
   prev_hobby: ['prev_hobby_name','prev_hobby_reason'],
@@ -263,7 +243,6 @@ export const SECTION_STEPS = {
 export const SECTION_DEFAULTS = {
   sports:     { sport_indoor_outdoor:'None', which_sport:'None', sport_hours_per_day:'Disagree', sport_team_solo:'None', sport_activity_level:'None', sport_frequency:'None' },
   arts:       { which_art:'None', art_sub_type:'None', art_creativity:'Disagree', art_performance:'Disagree', art_hours:'None', art_learning_style:'None', art_digital_traditional:'None', art_with_whom:'None' },
-  academics:  { fav_subject:'None', acad_problem_solving:'Disagree', acad_curiosity:'None', acad_study_type:'None', acad_competitions:'Disagree', acad_reading_habit:'None' },
   analytical: { analy_puzzle_type:'None', analy_logic_level:'Disagree', analy_challenge:'None', analy_work_style:'None', analy_coding_interest:'Disagree', analy_patience_level:'Disagree' },
   cooking:    { cooking_type:'None' },
   gardening:  { gardening_type:'None', nature_interest:'None' },

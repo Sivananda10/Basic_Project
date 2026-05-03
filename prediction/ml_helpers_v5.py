@@ -43,8 +43,8 @@ HEALTH_RESTRICTIONS = {
     'Autism': {
         'blocked': [],
         'safe_alt': None,
-        'warning': 'Activities with clear structure, predictable rules, and calm environments are recommended. Chess, Coding, Drawing, and Gardening work especially well.',
-        'preferred': ['Chess', 'Coding', 'Drawing', 'Gardening', 'Meditation', 'Robotics'],
+        'warning': 'Activities with clear structure, predictable rules, and calm environments are recommended. Chess, Drawing, and Gardening work especially well.',
+        'preferred': ['Chess', 'Drawing', 'Gardening', 'Meditation', 'Robotics'],
     },
     'Physical Limitation': {
         'blocked': ['Cricket', 'Football', 'Running', 'Athletics', 'Gymnastics'],
@@ -166,10 +166,8 @@ IMPROVEMENT_TIPS = {
 HOBBY_RULES = {
     'Sports':     {'key':'which_sport',               'default':'Cricket'},
     'Arts':       {'key':'which_art',                 'default':'Drawing'},
-    'Academics':  {'key':'fav_subject',               'default':'Math Olympiad',
-                   'map':{'Math':'Math Olympiad','Science':'Science Club','Language':'Creative Writing'}},
-    'Analytical': {'key':'analy_puzzle_type',         'default':'Coding',
-                   'map':{'Coding':'Coding','Puzzles':'Chess','Logical Games':'Robotics','Robotics':'Robotics'}},
+    'Analytical': {'key':'analy_puzzle_type',         'default':'Chess',
+                   'map':{'Coding':'Robotics','Puzzles':'Chess','Logical Games':'Robotics','Robotics':'Robotics'}},
     'Health':     {'key':'health_activity_preference','default':'Yoga'},
     'Cooking':    {'key':'cooking_type',              'default':'Baking'},
     'Gardening':  {'key':'gardening_type',            'default':'Gardening', 'constant':'Gardening'},
@@ -290,10 +288,9 @@ def build_reason(category, hobby, role, answers):
     # Social style
     whom = a.get('activity_with_whom', 'Mixed')
     team = a.get('sport_team_solo', '')
-    study = a.get('acad_study_type', '')
-    if whom == 'Alone' or team == 'Individual' or study == 'Individual':
+    if whom == 'Alone' or team == 'Individual':
         traits.append('works best independently with focused attention')
-    elif whom == 'With Friends' or team == 'Team' or study == 'Group':
+    elif whom == 'With Friends' or team == 'Team':
         traits.append('thrives in social settings and enjoys collaborative activities')
     elif whom == 'With Family':
         traits.append('values family time and prefers bonding through shared activities')
@@ -325,30 +322,19 @@ def build_reason(category, hobby, role, answers):
         if sub and sub != 'None':
             traits.append(f'has a clear preference for {sub.lower()} as their creative outlet')
 
-    elif category == 'Academics':
-        subj = a.get('fav_subject', '')
-        ps = a.get('acad_problem_solving', 'Low')
-        comp = a.get('acad_competitions', 'Low')
-        if ps in ('High', 'Medium', 'Yes'):
-            traits.append('enjoys tackling challenging problems and finding solutions')
-        if comp in ('High', 'Medium', 'Yes'):
-            traits.append('has a competitive spirit that fuels academic achievement')
-        if subj and subj not in ('None', 'Other'):
-            traits.append(f'shows particular strength and interest in {subj}')
-
     elif category == 'Analytical':
         puzzle = a.get('analy_puzzle_type', '')
         logic = a.get('analy_logic_level', 'Medium')
         patience = a.get('analy_patience_level', 'Medium')
-        coding = a.get('analy_coding_interest', 'Low')
+        tech = a.get('analy_coding_interest', 'Low')
         if logic in ('High', 'Medium'):
             traits.append('has strong logical reasoning abilities')
         if patience in ('High', 'Medium'):
             traits.append('shows exceptional patience and persistence with complex challenges')
-        if coding in ('High', 'Medium', 'Yes'):
-            traits.append('is drawn to computers and programming')
+        if tech in ('High', 'Medium', 'Yes'):
+            traits.append('is drawn to computers and digital technology')
         if puzzle and puzzle not in ('None', 'Other'):
-            puzzle_names = {'Coding': 'coding challenges', 'Puzzles': 'chess and board games',
+            puzzle_names = {'Coding': 'technology and digital tools', 'Puzzles': 'chess and board games',
                           'Logical Games': 'strategy and logic games', 'Robotics': 'building and electronics'}
             traits.append(f'particularly enjoys {puzzle_names.get(puzzle, puzzle.lower())}')
 
@@ -448,11 +434,13 @@ def predict_hobby_v5(answers):
     vec   = build_feature_vector(answers, label_encs)
     probs = model.predict_proba(vec)[0]
 
+    # Categories removed from the questionnaire — never surface these
+    REMOVED_CATEGORIES = {'Academics'}
+
     # Explicit preference override
     explicit_map = {
         'Sports':    answers.get('likes_sports','No') == 'Yes',
         'Arts':      answers.get('likes_arts','No')   == 'Yes',
-        'Academics': answers.get('likes_academics','No') == 'Yes',
         'Analytical':answers.get('likes_analytical','No') == 'Yes',
         'Cooking':   answers.get('likes_cooking','No') == 'Yes',
         'Gardening': answers.get('likes_gardening','No') == 'Yes',
@@ -474,7 +462,14 @@ def predict_hobby_v5(answers):
         if answers.get('screen_usage_hours') == 'High' or answers.get('game_design_interest') == 'Yes':
             category = 'Digital'
         else:
-            category = all_classes[int(np.argmax(probs))]
+            # Pick best category that isn't removed
+            for idx in np.argsort(probs)[::-1]:
+                cat = all_classes[idx]
+                if cat not in REMOVED_CATEGORIES:
+                    category = cat
+                    break
+            else:
+                category = all_classes[int(np.argmax(probs))]
 
     cat_idx  = all_classes.index(category) if category in all_classes else 0
     conf     = round(float(probs[cat_idx]) * 100, 1)
@@ -484,10 +479,10 @@ def predict_hobby_v5(answers):
     role  = pick_role(hobby, answers)
     meta  = HOBBY_META.get(hobby, {})
 
-    # Alternatives (top-3 other categories)
+    # Alternatives (top-3 other categories, excluding removed ones)
     sorted_idxs  = np.argsort(probs)[::-1]
     alternatives = []
-    seen_cats    = {category}
+    seen_cats    = {category} | REMOVED_CATEGORIES
     for idx in sorted_idxs:
         if len(alternatives) >= 3: break
         cat = all_classes[idx]

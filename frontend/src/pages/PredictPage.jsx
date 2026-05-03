@@ -8,7 +8,6 @@ import './PredictPage.css';
 const LIKERT_GATES = {
   likes_sports:     'sports',
   likes_arts:       'arts',
-  likes_academics:  'academics',
   likes_analytical: 'analytical',
   likes_cooking:    'cooking',
   likes_gardening:  'gardening',
@@ -118,7 +117,7 @@ export default function PredictPage() {
 
       // Map Likert → Level for intensity features
       const levelFeats = ['sport_hours_per_day','art_creativity','art_performance',
-        'acad_problem_solving','acad_competitions','analy_logic_level',
+        'analy_logic_level',
         'analy_coding_interest','analy_patience_level','health_energy',
         'emotional_engagement','game_design_interest'];
       for (const feat of levelFeats) {
@@ -179,7 +178,7 @@ export default function PredictPage() {
           <h1>Discover Your Child's<br /><span>Perfect Hobby</span></h1>
           <p>
             Answer <strong>adaptive questions</strong> about your child across
-            Sports, Arts, Academics, Analytical Thinking, Cooking, Gardening, Digital & Health.
+            Sports, Arts, Analytical Thinking, Cooking, Gardening, Digital & Health.
           </p>
           <div className="qz-meta">
             <span className="qz-meta-item">~4 min</span>
