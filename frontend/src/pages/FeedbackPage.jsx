@@ -8,16 +8,19 @@ export default function FeedbackPage() {
   const [form, setForm]       = useState({ is_accurate: '', comments: '' });
   const [error, setError]     = useState('');
   const [loading, setLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.is_accurate) { setError('Please select whether the prediction was accurate.'); return; }
     setLoading(true);
+    setError('');
     try {
       await submitFeedback(id, { ...form, is_accurate: form.is_accurate === 'true' });
-      navigate('/history');
+      setSubmitted(true);
+      setTimeout(() => navigate('/history'), 2000);
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to submit feedback.');
+      setError(err.response?.data?.error || 'Failed to submit feedback. This prediction may already have feedback.');
     } finally { setLoading(false); }
   };
 
@@ -65,52 +68,93 @@ export default function FeedbackPage() {
         }
         .fb-submit:hover { transform:translateY(-2px); box-shadow:0 10px 32px rgba(67,97,238,.4); }
         .fb-submit:disabled { opacity:.65; cursor:not-allowed; transform:none; }
-        .fb-error { background:#fee2e2; color:#b91c1c; border-radius:12px; padding:12px 16px; margin-bottom:18px; font-size:.85rem; font-weight:500; }
+        .fb-error { background:#fee2e2; color:#b91c1c; border-radius:12px; padding:12px 16px; margin-bottom:18px; font-size:.85rem; font-weight:500; display:flex; align-items:center; gap:8px; }
         .fb-mb { margin-bottom:16px; }
+        .fb-success { text-align:center; padding:32px 0; }
+        .fb-success-icon { font-size:4rem; display:block; margin-bottom:16px; }
+        .fb-success h3 { font-size:1.3rem; font-weight:800; color:#065f46; margin-bottom:8px; }
+        .fb-success p  { font-size:.88rem; color:#6b7280; }
+        .fb-no-id { text-align:center; padding:40px 20px; }
+        .fb-no-id h3 { font-size:1.2rem; font-weight:700; color:#1a1a2e; margin-bottom:12px; }
+        .fb-no-id p  { color:#6b7280; font-size:.9rem; margin-bottom:24px; }
+        .fb-id-badge { display:inline-block; padding:4px 12px; border-radius:99px; background:rgba(67,97,238,.08);
+          color:#4361ee; font-size:.76rem; font-weight:700; margin-bottom:8px; }
       `}</style>
 
       <div className="fb-page">
         <div style={{ width: '100%' }}>
           <div className="fb-card">
-            <div className="fb-head">
-              <i className="bi bi-chat-dots-fill fb-icon" />
-              <h3>Give Feedback</h3>
-              <p>Help us improve by rating the accuracy of our AI prediction for your child.</p>
-            </div>
 
-            {error && <div className="fb-error"><i className="bi bi-exclamation-circle" style={{marginRight:'6px'}}/>{error}</div>}
-
-            <form onSubmit={handleSubmit}>
-              <label className="fb-label">Was the prediction accurate?</label>
-              <div className="fb-opts">
-                <button type="button"
-                  className={`fb-opt${form.is_accurate === 'true' ? ' selected-yes' : ''}`}
-                  onClick={() => setForm({ ...form, is_accurate: 'true' })}>
-                  <i className="bi bi-hand-thumbs-up" /> Yes, accurate
-                </button>
-                <button type="button"
-                  className={`fb-opt${form.is_accurate === 'false' ? ' selected-no' : ''}`}
-                  onClick={() => setForm({ ...form, is_accurate: 'false' })}>
-                  <i className="bi bi-hand-thumbs-down" /> No, not accurate
-                </button>
+            {/* ── No prediction ID ── */}
+            {!id ? (
+              <div className="fb-no-id">
+                <i className="bi bi-exclamation-circle" style={{fontSize:'3rem',color:'#f72585',display:'block',marginBottom:'16px'}} />
+                <h3>No Prediction Selected</h3>
+                <p>Please go to your history and click <strong>💬 Feedback</strong> on a prediction to rate it.</p>
+                <Link to="/history" className="fb-submit" style={{display:'inline-flex',textDecoration:'none',padding:'12px 28px'}}>
+                  Go to History
+                </Link>
               </div>
 
-              <div className="fb-mb">
-                <label className="fb-label" htmlFor="fb-comments">Comments (optional)</label>
-                <textarea className="fb-textarea" id="fb-comments"
-                  placeholder="Any additional thoughts about the prediction…"
-                  value={form.comments}
-                  onChange={e => setForm({ ...form, comments: e.target.value })}
-                />
+            /* ── Submission success ── */
+            ) : submitted ? (
+              <div className="fb-success">
+                <span className="fb-success-icon">🎉</span>
+                <h3>Thank you for your feedback!</h3>
+                <p>Your response helps improve our predictions.<br/>Redirecting to history…</p>
               </div>
 
-              <div className="fb-actions">
-                <Link to="/history" className="fb-cancel">Cancel</Link>
-                <button type="submit" className="fb-submit" disabled={loading}>
-                  <i className="bi bi-send" style={{marginRight:'6px'}}/>{loading ? 'Submitting…' : 'Submit Feedback'}
-                </button>
-              </div>
-            </form>
+            /* ── Feedback form ── */
+            ) : (
+              <>
+                <div className="fb-head">
+                  <i className="bi bi-chat-dots-fill fb-icon" />
+                  <span className="fb-id-badge">Prediction #{id}</span>
+                  <h3>Give Feedback</h3>
+                  <p>Help us improve by rating the accuracy of our AI prediction for your child.</p>
+                </div>
+
+                {error && (
+                  <div className="fb-error">
+                    <i className="bi bi-exclamation-circle" />
+                    {error}
+                  </div>
+                )}
+
+                <form onSubmit={handleSubmit}>
+                  <label className="fb-label">Was the prediction accurate?</label>
+                  <div className="fb-opts">
+                    <button type="button"
+                      className={`fb-opt${form.is_accurate === 'true' ? ' selected-yes' : ''}`}
+                      onClick={() => setForm({ ...form, is_accurate: 'true' })}>
+                      <i className="bi bi-hand-thumbs-up" /> Yes, accurate
+                    </button>
+                    <button type="button"
+                      className={`fb-opt${form.is_accurate === 'false' ? ' selected-no' : ''}`}
+                      onClick={() => setForm({ ...form, is_accurate: 'false' })}>
+                      <i className="bi bi-hand-thumbs-down" /> No, not accurate
+                    </button>
+                  </div>
+
+                  <div className="fb-mb">
+                    <label className="fb-label" htmlFor="fb-comments">Comments (optional)</label>
+                    <textarea className="fb-textarea" id="fb-comments"
+                      placeholder="Any additional thoughts about the prediction…"
+                      value={form.comments}
+                      onChange={e => setForm({ ...form, comments: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="fb-actions">
+                    <Link to="/history" className="fb-cancel">Cancel</Link>
+                    <button type="submit" className="fb-submit" disabled={loading}>
+                      <i className="bi bi-send" style={{marginRight:'6px'}}/>{loading ? 'Submitting…' : 'Submit Feedback'}
+                    </button>
+                  </div>
+                </form>
+              </>
+            )}
+
           </div>
         </div>
       </div>

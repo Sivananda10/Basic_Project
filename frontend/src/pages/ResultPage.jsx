@@ -184,7 +184,7 @@ export default function ResultPage() {
         <div className="rp-actions">
           <button className="rp-btn rp-btn-primary" onClick={() => navigate('/predict')}>Try Again</button>
           <button className="rp-btn rp-btn-secondary" onClick={() => navigate('/history')}>View History</button>
-          <button className="rp-btn rp-btn-secondary" onClick={() => navigate('/feedback', { state: { predictionId: prediction.id } })}>Give Feedback</button>
+          <button className="rp-btn rp-btn-secondary" onClick={() => navigate(`/feedback/${prediction.id}`)}>Give Feedback</button>
         </div>
       </div>
     </div>

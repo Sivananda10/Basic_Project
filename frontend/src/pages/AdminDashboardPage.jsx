@@ -51,7 +51,6 @@ export default function AdminDashboardPage() {
     { id: 'predictions', label: '🔮 Predictions' },
     { id: 'users',       label: '👥 Users' },
     { id: 'feedback',    label: '💬 Feedback' },
-    { id: 'models',      label: '🤖 ML Models' },
   ];
 
   return (
@@ -316,28 +315,6 @@ export default function AdminDashboardPage() {
           </div>
         )}
 
-        {/* ═══════════ ML MODELS TAB ═══════════ */}
-        {activeTab === 'models' && (
-          <div className="adm-card">
-            <h3 className="adm-card-title">🤖 Model Visualizations</h3>
-            {Object.values(charts).some(Boolean) ? (
-              <div className="adm-ml-grid">
-                {Object.entries(charts).map(([key, exists]) => exists && (
-                  <div key={key} className="adm-ml-card">
-                    <img
-                      src={`http://localhost:8000/static/images/${key}.png`}
-                      alt={CHART_LABELS[key] || key}
-                      onError={e => { e.target.parentElement.style.display = 'none'; }}
-                    />
-                    <div className="adm-ml-label">{CHART_LABELS[key] || key.replace(/_/g, ' ')}</div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="adm-empty-mini"><span>🤖</span><p>No model charts available. Train the model to generate visualizations.</p></div>
-            )}
-          </div>
-        )}
       </div>
     </div>
   );

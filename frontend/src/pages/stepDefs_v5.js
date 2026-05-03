@@ -37,7 +37,7 @@ export const STEP_DEFS = [
   ]},
   { id:'gender', title:'About the Child', color:'#4361ee', questions:[
     { feature:'gender', text:'Is the child a boy or a girl?', hint:'This helps personalise questions slightly',
-      options:[{label:'Boy',value:'Boy'},{label:'Girl',value:'Girl'},{label:'Prefer not to say',value:'Other'}] },
+      options:[{label:'Boy',value:'Boy'},{label:'Girl',value:'Girl'}] },
   ]},
 
   // ── SPORTS ────────────────────────────────────────────────────────

@@ -45,8 +45,8 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model  = User
-        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'is_staff']
-        read_only_fields = ['id', 'username', 'is_staff']
+        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'is_staff', 'date_joined']
+        read_only_fields = ['id', 'username', 'is_staff', 'date_joined']
 
 
 class ChangePasswordSerializer(serializers.Serializer):
@@ -87,7 +87,7 @@ class PredictionSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'predicted_hobby', 'hobby_role', 'category',
             'recommendation_reason', 'improvement_suggestions', 'career_paths',
-            'predicted_at', 'input_data', 'has_feedback',
+            'predicted_at', 'input_data', 'has_feedback', 'input_answers',
         ]
 
     def get_has_feedback(self, obj):

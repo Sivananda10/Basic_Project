@@ -12,14 +12,37 @@ import './HistoryPage.css';
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend);
 
 const CAT_ICONS = {
-  Sports:'🏅', Arts:'🎨', Academics:'📚', Analytical:'🧩',
+  Sports:'🏅', Arts:'🎨', Analytical:'🧩',
   Health:'💪', Cooking:'🍳', Gardening:'🌱', Digital:'🎮',
+};
+
+// Human-readable labels for raw answer keys
+const ANSWER_LABELS = {
+  age: 'Age', gender: 'Gender',
+  likes_sports: 'Likes Sports?', sport_preference: 'Sport Preference',
+  sport_type: 'Sport Type', sport_activity_level: 'Activity Level',
+  sport_hours_per_day: 'Hours/Day (Sports)', sport_choice: 'Preferred Sport',
+  likes_arts: 'Likes Arts?', art_type: 'Art Type',
+  art_creativity: 'Creativity Level', art_hours: 'Hours/Day (Arts)',
+  art_performance: 'Performed in Public?',
+  likes_analytical: 'Likes Analytical/Tech?', analy_type: 'Activity Type',
+  analy_logic_level: 'Logic Level', analy_puzzle_type: 'Puzzle Type',
+  analy_hours: 'Hours/Day (Analytical)',
+  likes_cooking: 'Likes Cooking?', cook_type: 'Cuisine Type',
+  cook_freq: 'Cooking Frequency', cook_helps_at_home: 'Helps at Home?',
+  likes_gardening: 'Likes Gardening?', garden_type: 'Garden Activity',
+  garden_freq: 'Frequency', garden_outdoor: 'Outdoor Activity?',
+  health_condition: 'Health Condition',
+  health_hours: 'Exercise Hours/Day', health_activity: 'Preferred Exercise',
+  tried_hobby_before: 'Tried a Hobby Before?', prev_hobby: 'Previous Hobby',
+  prev_hobby_duration: 'Duration', prev_hobby_outcome: 'Outcome',
 };
 
 export default function HistoryPage() {
   const [data, setData]       = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError]     = useState('');
+  const [expandedRow, setExpandedRow] = useState(null);
 
   useEffect(() => {
     getHistory()
@@ -187,50 +210,79 @@ export default function HistoryPage() {
                       <th>Category</th>
                       <th>Feedback</th>
                       <th>Action</th>
+                      <th>Details</th>
                     </tr>
                   </thead>
                   <tbody>
                     {predictions.map((pred, i) => {
                       const category = pred.category || pred.predicted_hobby || '';
-                      const catIcon = CAT_ICONS[category] || '⭐';
+                      const catIcon  = CAT_ICONS[category] || '⭐';
                       const catColor = catColors[catLabels.indexOf(category)] || '#6366f1';
+                      const isOpen   = expandedRow === pred.id;
+                      const answers  = pred.input_answers || {};
+                      const qaEntries = Object.entries(answers).filter(([k]) => ANSWER_LABELS[k]);
                       return (
-                        <tr key={pred.id}>
-                          <td className="hy-td-num">{i + 1}</td>
-                          <td className="hy-td-date">
-                            {new Date(pred.predicted_at).toLocaleString('en-GB', {
-                              day: '2-digit', month: 'short', year: 'numeric',
-                              hour: '2-digit', minute: '2-digit',
-                            })}
-                          </td>
-                          <td>
-                            <span className="hy-hobby-badge" style={{ background: `${catColor}15`, color: catColor, borderColor: `${catColor}30` }}>
-                              {catIcon} {fmt(pred.predicted_hobby)}
-                            </span>
-                          </td>
-                          <td className="hy-td-role">{pred.hobby_role || '—'}</td>
-                          <td>
-                            <span className="hy-cat-tag" style={{ color: catColor }}>{category}</span>
-                          </td>
-                          <td>
-                            {pred.has_feedback != null ? (
-                              pred.has_feedback
-                                ? (pred.feedback?.is_accurate
-                                  ? <span className="hy-fb hy-fb-ok">✓ Accurate</span>
-                                  : <span className="hy-fb hy-fb-bad">✗ Inaccurate</span>)
-                                : <span className="hy-fb hy-fb-pending">Pending</span>
-                            ) : <span className="hy-fb hy-fb-pending">Pending</span>}
-                          </td>
-                          <td>
-                            {!pred.has_feedback ? (
-                              <Link to={`/feedback/${pred.id}`} className="hy-btn-action">
-                                💬 Feedback
-                              </Link>
-                            ) : (
-                              <span className="hy-done-tag">Done</span>
-                            )}
-                          </td>
-                        </tr>
+                        <>
+                          <tr key={pred.id}>
+                            <td className="hy-td-num">{i + 1}</td>
+                            <td className="hy-td-date">
+                              {new Date(pred.predicted_at).toLocaleString('en-GB', {
+                                day: '2-digit', month: 'short', year: 'numeric',
+                                hour: '2-digit', minute: '2-digit',
+                              })}
+                            </td>
+                            <td>
+                              <span className="hy-hobby-badge" style={{ background: `${catColor}15`, color: catColor, borderColor: `${catColor}30` }}>
+                                {catIcon} {fmt(pred.predicted_hobby)}
+                              </span>
+                            </td>
+                            <td className="hy-td-role">{pred.hobby_role || '—'}</td>
+                            <td>
+                              <span className="hy-cat-tag" style={{ color: catColor }}>{category}</span>
+                            </td>
+                            <td>
+                              {pred.has_feedback
+                                ? <span className="hy-fb hy-fb-ok">✓ Done</span>
+                                : <span className="hy-fb hy-fb-pending">Pending</span>}
+                            </td>
+                            <td>
+                              {!pred.has_feedback ? (
+                                <Link to={`/feedback/${pred.id}`} className="hy-btn-action">💬 Feedback</Link>
+                              ) : (
+                                <span className="hy-done-tag">Done</span>
+                              )}
+                            </td>
+                            <td>
+                              <button
+                                className="hy-btn-details"
+                                onClick={() => setExpandedRow(isOpen ? null : pred.id)}
+                              >
+                                {isOpen ? '▲ Hide' : '📝 Details'}
+                              </button>
+                            </td>
+                          </tr>
+                          {isOpen && (
+                            <tr key={`detail-${pred.id}`} className="hy-detail-row">
+                              <td colSpan={8}>
+                                <div className="hy-qa-panel">
+                                  <div className="hy-qa-title">📝 Questionnaire Answers</div>
+                                  {qaEntries.length > 0 ? (
+                                    <div className="hy-qa-grid">
+                                      {qaEntries.map(([k, v]) => (
+                                        <div key={k} className="hy-qa-item">
+                                          <span className="hy-qa-q">{ANSWER_LABELS[k]}</span>
+                                          <span className="hy-qa-a">{String(v)}</span>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  ) : (
+                                    <p className="hy-qa-empty">No answer data available for this prediction.</p>
+                                  )}
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                        </>
                       );
                     })}
                   </tbody>

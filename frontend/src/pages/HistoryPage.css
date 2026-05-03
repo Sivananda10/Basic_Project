@@ -373,3 +373,71 @@
   .hy-table thead th { padding: 8px 10px; }
   .hy-table tbody td { padding: 10px; }
 }
+
+/* ── Details / Q&A Panel ─────────────────────────────────────── */
+.hy-btn-details {
+  background: rgba(99,102,241,0.1);
+  border: 1px solid rgba(99,102,241,0.25);
+  color: #a5b4fc;
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-size: .78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .2s;
+  white-space: nowrap;
+}
+.hy-btn-details:hover {
+  background: rgba(99,102,241,0.2);
+  color: #c7d2fe;
+  border-color: rgba(99,102,241,0.4);
+}
+.hy-detail-row td {
+  padding: 0 !important;
+  border-bottom: 2px solid rgba(99,102,241,0.2) !important;
+}
+.hy-qa-panel {
+  padding: 20px 28px;
+  background: rgba(99,102,241,0.04);
+  border-top: 1px solid rgba(99,102,241,0.15);
+  animation: hy-fade-in .25s ease;
+}
+@keyframes hy-fade-in { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+.hy-qa-title {
+  font-size: .85rem;
+  font-weight: 700;
+  color: #a5b4fc;
+  margin-bottom: 14px;
+  letter-spacing: .3px;
+}
+.hy-qa-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px;
+}
+.hy-qa-item {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 10px;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.hy-qa-q {
+  font-size: .7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  color: rgba(255,255,255,0.35);
+}
+.hy-qa-a {
+  font-size: .88rem;
+  font-weight: 600;
+  color: #e8ecff;
+}
+.hy-qa-empty {
+  font-size: .82rem;
+  color: rgba(255,255,255,0.3);
+  font-style: italic;
+}

@@ -85,6 +85,8 @@ class Prediction(models.Model):
     recommendation_reason  = models.TextField(blank=True, null=True)
     improvement_suggestions= models.JSONField(blank=True, null=True)
     career_paths           = models.JSONField(blank=True, null=True)
+    input_answers          = models.JSONField(blank=True, null=True,
+                             help_text='Full questionnaire answers stored for history display')
 
     class Meta:
         ordering = ['-predicted_at']

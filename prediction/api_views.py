@@ -245,6 +245,7 @@ def api_predict(request):
             recommendation_reason   = result.get('recommendation_reason'),
             improvement_suggestions = result.get('improvement_suggestions'),
             career_paths            = result.get('career_paths'),
+            input_answers           = answers,
         )
 
         result['id']           = prediction_obj.id
@@ -347,13 +348,14 @@ def api_contact(request):
     """POST /api/contact/  →  log contact form submission (no DB model needed)."""
     name    = request.data.get('name', '').strip()
     email   = request.data.get('email', '').strip()
+    subject = request.data.get('subject', '').strip()
     message = request.data.get('message', '').strip()
 
     if not name or not email or not message:
         return Response({'error': 'All fields are required.'}, status=status.HTTP_400_BAD_REQUEST)
 
     # In production you'd send an email here
-    print(f"📧 Contact form: {name} <{email}> — {message[:80]}")
+    print(f"📧 Contact form: {name} <{email}> [{subject}] — {message[:80]}")
     return Response({'message': 'Thank you for your message! We will get back to you soon.'})
 
 
