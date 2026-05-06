@@ -1,6 +1,12 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:8000/api';
+// ── Dynamic base URL ──────────────────────────────────────────────────────
+// In desktop mode: the React build is served BY Django on port 5000.
+//   window.location.origin = "http://127.0.0.1:5000"  →  API at same origin.
+// In Vite dev mode: Vite runs on 5173 and proxies /api → Django 8000.
+//   window.location.origin = "http://localhost:5173"  →  proxy handles it.
+// So we always use a relative /api path — works in both scenarios.
+const BASE_URL = '/api';
 
 const axiosInstance = axios.create({
   baseURL: BASE_URL,

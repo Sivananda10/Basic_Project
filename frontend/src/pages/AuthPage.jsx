@@ -10,15 +10,28 @@ export default function AuthPage() {
   const { login, register } = useAuth();
   const { addToast } = useToast();
 
-  // Determine initial mode from URL
-  const [mode, setMode]       = useState(location.pathname === '/register' ? 'register' : 'login');
-  const [animating, setAnimating] = useState(false);
-  const [slideDir, setSlideDir]   = useState(''); // 'up' | 'down'
+  // Determine initial mode from URL (use window.location for reliability in PyWebView)
+  const getInitialMode = () =>
+    (window.location.pathname === '/register' || location.pathname === '/register')
+      ? 'register' : 'login';
 
-  // Keep URL in sync with mode
+  const [mode, setMode]           = useState(getInitialMode);
+  const [animating, setAnimating] = useState(false);
+  const [slideDir, setSlideDir]   = useState('');
+
+  // Sync URL bar when mode changes using replaceState (no page reload in PyWebView)
   useEffect(() => {
-    navigate(mode === 'login' ? '/login' : '/register', { replace: true });
-  }, [mode]); // eslint-disable-line
+    const url = mode === 'login' ? '/login' : '/register';
+    try {
+      window.history.replaceState(null, '', url);
+    } catch (e) {}
+  }, [mode]);
+
+  // Also re-sync mode if the URL changes externally (e.g. NavLink click)
+  useEffect(() => {
+    const newMode = location.pathname === '/register' ? 'register' : 'login';
+    if (newMode !== mode) setMode(newMode);
+  }, [location.pathname]); // eslint-disable-line
 
   // Switch mode with animation
   const switchMode = (next) => {

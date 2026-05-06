@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kids Hobby Prediction System — GVP</title>
+  <style>
+    /* ── OFFLINE FONTS (served from Django static) ── */
+    @font-face {
+      font-family: 'Poppins';
+      src: url('/static/fonts/poppins-400.woff2') format('woff2');
+      font-weight: 400; font-style: normal; font-display: swap;
+    }
+    @font-face {
+      font-family: 'Poppins';
+      src: url('/static/fonts/poppins-600.woff2') format('woff2');
+      font-weight: 600; font-style: normal; font-display: swap;
+    }
+    @font-face {
+      font-family: 'Poppins';
+      src: url('/static/fonts/poppins-700.woff2') format('woff2');
+      font-weight: 700; font-style: normal; font-display: swap;
+    }
+    @font-face {
+      font-family: 'Poppins';
+      src: url('/static/fonts/poppins-800.woff2') format('woff2');
+      font-weight: 800; font-style: normal; font-display: swap;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100vw; height: 100vh; overflow: hidden;
+      font-family: 'Poppins', 'Segoe UI', Arial, sans-serif;
+    }
+
+    /* ═══════════════════════════════
+       FULL-SCREEN PPT SLIDE LAYOUT
+       ═══════════════════════════════ */
+    .slide {
+      width: 100vw; height: 100vh;
+      display: flex; flex-direction: column;
+      background: #ffffff; /* White background */
+      color: #000000; /* Black text */
+      position: relative; overflow: hidden;
+    }
+
+    /* Decorative glowing orbs in background - made subtle grey */
+    .slide::before {
+      content: '';
+      position: absolute; top: -120px; left: -120px;
+      width: 400px; height: 400px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,0,0,0.03) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .slide::after {
+      content: '';
+      position: absolute; bottom: -100px; right: -100px;
+      width: 350px; height: 350px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,0,0,0.03) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    /* ── TOP ACCENT BAR ── */
+    .accent-bar {
+      height: 6px; flex-shrink: 0;
+      background: #000000; /* Solid black */
+      position: relative; z-index: 1;
+    }
+
+    /* ── HEADER ROW ── */
+    .header-row {
+      flex: 0 0 auto;
+      display: flex; align-items: center;
+      padding: 22px 56px 18px;
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+      position: relative; z-index: 1;
+      gap: 24px;
+    }
+
+    .logo-wrap {
+      width: 80px; height: 80px; flex-shrink: 0;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 1.5px solid rgba(0,0,0,0.2);
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+      box-shadow: 0 0 15px rgba(0,0,0,0.05);
+    }
+    .logo-wrap img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(100%); }
+    .logo-fallback {
+      font-size: 16px; font-weight: 800; color: #000000; text-align: center;
+    }
+
+    .college-block { flex: 1; text-align: center; }
+
+    .college-name {
+      font-size: 45px; font-weight: 800;
+      color: #000000; line-height: 1.35;
+            text-transform:uppercase;
+
+    }
+    .college-name .highlight { color: #333333; }
+
+    .college-meta {
+      font-size: 18px; font-style: italic;
+      color: #555555; margin-top: 4px; line-height: 1.7;
+      text-transform:uppercase;
+    }
+
+    .dept-pill {
+      display: inline-block; margin-top: 8px;
+      font-size: 16px; font-weight: 600;
+      padding: 4px 18px; border-radius: 99px;
+      background: #f0f0f0;
+      color: #000000;
+      border: 1px solid #cccccc;
+    }
+
+    /* ── TITLE ROW ── */
+    .title-row {
+      flex: 0 0 auto;
+      text-align: center;
+      padding: 20px 56px 16px;
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+      position: relative; z-index: 1;
+    }
+
+    .eyebrow {
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 3px; text-transform: uppercase;
+      color: #666666; margin-bottom: 8px;
+    }
+
+    .main-title {
+      font-size: 40px; font-weight: 800; line-height: 1.2;
+      color: #000000;
+    }
+
+    .tag-row {
+      display: flex; justify-content: center; gap: 10px;
+      margin-top: 12px; flex-wrap: wrap;
+    }
+    .tag {
+      font-size: 11px; font-weight: 600;
+      padding: 4px 14px; border-radius: 99px;
+      background: #ffffff;
+      color: #000000;
+      border: 1px solid #bbbbbb;
+    }
+
+    /* ── BODY ROW (guidance + team) ── */
+    .body-row {
+      flex: 1;
+      display: flex;
+      position: relative; z-index: 1;
+      min-height: 0;
+    }
+
+    /* LEFT — Guidance */
+    .guide-panel {
+      flex: 0 0 300px;
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 28px 32px 28px 56px;
+      border-right: 1px solid rgba(0,0,0,0.1);
+    }
+
+    .panel-label {
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 3px; text-transform: uppercase;
+      color: #666666; margin-bottom: 18px;
+    }
+
+    .guide-avatar {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: #f0f0f0;
+      border: 1px solid #cccccc;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: 800; color: #000000;
+      margin-bottom: 14px;
+    }
+
+    .guide-name {
+      font-size: 35px; font-weight: 700; color: #000000;
+      margin-bottom: 9px;
+    }
+
+    .guide-role {
+      font-size: 13px; color: #555555;
+      line-height: 1.8;
+    }
+
+    /* RIGHT — Team */
+    .team-panel {
+      flex: 1;
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 28px 56px 28px 32px;
+    }
+
+    .team-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 12px; margin-top: 14px;
+    }
+
+    .member-card {
+      background: #ffffff;
+      border: 1px solid #dddddd;
+      border-radius: 14px; padding: 14px 16px;
+      display: flex; align-items: center; gap: 14px;
+      transition: all 0.25s ease;
+    }
+    .member-card:hover {
+      background: #f9f9f9;
+      border-color: #000000;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+
+    .m-num {
+      width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 800;
+      background: #f0f0f0;
+      border: 1px solid #cccccc;
+      color: #000000;
+    }
+
+    .m-name {
+      font-size: 15px; font-weight: 700; color: #000000; line-height: 1.3;
+    }
+    .m-id {
+      font-size: 11.5px; color: #555555;
+      margin-top: 2px; font-family: monospace;
+    }
+    .m-sem {
+      font-size: 10.5px; font-weight: 600;
+      color: #333333; margin-top: 3px;
+    }
+
+    /* ── BUTTON ROW ── */
+    .btn-row {
+      flex: 0 0 auto;
+      padding: 16px 56px 20px;
+      border-top: 1px solid rgba(0,0,0,0.1);
+      position: relative; z-index: 1;
+    }
+
+    .cta-btn {
+      display: flex; align-items: center; justify-content: center;
+      gap: 14px; width: 100%; padding: 16px;
+      background: #000000;
+      border: 2px solid #000000; border-radius: 14px;
+      font-size: 17px; font-weight: 700; font-family: 'Poppins', sans-serif;
+      color: #ffffff; cursor: pointer; letter-spacing: 0.5px;
+      transition: all 0.3s ease; position: relative; overflow: hidden;
+    }
+    .cta-btn:hover { 
+      background: #ffffff;
+      color: #000000;
+    }
+    .cta-btn:active { transform: translateY(2px); }
+
+    .cta-btn svg {
+      width: 19px; height: 19px; stroke: currentColor;
+      fill: none; stroke-width: 2.5;
+      stroke-linecap: round; stroke-linejoin: round;
+    }
+
+    /* BODY SECTION */
+.body-row{
+  flex:1;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:40px 0px;
+  gap:60px;
+}
+
+/* GUIDE */
+.guide-panel{
+  flex:1;
+}
+
+.guide-title{
+  font-size:32px;
+  font-weight:700;
+  margin-bottom:22px;
+}
+
+.guide-name{
+  font-size:32px;
+  font-weight:600;
+  margin-bottom:10px;
+}
+
+.guide-designation{
+  font-size:28px;
+  margin-bottom:12px;
+}
+
+.guide-dept{
+  font-size:22px;
+  color:#444;
+  font-style:italic;
+}
+
+/* TEAM */
+.team-panel{
+  flex:1;
+}
+
+.team-title{
+  font-size:30px;
+  font-weight:700;
+  margin-bottom:28px;
+}
+
+.team-list{
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+}
+
+.team-row{
+  display:grid;
+  grid-template-columns: 1.7fr 1fr 1fr;
+  font-size:21px;
+  align-items:center;
+}
+  </style>
+</head>
+<body>
+
+<div class="slide">
+
+  <div class="accent-bar"></div>
+
+  <!-- HEADER -->
+  <div class="header-row">
+    <div class="logo-wrap" id="logo-l">
+      <img src="/static/img/gvp_logo.jpeg" alt="GVP"
+           onerror="this.style.display='none';this.parentNode.innerHTML='<div class=\'logo-fallback\'>GVP</div>';" />
+    </div>
+
+    <div class="college-block">
+      <div class="college-name">
+        <span class="highlight">Gayatri Vidya Parishad <br>
+        College for Degree  PG Courses (A)
+      </div>
+      <div class="college-meta">
+        Affiliated to Andhra University &nbsp;·&nbsp; NAAC Reaccredited &nbsp;·&nbsp; ISO 9001:2015
+        &nbsp;·&nbsp; Visakhapatnam &ndash; 530045
+      </div>
+      <span class="dept-pill">Dept. of Computer Applications (UG)</span>
+    </div>
+
+    <div class="logo-wrap" id="logo-r">
+      <img src="/static/img/gvp_logo.jpeg" alt="CS"
+           onerror="this.style.display='none';this.parentNode.innerHTML='<div class=\'logo-fallback\'>CS</div>';" />
+    </div>
+  </div>
+
+  <!-- TITLE -->
+  <div class="title-row">
+    <div class="main-title">Kids Hobby Prediction System using ML</div>
+   
+  </div>
+<div class="body-row">
+
+  <!-- LEFT SIDE -->
+  <div class="guide-panel">
+
+    <div class="guide-title">
+      Under Guidance of
+    </div>
+
+    <div class="guide-name">
+      Smt. P. Ratna Pavani
+    </div>
+
+    <div class="guide-designation">
+      Assistant Professor
+    </div>
+
+    <div class="guide-dept">
+      Department of Computer Applications (UG)
+    </div>
+
+  </div>
+
+  <!-- RIGHT SIDE -->
+  <div class="team-panel">
+
+    <div class="team-title">
+      TEAM MEMBERS:
+    </div>
+
+    <div class="team-list">
+
+      <div class="team-row">
+        <span>Ch. Prameela</span>
+        <span>2023-2402006</span>
+        <span>BCA 6th Sem</span>
+      </div>
+
+      <div class="team-row">
+        <span>N. Sivananda</span>
+        <span>2023-2402010</span>
+        <span>BCA 6th Sem</span>
+      </div>
+
+      <div class="team-row">
+        <span>G. Bindu Bhavani</span>
+        <span>2023-2402034</span>
+        <span>BCA 6th Sem</span>
+      </div>
+
+      <div class="team-row">
+        <span>G. Denush</span>
+        <span>2023-2402060</span>
+        <span>BCA 6th Sem</span>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+  <!-- BUTTON -->
+  <div class="btn-row">
+    <button class="cta-btn" onclick="window.location.href='/'">
+      <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      Get Started
+      <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </button>
+  </div>
+
+</div>
+
+</body>
+</html>
