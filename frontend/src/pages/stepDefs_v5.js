@@ -20,12 +20,21 @@ function sportOpts(ans) {
   const io = ans.sport_indoor_outdoor || 'both';
   let sports;
   if (io === 'both') {
-    // Combine both pools, deduplicate while preserving order
     sports = [...new Set([...SPORT_POOL.outdoor, ...SPORT_POOL.indoor])];
   } else {
     sports = SPORT_POOL[io] || SPORT_POOL.outdoor;
   }
   return [...sports.map(s => ({ label: s, value: s })), { label: 'Other', value: 'Other' }];
+}
+
+// Returns true if a sport is in the multi-selected list (for "both") or single selected
+function hasSport(ans, sport) {
+  const io = ans.sport_indoor_outdoor;
+  if (io === 'both') {
+    const sel = ans.which_sports_multi || [];
+    return sel.includes(sport);
+  }
+  return ans.which_sport === sport;
 }
 
 
@@ -51,10 +60,71 @@ export const STEP_DEFS = [
     { feature:'sport_indoor_outdoor', text:'Does your child prefer indoor or outdoor sports?',
       options:[{label:'🌳 Outdoor',value:'outdoor'},{label:'🏠 Indoor',value:'indoor'},{label:'Both equally',value:'both'}] },
   ]},
-  { id:'sports_which', section:'sports', title:'Favourite Sport', color:'#06d6a0', questions:[
-    { feature:'which_sport', text:'Which sport does your child enjoy the most?', allowOther:true,
-      dynamicOptions: sportOpts, options:[] },
-  ]},
+
+  // Single-pick sport (outdoor or indoor only)
+  { id:'sports_which', section:'sports', title:'Favourite Sport', color:'#06d6a0',
+    showIf: ans => ans.sport_indoor_outdoor !== 'both',
+    questions:[
+      { feature:'which_sport', text:'Which sport does your child enjoy the most?', allowOther:true,
+        dynamicOptions: sportOpts, options:[] },
+    ]},
+
+  // Multi-select sport (both)
+  { id:'sports_which_multi', section:'sports', title:'Select Sports (choose all that apply)', color:'#06d6a0',
+    showIf: ans => ans.sport_indoor_outdoor === 'both',
+    questions:[
+      { feature:'which_sports_multi', text:'Which sports does your child enjoy? (Select all that apply)',
+        type:'multi', allowOther:true,
+        options:[
+          {label:'🏏 Cricket',value:'Cricket'},{label:'⚽ Football',value:'Football'},
+          {label:'🏀 Basketball',value:'Basketball'},{label:'🏃 Athletics',value:'Athletics'},
+          {label:'🏊 Swimming',value:'Swimming'},{label:'🏸 Badminton',value:'Badminton'},
+          {label:'🏓 Table Tennis',value:'Table Tennis'},{label:'🎱 Carrom',value:'Carrom'},
+          {label:'♟️ Chess',value:'Chess'},{label:'Other',value:'Other'},
+        ]},
+    ]},
+
+  // Cricket sub-questions (show if cricket selected)
+  { id:'sports_cricket_role', section:'sports', title:'Cricket Role', color:'#06d6a0',
+    showIf: ans => hasSport(ans, 'Cricket'),
+    questions:[
+      { feature:'cricket_role', text:'What role does your child prefer in Cricket?',
+        options:[{label:'🏏 Batting',value:'Batting'},{label:'⚾ Bowling',value:'Bowling'},
+                 {label:'🧤 Wicket Keeping',value:'Keeping'},{label:'All-rounder',value:'All-rounder'}] },
+    ]},
+  { id:'sports_cricket_hand', section:'sports', title:'Cricket Hand Preference', color:'#06d6a0',
+    showIf: ans => hasSport(ans, 'Cricket'),
+    questions:[
+      { feature:'cricket_hand', text:'Is your child right-handed or left-handed in cricket?',
+        options:[{label:'Right-handed',value:'Right'},{label:'Left-handed',value:'Left'}] },
+    ]},
+
+  // Football sub-question
+  { id:'sports_football_pos', section:'sports', title:'Football Position', color:'#06d6a0',
+    showIf: ans => hasSport(ans, 'Football'),
+    questions:[
+      { feature:'football_position', text:'What position does your child prefer in Football?',
+        options:[{label:'⚽ Forward / Striker',value:'Forward'},{label:'🛡️ Defender',value:'Defender'},
+                 {label:'🧤 Goalkeeper',value:'Goalkeeper'},{label:'🔄 Midfielder',value:'Midfielder'}] },
+    ]},
+
+  // Badminton sub-question
+  { id:'sports_badminton_type', section:'sports', title:'Badminton Style', color:'#06d6a0',
+    showIf: ans => hasSport(ans, 'Badminton'),
+    questions:[
+      { feature:'badminton_type', text:'Does your child prefer Singles or Doubles in Badminton?',
+        options:[{label:'🧍 Singles',value:'Singles'},{label:'👥 Doubles',value:'Doubles'}] },
+    ]},
+
+  // Chess sub-question
+  { id:'sports_chess_style', section:'sports', title:'Chess Style', color:'#06d6a0',
+    showIf: ans => hasSport(ans, 'Chess'),
+    questions:[
+      { feature:'chess_style', text:'What style of chess does your child prefer?',
+        options:[{label:'⚡ Blitz (fast)',value:'Blitz'},{label:'🕐 Classical (slow)',value:'Classical'},{label:'Both',value:'Both'}] },
+    ]},
+
+  // Sports hours / commitment (always shown in sports section)
   { id:'sports_hours', section:'sports', title:'Sports Commitment', color:'#06d6a0', questions:[
     { feature:'sport_hours_per_day', text:'"My child spends a lot of time playing sports every day."',
       type:'likert', options: LIKERT_OPTS },
@@ -232,7 +302,7 @@ export const STEP_DEFS = [
 ];
 
 export const SECTION_STEPS = {
-  sports:     ['sports_io','sports_which','sports_hours','sports_team','sports_freq'],
+  sports:     ['sports_io','sports_which','sports_which_multi','sports_cricket_role','sports_cricket_hand','sports_football_pos','sports_badminton_type','sports_chess_style','sports_hours','sports_team','sports_freq'],
   arts:       ['arts_which','arts_subtype','arts_creativity','arts_perf'],
   analytical: ['analy_type','analy_logic','analy_tech','analy_patience'],
   cooking:    ['cook_type'],

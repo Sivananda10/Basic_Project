@@ -431,3 +431,339 @@
   .rp-actions { flex-direction: column; }
   .rp-btn { width: 100%; text-align: center; }
 }
+
+/* ══════════════════════════════════════════════════════════════════════
+   Follow-up Questions — Premium Stepped Card UI
+   ══════════════════════════════════════════════════════════════════════ */
+
+.rp-fq-wrap {
+  margin-top: 1.6rem;
+  border-radius: 22px;
+  border: 1px solid rgba(255,255,255,0.07);
+  background: rgba(255,255,255,0.025);
+  backdrop-filter: blur(20px);
+  overflow: hidden;
+  animation: fadeSlideUp 0.4s ease both;
+}
+
+/* Header row */
+.rp-fq-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.4rem 1.8rem 1.2rem;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.rp-fq-header-left { display: flex; flex-direction: column; gap: .3rem; }
+
+.rp-fq-tag {
+  display: inline-block;
+  padding: .2rem .8rem;
+  border-radius: 100px;
+  background: rgba(99,102,241,0.15);
+  color: #a5b4fc;
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  width: fit-content;
+}
+
+.rp-fq-title {
+  margin: 0;
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+}
+
+.rp-fq-sub {
+  margin: 0;
+  color: rgba(255,255,255,0.35);
+  font-size: .78rem;
+}
+
+/* Progress dots */
+.rp-fq-dots {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  padding-top: 4px;
+}
+
+.rp-fq-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.2);
+  background: transparent;
+  transition: all .3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.rp-fq-dot.done {
+  transform: scale(1.15);
+  box-shadow: 0 0 8px var(--glow, rgba(99,102,241,0.6));
+}
+
+/* Questions container */
+.rp-fq-questions {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* Each question card */
+.rp-fq-card {
+  padding: 1.4rem 1.8rem;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  transition: background .3s;
+  position: relative;
+}
+
+.rp-fq-card:last-child { border-bottom: none; }
+
+.rp-fq-card--done {
+  background: rgba(255,255,255,0.015);
+}
+
+/* Left accent bar on done card */
+.rp-fq-card--done::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 3px;
+  height: 100%;
+  background: var(--fq-color, #6366f1);
+  border-radius: 0 2px 2px 0;
+  opacity: 0.7;
+}
+
+/* Step indicator row */
+.rp-fq-step {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  margin-bottom: 1rem;
+}
+
+.rp-fq-step-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1.5px solid;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .75rem;
+  font-weight: 800;
+  flex-shrink: 0;
+  transition: all .3s;
+}
+
+.rp-fq-step-check {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .78rem;
+  font-weight: 900;
+  color: #fff;
+  flex-shrink: 0;
+  animation: popIn .3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes popIn {
+  from { transform: scale(0) rotate(-20deg); opacity: 0; }
+  to   { transform: scale(1) rotate(0deg);   opacity: 1; }
+}
+
+.rp-fq-step-q {
+  color: rgba(255,255,255,0.85);
+  font-size: .9rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+/* Options grid — 2 columns on wide, 1 on narrow */
+.rp-fq-opts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: .55rem;
+}
+
+.rp-fq-opt {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  padding: .72rem 1rem;
+  border-radius: 12px;
+  border: 1.5px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.03);
+  color: rgba(255,255,255,0.6);
+  font-size: .84rem;
+  font-weight: 500;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  text-align: left;
+  transition: all .2s cubic-bezier(0.4,0,0.2,1);
+  position: relative;
+  overflow: hidden;
+}
+
+.rp-fq-opt:hover {
+  border-color: rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.9);
+  transform: translateY(-1px);
+}
+
+.rp-fq-opt--sel {
+  font-weight: 700;
+}
+
+/* Custom radio dot */
+.rp-fq-radio {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.2);
+  flex-shrink: 0;
+  transition: all .2s;
+  position: relative;
+}
+
+.rp-fq-radio::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%) scale(0);
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform .2s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+.rp-fq-opt--sel .rp-fq-radio::after {
+  transform: translate(-50%,-50%) scale(1);
+}
+
+/* Checkmark badge */
+.rp-fq-tick {
+  margin-left: auto;
+  font-size: .75rem;
+  font-weight: 900;
+  flex-shrink: 0;
+}
+
+/* Footer */
+.rp-fq-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.2rem 1.8rem;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  gap: 1rem;
+}
+
+.rp-fq-answered {
+  font-size: .78rem;
+  color: rgba(255,255,255,0.3);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.rp-fq-error {
+  padding: 0 1.8rem .4rem;
+  color: #f87171;
+  font-size: .8rem;
+}
+
+.rp-fq-submit {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .75rem 1.6rem;
+  border-radius: 14px;
+  border: none;
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.3);
+  font-family: 'Inter', sans-serif;
+  font-size: .9rem;
+  font-weight: 700;
+  cursor: not-allowed;
+  transition: all .3s cubic-bezier(0.4,0,0.2,1);
+  white-space: nowrap;
+}
+
+.rp-fq-submit:not(:disabled) {
+  color: #fff;
+  cursor: pointer;
+}
+
+.rp-fq-submit:not(:disabled):hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+}
+
+/* Spinner inside save button */
+.rp-fq-spin {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  animation: spin .7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Success state */
+.rp-fq-success {
+  margin-top: 1.4rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.1rem 1.4rem;
+  border-radius: 16px;
+  border: 1px solid;
+  animation: fadeSlideUp .4s ease both;
+}
+
+.rp-fq-success-icon {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem; font-weight: 900;
+  flex-shrink: 0;
+  animation: popIn .4s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+
+.rp-fq-success-title {
+  color: #fff;
+  font-weight: 800;
+  font-size: .95rem;
+  margin-bottom: .2rem;
+}
+
+.rp-fq-success-sub {
+  color: rgba(255,255,255,0.45);
+  font-size: .78rem;
+  line-height: 1.5;
+}
+
+/* Mobile tweaks */
+@media (max-width: 600px) {
+  .rp-fq-header  { flex-direction: column; gap: .8rem; padding: 1.2rem; }
+  .rp-fq-card    { padding: 1.2rem; }
+  .rp-fq-opts    { grid-template-columns: 1fr; }
+  .rp-fq-footer  { flex-direction: column; align-items: stretch; padding: 1rem 1.2rem; }
+  .rp-fq-submit  { text-align: center; justify-content: center; }
+}
+

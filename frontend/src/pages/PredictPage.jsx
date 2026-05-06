@@ -16,13 +16,11 @@ const LIKERT_GATES = {
 function buildStepSequence(answers) {
   const skippedSections = new Set();
 
-  // Likert-gated sections: only open on Agree / Strongly Agree
   for (const [feature, section] of Object.entries(LIKERT_GATES)) {
     const val = answers[feature];
     if (val && !AGREE_SET.has(val)) skippedSections.add(section);
   }
 
-  // Binary gate for previous hobby
   if (answers.tried_hobby_before === 'No') skippedSections.add('prev_hobby');
 
   return STEP_DEFS.filter(step => {
@@ -48,9 +46,11 @@ export default function PredictPage() {
   function handleAnswer(feature, value) {
     setAnswers(prev => {
       const next = { ...prev, [feature]: value };
-      if (feature === 'sport_indoor_outdoor') delete next.which_sport;
+      if (feature === 'sport_indoor_outdoor') {
+        delete next.which_sport;
+        delete next.which_sports_multi;
+      }
 
-      // Binary gate handling
       const q = step?.questions?.find(q => q.feature === feature);
       if (q?.type === 'gate' && value === 'No' && q.gateSkipsSection) {
         Object.assign(next, SECTION_DEFAULTS[q.gateSkipsSection] || {});
@@ -59,7 +59,6 @@ export default function PredictPage() {
         Object.keys(SECTION_DEFAULTS[q.gateSkipsSection] || {}).forEach(k => { delete next[k]; });
       }
 
-      // Likert gate handling
       if (q?.type === 'likert' && LIKERT_GATES[feature]) {
         if (!AGREE_SET.has(value)) {
           Object.assign(next, SECTION_DEFAULTS[LIKERT_GATES[feature]] || {});
@@ -71,9 +70,23 @@ export default function PredictPage() {
     });
   }
 
+  function handleMultiToggle(feature, value) {
+    setAnswers(prev => {
+      const current = Array.isArray(prev[feature]) ? prev[feature] : [];
+      const next = current.includes(value)
+        ? current.filter(v => v !== value)
+        : [...current, value];
+      return { ...prev, [feature]: next };
+    });
+  }
+
   function isStepComplete() {
     if (!step) return false;
     return step.questions.every(q => {
+      if (q.type === 'multi') {
+        const sel = answers[q.feature];
+        return Array.isArray(sel) && sel.length > 0;
+      }
       if (answers[q.feature] === undefined) return false;
       if (q.allowOther && answers[q.feature] === 'Other') {
         return !!(answers[q.feature + '_custom'] || '').trim();
@@ -110,40 +123,37 @@ export default function PredictPage() {
     try {
       const payload = { ...GLOBAL_DEFAULTS, ...answers };
 
-      // Map Likert → binary Yes/No for ML gate features
+      // Flatten multi-select sports into a comma-separated string for the ML model
+      if (Array.isArray(payload.which_sports_multi)) {
+        payload.which_sport = payload.which_sports_multi.join(', ');
+      }
+
       for (const feat of Object.keys(LIKERT_GATES)) {
         payload[feat] = likertToML(payload[feat]);
       }
 
-      // Map Likert → Level for intensity features
-      const levelFeats = ['sport_hours_per_day','art_creativity','art_performance',
-        'analy_logic_level',
-        'analy_coding_interest','analy_patience_level','health_energy',
-        'emotional_engagement','game_design_interest'];
+      const levelFeats = ['sport_hours_per_day', 'art_creativity', 'art_performance',
+        'analy_logic_level', 'analy_coding_interest', 'analy_patience_level', 'health_energy',
+        'emotional_engagement', 'game_design_interest'];
       for (const feat of levelFeats) {
-        if (AGREE_SET.has(payload[feat]) || ['Neutral','Disagree','Strongly Disagree'].includes(payload[feat])) {
+        if (AGREE_SET.has(payload[feat]) || ['Neutral', 'Disagree', 'Strongly Disagree'].includes(payload[feat])) {
           payload[feat] = likertToLevel(payload[feat]);
         }
       }
 
-      // Derive personality traits
       const whom = payload.activity_with_whom || 'Mixed';
       const team = payload.sport_team_solo || 'Individual';
       if (whom === 'Alone' && team === 'Individual') payload.personality_type = 'Introvert';
       else if (whom === 'With Friends' || whom === 'Mixed' || team === 'Team') payload.personality_type = 'Extrovert';
       else payload.personality_type = 'Ambivert';
 
-      // Creativity score
       payload.creativity_score = payload.art_creativity === 'High' ? '8' : '5';
-      // Leadership
       payload.leadership_tendency = team === 'Team' ? 'High' : 'Medium';
-      // Attention span
       payload.attention_span = payload.analy_patience_level === 'High' ? 'Long' : 'Medium';
 
-      // Fix game_design_interest back to Yes/No for ML
       if (payload.game_design_interest === 'High') payload.game_design_interest = 'Yes';
       else if (payload.game_design_interest === 'Medium') payload.game_design_interest = 'Yes';
-      else if (['Low','None'].includes(payload.game_design_interest)) payload.game_design_interest = 'No';
+      else if (['Low', 'None'].includes(payload.game_design_interest)) payload.game_design_interest = 'No';
 
       const res = await apiSubmit(payload);
       navigate('/result', { state: { prediction: res.data } });
@@ -178,7 +188,7 @@ export default function PredictPage() {
           <h1>Discover Your Child's<br /><span>Perfect Hobby</span></h1>
           <p>
             Answer <strong>adaptive questions</strong> about your child across
-            Sports, Arts, Analytical Thinking, Cooking, Gardening, Digital & Health.
+            Sports, Arts, Analytical Thinking, Cooking, Gardening, Digital &amp; Health.
           </p>
           <div className="qz-meta">
             <span className="qz-meta-item">~4 min</span>
@@ -206,12 +216,18 @@ export default function PredictPage() {
             const resolvedOptions = q.dynamicOptions ? q.dynamicOptions(answers) : q.options;
             const questionText = q.dynamicText ? q.dynamicText(answers) : q.text;
             const currentVal = answers[q.feature];
+            const multiSel = Array.isArray(currentVal) ? currentVal : [];
 
             return (
               <div key={q.feature} className="qz-block">
                 <div className="qz-question">
                   {questionText}
                   {q.hint && <span className="qz-hint">{q.hint}</span>}
+                  {q.type === 'multi' && (
+                    <span className="qz-hint" style={{ display: 'block', marginTop: 4, color: '#06d6a0' }}>
+                      ✅ Select all that apply (choose one or more)
+                    </span>
+                  )}
                 </div>
 
                 {/* LIKERT SCALE */}
@@ -244,6 +260,33 @@ export default function PredictPage() {
                         {opt.label}
                       </button>
                     ))}
+                  </div>
+                ) :
+
+                /* MULTI CHECKBOX */
+                q.type === 'multi' ? (
+                  <div className="qz-options">
+                    {resolvedOptions.map(opt => {
+                      const isChk = multiSel.includes(opt.value);
+                      return (
+                        <button key={opt.value}
+                          className={`qz-opt ${isChk ? 'selected' : ''}`}
+                          style={isChk ? { borderColor: step.color, background: `${step.color}12` } : {}}
+                          onClick={() => handleMultiToggle(q.feature, opt.value)}>
+                          <span className="qz-opt-radio"
+                            style={isChk
+                              ? { borderColor: step.color, background: step.color, borderRadius: '4px' }
+                              : { borderRadius: '4px' }} />
+                          <span className="qz-opt-label">{opt.label}</span>
+                          {isChk && <span style={{ marginLeft: 'auto', color: step.color, fontWeight: 700 }}>✓</span>}
+                        </button>
+                      );
+                    })}
+                    {q.allowOther && multiSel.includes('Other') && (
+                      <input className="qz-other-input" type="text" placeholder="Please specify…"
+                        value={answers[q.feature + '_custom'] || ''}
+                        onChange={e => setAnswers(prev => ({ ...prev, [q.feature + '_custom']: e.target.value }))} />
+                    )}
                   </div>
                 ) :
 

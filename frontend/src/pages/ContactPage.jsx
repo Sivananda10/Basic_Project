@@ -156,7 +156,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <div className="ct-info-title">Email Us</div>
-                    <div className="ct-info-val">support@hobbypredictor.in</div>
+                    <div className="ct-info-val">nammisivananda10@gmail.com</div>
                   </div>
                 </div>
                 <div className="ct-info-card">

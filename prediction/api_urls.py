@@ -21,6 +21,7 @@ urlpatterns = [
 
     # ── Prediction ────────────────────────────
     path('predict/',                   api_views.api_predict,         name='api_predict'),
+    path('predict/<int:prediction_id>/followup/', api_views.api_save_followup, name='api_save_followup'),
     path('history/',                   api_views.api_history,         name='api_history'),
     path('feedback/<int:prediction_id>/', api_views.api_feedback,     name='api_feedback'),
 

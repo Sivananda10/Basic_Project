@@ -2,10 +2,12 @@ django>=4.0
 scikit-learn
 pandas
 numpy
-matplotlib
-seaborn
 joblib
-mysqlclient
 djangorestframework
 djangorestframework-simplejwt
 django-cors-headers
+# Production deployment
+gunicorn
+whitenoise
+psycopg2-binary
+dj-database-url

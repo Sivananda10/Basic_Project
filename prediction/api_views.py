@@ -345,7 +345,7 @@ def api_feedback(request, prediction_id):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def api_contact(request):
-    """POST /api/contact/  →  log contact form submission (no DB model needed)."""
+    """POST /api/contact/  →  send contact form email to admin."""
     name    = request.data.get('name', '').strip()
     email   = request.data.get('email', '').strip()
     subject = request.data.get('subject', '').strip()
@@ -354,13 +354,63 @@ def api_contact(request):
     if not name or not email or not message:
         return Response({'error': 'All fields are required.'}, status=status.HTTP_400_BAD_REQUEST)
 
-    # In production you'd send an email here
-    print(f"📧 Contact form: {name} <{email}> [{subject}] — {message[:80]}")
+    # Build email body
+    from django.conf import settings as dj_settings
+    from django.core.mail import send_mail
+
+    contact_email = getattr(dj_settings, 'CONTACT_EMAIL', 'nammisivananda10@gmail.com')
+    full_subject  = f"[HobbyPredictor] {subject or 'New contact message'}"
+    body = (
+        f"You have a new message from the HobbyPredictor contact form.\n"
+        f"{'=' * 55}\n"
+        f"Name   : {name}\n"
+        f"Email  : {email}\n"
+        f"Subject: {subject or '(none)'}\n"
+        f"{'=' * 55}\n\n"
+        f"{message}\n"
+    )
+    try:
+        send_mail(
+            subject      = full_subject,
+            message      = body,
+            from_email   = dj_settings.DEFAULT_FROM_EMAIL,
+            recipient_list = [contact_email],
+            fail_silently = False,
+        )
+        print(f"📧 Contact mail sent to {contact_email} from {name} <{email}>")
+    except Exception as mail_err:
+        # Fall back to console log so the user still gets a success response
+        print(f"⚠️  Email send failed (check SMTP settings): {mail_err}")
+        print(f"📧 Contact form: {name} <{email}> [{subject}] — {message[:80]}")
+
     return Response({'message': 'Thank you for your message! We will get back to you soon.'})
 
-
 # ──────────────────────────────────────────────
-# ADMIN DASHBOARD ENDPOINT
+# FOLLOW-UP ANSWERS ENDPOINT
+# ──────────────────────────────────────────────
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def api_save_followup(request, prediction_id):
+    """
+    POST /api/predict/<id>/followup/
+    Merge hobby-specific follow-up answers into prediction.input_answers.
+    """
+    try:
+        prediction = Prediction.objects.get(id=prediction_id, user=request.user)
+    except Prediction.DoesNotExist:
+        return Response({'error': 'Prediction not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+    followup = request.data.get('followup', {})
+    if not isinstance(followup, dict):
+        return Response({'error': 'followup must be a JSON object.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    existing = prediction.input_answers or {}
+    existing.update({'followup': followup})
+    prediction.input_answers = existing
+    prediction.save(update_fields=['input_answers'])
+    return Response({'message': 'Follow-up answers saved.'})
+
 # ──────────────────────────────────────────────
 
 @api_view(['GET'])

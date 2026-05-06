@@ -14,3 +14,6 @@ export const submitContact = (data) =>
 
 export const getAdminDashboard = () =>
   axiosInstance.get('/admin/dashboard/');
+
+export const saveFollowup = (predictionId, followup) =>
+  axiosInstance.post(`/predict/${predictionId}/followup/`, { followup });

@@ -3,15 +3,17 @@ Django settings for kids_hobby_prediction project.
 """
 
 import os
+import dj_database_url
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-k1ds-h0bby-pr3d1ct10n-s3cr3t-k3y-ch4ng3-1n-pr0d'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-k1ds-h0bby-pr3d1ct10n-s3cr3t-k3y-ch4ng3-1n-pr0d')
 
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['*']
+_RENDER_HOST = os.environ.get('RENDER_EXTERNAL_HOSTNAME', '')
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.onrender.com'] + ([_RENDER_HOST] if _RENDER_HOST else [])
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -31,6 +33,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',   # Must be first
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Static files in production
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -60,24 +63,18 @@ TEMPLATES = [
 WSGI_APPLICATION = 'kids_hobby_prediction.wsgi.application'
 
 # ──────────────────────────────────────────────
-# DATABASE — Switch to MySQL when ready
-# Using SQLite for development, MySQL for production
+# DATABASE — PostgreSQL on Render, SQLite locally
 # ──────────────────────────────────────────────
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+_DATABASE_URL = os.environ.get('DATABASE_URL')
+if _DATABASE_URL:
+    DATABASES = {'default': dj_database_url.config(default=_DATABASE_URL, conn_max_age=600)}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-    # Uncomment below and comment above for MySQL:
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.mysql',
-    #     'NAME': 'kids_hobby_db',
-    #     'USER': 'hobby_user',
-    #     'PASSWORD': 'your_password',
-    #     'HOST': 'localhost',
-    #     'PORT': '3306',
-    # }
-}
 
 AUTH_PASSWORD_VALIDATORS = []
 
@@ -89,6 +86,8 @@ USE_TZ = True
 # Static files
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Login redirect
 LOGIN_URL = '/login/'
@@ -105,10 +104,11 @@ if DEBUG:
     # never block requests.
     CORS_ALLOW_ALL_ORIGINS = True
 else:
+    _VERCEL_URL = os.environ.get('CORS_ALLOWED_ORIGINS', '')
     CORS_ALLOWED_ORIGINS = [
         'http://localhost:5173',
         'http://127.0.0.1:5173',
-    ]
+    ] + ([_VERCEL_URL] if _VERCEL_URL else [])
 CORS_ALLOW_CREDENTIALS = True
 
 # ──────────────────────────────────────────────
@@ -132,3 +132,18 @@ SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': False,
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
+
+# ──────────────────────────────────────────────
+# EMAIL — Contact form delivery
+# Set EMAIL_HOST_USER / EMAIL_HOST_PASSWORD in environment
+# or keep console backend for pure offline demo.
+# ──────────────────────────────────────────────
+CONTACT_EMAIL = 'nammisivananda10@gmail.com'
+
+EMAIL_BACKEND     = os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
+EMAIL_HOST        = 'smtp.gmail.com'
+EMAIL_PORT        = 587
+EMAIL_USE_TLS     = True
+EMAIL_HOST_USER   = os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER or 'noreply@hobbypredictor.in'

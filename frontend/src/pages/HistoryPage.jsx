@@ -19,23 +19,44 @@ const CAT_ICONS = {
 // Human-readable labels for raw answer keys
 const ANSWER_LABELS = {
   age: 'Age', gender: 'Gender',
-  likes_sports: 'Likes Sports?', sport_preference: 'Sport Preference',
-  sport_type: 'Sport Type', sport_activity_level: 'Activity Level',
-  sport_hours_per_day: 'Hours/Day (Sports)', sport_choice: 'Preferred Sport',
-  likes_arts: 'Likes Arts?', art_type: 'Art Type',
-  art_creativity: 'Creativity Level', art_hours: 'Hours/Day (Arts)',
-  art_performance: 'Performed in Public?',
-  likes_analytical: 'Likes Analytical/Tech?', analy_type: 'Activity Type',
-  analy_logic_level: 'Logic Level', analy_puzzle_type: 'Puzzle Type',
-  analy_hours: 'Hours/Day (Analytical)',
-  likes_cooking: 'Likes Cooking?', cook_type: 'Cuisine Type',
-  cook_freq: 'Cooking Frequency', cook_helps_at_home: 'Helps at Home?',
-  likes_gardening: 'Likes Gardening?', garden_type: 'Garden Activity',
-  garden_freq: 'Frequency', garden_outdoor: 'Outdoor Activity?',
-  health_condition: 'Health Condition',
-  health_hours: 'Exercise Hours/Day', health_activity: 'Preferred Exercise',
-  tried_hobby_before: 'Tried a Hobby Before?', prev_hobby: 'Previous Hobby',
-  prev_hobby_duration: 'Duration', prev_hobby_outcome: 'Outcome',
+  likes_sports: 'Likes Sports?', sport_indoor_outdoor: 'Indoor / Outdoor Preference',
+  which_sport: 'Sport(s)', which_sports_multi: 'Sports Selected',
+  sport_hours_per_day: 'Hours/Day (Sports)', sport_team_solo: 'Team or Solo?',
+  sport_frequency: 'Days/Week (Sports)',
+  cricket_role: 'Cricket Role', cricket_hand: 'Cricket Hand', football_position: 'Football Position',
+  badminton_type: 'Badminton Type', chess_style: 'Chess Style',
+  likes_arts: 'Likes Arts?', which_art: 'Art Form', art_sub_type: 'Art Style',
+  art_creativity: 'Creativity Level', art_performance: 'Stage Confidence',
+  likes_analytical: 'Likes Analytical/Tech?', analy_puzzle_type: 'Puzzle Type',
+  analy_logic_level: 'Logic Level', analy_coding_interest: 'Tech Interest',
+  analy_patience_level: 'Patience Level',
+  likes_cooking: 'Likes Cooking?', cooking_type: 'Cooking Type',
+  likes_gardening: 'Likes Gardening?', gardening_type: 'Garden Type',
+  screen_usage_hours: 'Screen Time', screen_content_type: 'Screen Content',
+  gaming_genre: 'Gaming Genre', game_design_interest: 'Game Design Interest',
+  health_condition: 'Health Condition', health_energy: 'Energy Level',
+  health_activity_preference: 'Wellness Activity', health_sleep_quality: 'Sleep Quality',
+  activity_with_whom: 'Activity Partner', emotional_engagement: 'Emotional Engagement',
+  tried_hobby_before: 'Tried Hobby Before?', previous_hobby_name: 'Previous Hobby',
+  stopped_reason: 'Why Stopped?',
+};
+
+// Human-readable follow-up question IDs
+const FOLLOWUP_LABELS = {
+  fq_cricket_role: 'Cricket Role', fq_cricket_hand: 'Dominant Hand', fq_cricket_goal: 'Cricket Goal',
+  fq_football_pos: 'Football Position', fq_football_foot: 'Dominant Foot', fq_football_style: 'Playing Style',
+  fq_badminton_type: 'Badminton Format', fq_badminton_hand: 'Playing Hand', fq_badminton_style: 'Playing Style',
+  fq_swim_stroke: 'Swimming Stroke', fq_swim_goal: 'Swimming Goal', fq_swim_training: 'Training Frequency',
+  fq_chess_style: 'Chess Format', fq_chess_focus: 'Game Phase', fq_chess_goal: 'Chess Goal',
+  fq_singing_genre: 'Singing Genre', fq_singing_stage: 'Stage Comfort', fq_singing_training: 'Training Type',
+  fq_music_type: 'Music Type', fq_music_genre: 'Music Genre', fq_music_goal: 'Music Goal',
+  fq_dance_style: 'Dance Style', fq_dance_solo: 'Solo or Group', fq_dance_goal: 'Dance Goal',
+  fq_art_medium: 'Art Medium', fq_art_subject: 'Drawing Subject', fq_art_goal: 'Art Goal',
+  fq_code_lang: 'Coding Area', fq_code_experience: 'Experience Level', fq_code_goal: 'Coding Goal',
+  fq_yoga_type: 'Yoga Type', fq_yoga_focus: 'Yoga Focus', fq_yoga_freq: 'Practice Frequency',
+  fq_cook_type: 'Cooking Type', fq_cook_style: 'Cooking Style', fq_cook_goal: 'Cooking Goal',
+  fq_garden_type: 'What to Grow', fq_garden_space: 'Garden Space', fq_garden_goal: 'Gardening Goal',
+  fq_gen_time: 'Time Per Week', fq_gen_goal: 'Main Goal', fq_gen_training: 'Training Preference',
 };
 
 export default function HistoryPage() {
@@ -271,12 +292,33 @@ export default function HistoryPage() {
                                       {qaEntries.map(([k, v]) => (
                                         <div key={k} className="hy-qa-item">
                                           <span className="hy-qa-q">{ANSWER_LABELS[k]}</span>
-                                          <span className="hy-qa-a">{String(v)}</span>
+                                          <span className="hy-qa-a">
+                                            {Array.isArray(v) ? v.join(', ') : String(v)}
+                                          </span>
                                         </div>
                                       ))}
                                     </div>
                                   ) : (
                                     <p className="hy-qa-empty">No answer data available for this prediction.</p>
+                                  )}
+
+                                  {/* Follow-up answers */}
+                                  {answers.followup && Object.keys(answers.followup).length > 0 && (
+                                    <>
+                                      <div className="hy-qa-title" style={{ marginTop: '18px', color: '#4361ee' }}>
+                                        🎯 Hobby-Specific Follow-up Answers
+                                      </div>
+                                      <div className="hy-qa-grid">
+                                        {Object.entries(answers.followup).map(([k, v]) => (
+                                          <div key={k} className="hy-qa-item" style={{ borderColor: 'rgba(67,97,238,.15)', background: 'rgba(67,97,238,.04)' }}>
+                                            <span className="hy-qa-q" style={{ color: '#4361ee' }}>
+                                              {FOLLOWUP_LABELS[k] || k}
+                                            </span>
+                                            <span className="hy-qa-a">{String(v)}</span>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </>
                                   )}
                                 </div>
                               </td>
