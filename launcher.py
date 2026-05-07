@@ -30,9 +30,25 @@ DJANGO_HOST  = '127.0.0.1'
 APP_URL      = f'http://{DJANGO_HOST}:{DJANGO_PORT}'
 SPLASH_URL   = f'{APP_URL}/splash/'   # shown first; "Get Started" → main app
 
+# ── Log file for debugging crashes ───────────────────────────────────────
+LOG_FILE = os.path.join(os.path.dirname(sys.executable if getattr(sys, 'frozen', False) else __file__), 'kidhobbyai.log')
+
+def log(msg: str) -> None:
+    """Write message to both stdout and a log file."""
+    print(msg)
+    try:
+        with open(LOG_FILE, 'a', encoding='utf-8') as f:
+            f.write(msg + '\n')
+    except Exception:
+        pass
+
 # ── Django env setup ──────────────────────────────────────────────────────
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'kids_hobby_prediction.settings')
 os.environ['DESKTOP_MODE'] = 'true'   # read in settings.py to tune behaviour
+
+# Add BASE_DIR to sys.path so Django can find its modules when frozen
+if BASE_DIR not in sys.path:
+    sys.path.insert(0, BASE_DIR)
 
 
 def _is_port_open(host: str, port: int) -> bool:
@@ -46,28 +62,46 @@ def _is_port_open(host: str, port: int) -> bool:
 
 def start_django() -> None:
     """
-    Start the Django development server silently.
-    All stdout/stderr is suppressed so no terminal window flashes.
+    Start the Django development server.
+    - When frozen (PyInstaller .exe): uses Django's Python API directly,
+      because sys.executable is the .exe — not Python — so subprocess won't work.
+    - When running as .py script: uses subprocess (normal dev mode).
     """
-    python = sys.executable
-    manage  = os.path.join(BASE_DIR, 'manage.py')
+    if getattr(sys, 'frozen', False):
+        # ── Frozen mode: call Django management API directly in this thread ──
+        try:
+            log('[launcher] Frozen mode: starting Django via execute_from_command_line')
+            # Must set working directory so Django finds manage.py, db.sqlite3, etc.
+            os.chdir(BASE_DIR)
+            from django.core.management import execute_from_command_line
+            execute_from_command_line([
+                'manage.py', 'runserver',
+                f'{DJANGO_HOST}:{DJANGO_PORT}',
+                '--noreload',
+                '--nothreading',
+            ])
+        except Exception as e:
+            log(f'[launcher] Django crashed: {e}')
+    else:
+        # ── Script mode: use subprocess (works fine when Python is sys.executable) ──
+        python = sys.executable
+        manage = os.path.join(BASE_DIR, 'manage.py')
+        log(f'[launcher] Script mode: starting Django via subprocess: {manage}')
+        subprocess.Popen(
+            [
+                python, manage, 'runserver',
+                f'{DJANGO_HOST}:{DJANGO_PORT}',
+                '--noreload',
+                '--nothreading',
+            ],
+            cwd=BASE_DIR,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == 'win32' else 0,
+        )
 
-    subprocess.Popen(
-        [
-            python, manage, 'runserver',
-            f'{DJANGO_HOST}:{DJANGO_PORT}',
-            '--noreload',          # no file-watcher needed in desktop mode
-            '--nothreading',       # single-threaded is fine for desktop use
-        ],
-        cwd=BASE_DIR,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-        # On Windows, prevent a console window from appearing
-        creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == 'win32' else 0,
-    )
 
-
-def wait_for_django(timeout: int = 30) -> bool:
+def wait_for_django(timeout: int = 60) -> bool:
     """
     Poll until Django is accepting connections, or timeout is reached.
     Returns True if Django started successfully.
@@ -80,6 +114,18 @@ def wait_for_django(timeout: int = 30) -> bool:
     return False
 
 
+def show_error(title: str, message: str) -> None:
+    """Show a native error dialog on Windows, or print on other platforms."""
+    if sys.platform == 'win32':
+        try:
+            import ctypes
+            ctypes.windll.user32.MessageBoxW(0, message, title, 0x10)
+        except Exception:
+            print(f'[ERROR] {title}: {message}')
+    else:
+        print(f'[ERROR] {title}: {message}')
+
+
 def open_window() -> None:
     """Open the app in a native PyWebView window (cross-platform)."""
     try:
@@ -87,7 +133,7 @@ def open_window() -> None:
 
         window = webview.create_window(
             title='KidHobbyAI — Kids Hobby Prediction System',
-            url=SPLASH_URL,          # show splash page first
+            url=SPLASH_URL,
             width=1280,
             height=800,
             resizable=True,
@@ -96,11 +142,10 @@ def open_window() -> None:
         )
 
         def on_loaded():
-            print(f'[launcher] Page loaded: {window.get_current_url()}')
+            log(f'[launcher] Page loaded: {window.get_current_url()}')
         window.events.loaded += on_loaded
 
         if sys.platform == 'linux':
-            # Linux: use GTK + WebKit2 and enable localStorage on http://
             try:
                 import gi
                 gi.require_version('WebKit2', '4.1')
@@ -112,27 +157,22 @@ def open_window() -> None:
                 try:
                     webkit_settings.set_enable_html5_local_storage(True)
                     webkit_settings.set_enable_html5_database(True)
-                    print('[launcher] WebKit2 localStorage enabled ✓')
+                    log('[launcher] WebKit2 localStorage enabled ✓')
                 except Exception as e:
-                    print(f'[launcher] WebKit2 storage setting failed: {e}')
+                    log(f'[launcher] WebKit2 storage setting failed: {e}')
             except Exception as e:
-                print(f'[launcher] WebKit2 config skipped: {e}')
+                log(f'[launcher] WebKit2 config skipped: {e}')
             webview.start(gui='gtk', debug=False)
 
         elif sys.platform == 'win32':
-            # Windows: pywebview uses Edge WebView2 automatically — no extra config needed.
-            # WebView2 is pre-installed on Windows 10 (1803+) / Windows 11.
             webview.start(debug=False)
 
         else:
-            # macOS or other — let pywebview choose the best backend
             webview.start(debug=False)
 
     except ImportError:
-        # PyWebView not installed — fall back to opening in the system browser
-        print("[launcher] pywebview not found — opening in browser instead.")
+        log('[launcher] pywebview not found — opening in browser instead.')
         webbrowser.open(APP_URL)
-        # Keep the process alive so Django keeps running
         try:
             while True:
                 time.sleep(1)
@@ -141,18 +181,30 @@ def open_window() -> None:
 
 
 def main() -> None:
+    log('[launcher] ══════════════════════════════════════')
+    log(f'[launcher] KidHobbyAI starting up')
+    log(f'[launcher] BASE_DIR = {BASE_DIR}')
+    log(f'[launcher] frozen   = {getattr(sys, "frozen", False)}')
+    log('[launcher] ══════════════════════════════════════')
+
     # ── 1. Start Django in a daemon thread ───────────────────────────────
-    print("[launcher] Starting Django backend …")
+    log('[launcher] Starting Django backend …')
     django_thread = threading.Thread(target=start_django, daemon=True)
     django_thread.start()
 
     # ── 2. Wait until Django is ready ────────────────────────────────────
-    ready = wait_for_django(timeout=30)
+    log('[launcher] Waiting for Django to be ready …')
+    ready = wait_for_django(timeout=60)
     if not ready:
-        print("[launcher] ERROR: Django did not start within 30 seconds.")
+        msg = (
+            f'Django did not start within 60 seconds.\n\n'
+            f'Check the log file for details:\n{LOG_FILE}'
+        )
+        log(f'[launcher] ERROR: {msg}')
+        show_error('KidHobbyAI — Startup Error', msg)
         sys.exit(1)
 
-    print(f"[launcher] Django ready at {APP_URL}")
+    log(f'[launcher] Django ready at {APP_URL}')
 
     # ── 3. Open the native desktop window ────────────────────────────────
     open_window()
