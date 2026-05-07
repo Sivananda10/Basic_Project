@@ -45,7 +45,6 @@ pyinstaller ^
   --name "KidHobbyAI" ^
   --windowed ^
   --onedir ^
-  --icon "static\favicon.ico" ^
   --add-data "saved_models;saved_models" ^
   --add-data "prediction;prediction" ^
   --add-data "kids_hobby_prediction;kids_hobby_prediction" ^
