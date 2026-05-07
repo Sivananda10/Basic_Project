@@ -87,6 +87,10 @@ pyinstaller ^
   --collect-all "webview" ^
   --collect-all "sklearn" ^
   --collect-all "django" ^
+  --collect-all "whitenoise" ^
+  --collect-all "corsheaders" ^
+  --collect-all "rest_framework" ^
+  --collect-all "rest_framework_simplejwt" ^
   launcher.py
 
 IF ERRORLEVEL 1 (
