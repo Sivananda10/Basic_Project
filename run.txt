@@ -2,3 +2,6 @@ cd kids_hobby_project && source venv/bin/activate && python manage.py runserver
 
 frontend 
 npm run dev
+
+
+fuser -k 5000/tcp 2>/dev/null; python launcher.py

@@ -29,7 +29,11 @@ else:
 DJANGO_PORT  = 5000
 DJANGO_HOST  = '127.0.0.1'
 APP_URL      = f'http://{DJANGO_HOST}:{DJANGO_PORT}'
-SPLASH_URL   = f'{APP_URL}/splash/'   # shown first; "Get Started" → main app
+
+# Random cache-buster so WebKit2 disk cache never serves stale splash page
+import random as _random
+_cache_bust = _random.randint(100000, 999999)
+SPLASH_URL   = f'{APP_URL}/splash/?_={_cache_bust}'
 
 # ── Log file for debugging crashes ───────────────────────────────────────
 LOG_FILE = os.path.join(os.path.dirname(sys.executable if getattr(sys, 'frozen', False) else __file__), 'kidhobbyai.log')
@@ -176,6 +180,20 @@ def open_window() -> None:
         window.events.loaded += on_loaded
 
         if sys.platform == 'linux':
+            # Clear WebKit2 disk cache so splash always loads fresh
+            import shutil
+            cache_dirs = [
+                os.path.expanduser('~/.local/share/webview'),
+                os.path.expanduser('~/.cache/webview'),
+            ]
+            for d in cache_dirs:
+                if os.path.isdir(d):
+                    try:
+                        shutil.rmtree(d)
+                        log(f'[launcher] Cleared WebKit2 cache: {d}')
+                    except Exception as e:
+                        log(f'[launcher] Could not clear cache {d}: {e}')
+
             try:
                 import gi
                 gi.require_version('WebKit2', '4.1')
@@ -183,7 +201,7 @@ def open_window() -> None:
                 webkit_settings = WebKit2.Settings()
                 webkit_settings.set_enable_developer_extras(True)
                 webkit_settings.set_javascript_can_access_clipboard(True)
-                webkit_settings.set_enable_page_cache(True)
+                webkit_settings.set_enable_page_cache(False)   # NO cache!
                 try:
                     webkit_settings.set_enable_html5_local_storage(True)
                     webkit_settings.set_enable_html5_database(True)

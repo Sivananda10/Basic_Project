@@ -16,12 +16,21 @@ from django.urls import path, include, re_path
 from django.conf import settings
 from django.views.generic import TemplateView
 from django.views.static import serve as static_serve
+from django.template.response import TemplateResponse
+
+def splash_view(request):
+    """Splash page with no-cache headers so WebKit2 always loads fresh HTML."""
+    response = TemplateResponse(request, 'splash.html')
+    response['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    response['Pragma'] = 'no-cache'
+    response['Expires'] = '0'
+    return response
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('prediction.api_urls')),
-    # Splash intro page — shown on first launch before the React SPA
-    path('splash/', TemplateView.as_view(template_name='splash.html'), name='splash'),
+    # Splash intro page — no-cache so changes show immediately
+    path('splash/', splash_view, name='splash'),
 ]
 
 # ── Desktop mode: serve the React build from Django ──────────────────────
