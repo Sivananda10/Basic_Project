@@ -1,0 +1,134 @@
+name: Build Windows Desktop App
+
+on:
+  workflow_dispatch:   # Trigger manually from GitHub Actions tab
+  push:
+    branches: [ main ]
+    paths:
+      - 'launcher.py'
+      - 'build_desktop.bat'
+      - 'requirements_desktop.txt'
+      - 'prediction/**'
+      - 'kids_hobby_prediction/**'
+      - 'ml_scripts/**'
+      - 'frontend/src/**'
+
+jobs:
+  build-windows-exe:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: .   # repo root = kids_hobby_project/
+
+    steps:
+      # ── 1. Checkout code ────────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ── 2. Set up Python ────────────────────────────────────────────────
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # ── 3. Set up Node.js ───────────────────────────────────────────────
+      - name: Set up Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      # ── 4. Install Python dependencies ──────────────────────────────────
+      - name: Install Python dependencies
+        run: pip install -r requirements_desktop.txt
+
+      # ── 5. Train the ML model ────────────────────────────────────────────
+      #    (Only runs if saved_models/ is missing or incomplete)
+      - name: Check if models exist
+        id: check_models
+        shell: bash
+        run: |
+          if [ -f "saved_models/model_v4.pkl" ] && [ -f "saved_models/label_encoders_v4.pkl" ]; then
+            echo "models_exist=true" >> $GITHUB_OUTPUT
+          else
+            echo "models_exist=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Generate dataset
+        if: steps.check_models.outputs.models_exist == 'false'
+        run: python ml_scripts/generate_dataset_v4.py
+
+      - name: Preprocess dataset
+        if: steps.check_models.outputs.models_exist == 'false'
+        run: python ml_scripts/preprocess_v4.py
+
+      - name: Train ML model
+        if: steps.check_models.outputs.models_exist == 'false'
+        run: python ml_scripts/train_model_v4.py
+
+      # ── 6. Set up Django database ────────────────────────────────────────
+      - name: Run Django migrations
+        run: python manage.py migrate --run-syncdb
+
+      # ── 7. Patch frontend .env for desktop (localhost:5000) ─────────────
+      - name: Set frontend API URL to localhost for desktop build
+        shell: bash
+        run: echo "VITE_API_URL=http://127.0.0.1:5000/api" > frontend/.env.production
+
+      # ── 8. Build React frontend ──────────────────────────────────────────
+      - name: Install npm packages
+        working-directory: frontend
+        run: npm install
+
+      - name: Build React frontend
+        working-directory: frontend
+        run: npm run build
+
+      # ── 9. Collect Django static files ───────────────────────────────────
+      - name: Collect static files
+        run: python manage.py collectstatic --noinput
+
+      # ── 10. Package with PyInstaller ─────────────────────────────────────
+      - name: Build Windows .exe with PyInstaller
+        run: |
+          pyinstaller `
+            --name "KidHobbyAI" `
+            --windowed `
+            --onedir `
+            --add-data "saved_models;saved_models" `
+            --add-data "prediction;prediction" `
+            --add-data "kids_hobby_prediction;kids_hobby_prediction" `
+            --add-data "static;static" `
+            --add-data "frontend\dist;frontend\dist" `
+            --add-data "db.sqlite3;." `
+            --add-data "manage.py;." `
+            --add-data "templates;templates" `
+            --hidden-import "sklearn" `
+            --hidden-import "sklearn.ensemble" `
+            --hidden-import "sklearn.ensemble._forest" `
+            --hidden-import "sklearn.tree" `
+            --hidden-import "sklearn.tree._classes" `
+            --hidden-import "sklearn.utils._weight_vector" `
+            --hidden-import "sklearn.neighbors._partition_nodes" `
+            --hidden-import "joblib" `
+            --hidden-import "django" `
+            --hidden-import "django.template.defaulttags" `
+            --hidden-import "django.template.defaultfilters" `
+            --hidden-import "django.template.loader_tags" `
+            --hidden-import "rest_framework" `
+            --hidden-import "rest_framework_simplejwt" `
+            --hidden-import "corsheaders" `
+            --hidden-import "whitenoise" `
+            --hidden-import "dj_database_url" `
+            --collect-all "webview" `
+            --collect-all "sklearn" `
+            --collect-all "django" `
+            launcher.py
+        shell: powershell
+
+      # ── 11. Upload artifact ───────────────────────────────────────────────
+      - name: Upload KidHobbyAI Windows build
+        uses: actions/upload-artifact@v4
+        with:
+          name: KidHobbyAI-Windows
+          path: dist/KidHobbyAI/
+          retention-days: 30
