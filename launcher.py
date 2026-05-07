@@ -71,6 +71,16 @@ def start_django() -> None:
         # ── Frozen mode: call Django management API directly in this thread ──
         try:
             log('[launcher] Frozen mode: starting Django via execute_from_command_line')
+
+            # --windowed PyInstaller sets sys.stdout/stderr to None.
+            # Django (and many libraries) try to write to them → crash.
+            # Redirect to log file so everything is captured.
+            _log_handle = open(LOG_FILE, 'a', encoding='utf-8')
+            if sys.stdout is None:
+                sys.stdout = _log_handle
+            if sys.stderr is None:
+                sys.stderr = _log_handle
+
             # Must set working directory so Django finds manage.py, db.sqlite3, etc.
             os.chdir(BASE_DIR)
             from django.core.management import execute_from_command_line
