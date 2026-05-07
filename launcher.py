@@ -81,29 +81,9 @@ def wait_for_django(timeout: int = 30) -> bool:
 
 
 def open_window() -> None:
-    """Open the app in a native PyWebView window."""
+    """Open the app in a native PyWebView window (cross-platform)."""
     try:
         import webview  # type: ignore
-
-        # Force GTK backend with WebKit2 4.1
-        import gi
-        gi.require_version('WebKit2', '4.1')
-        from gi.repository import WebKit2
-
-        # ── Configure WebKit2 settings to enable web storage ─────────────
-        # By default, WebKit2GTK disables localStorage/sessionStorage on http://
-        # We MUST configure this BEFORE creating the webview window.
-        webkit_settings = WebKit2.Settings()
-        webkit_settings.set_enable_developer_extras(True)        # inspector
-        webkit_settings.set_javascript_can_access_clipboard(True)
-        webkit_settings.set_enable_page_cache(True)
-        # The key setting: allow all storage types on any origin
-        try:
-            webkit_settings.set_enable_html5_local_storage(True)
-            webkit_settings.set_enable_html5_database(True)
-            print('[launcher] WebKit2 localStorage enabled via settings ✓')
-        except Exception as e:
-            print(f'[launcher] WebKit2 storage setting failed: {e}')
 
         window = webview.create_window(
             title='KidHobbyAI — Kids Hobby Prediction System',
@@ -119,8 +99,34 @@ def open_window() -> None:
             print(f'[launcher] Page loaded: {window.get_current_url()}')
         window.events.loaded += on_loaded
 
-        # debug=False — hides the WebKit inspector/console panel
-        webview.start(gui='gtk', debug=False)
+        if sys.platform == 'linux':
+            # Linux: use GTK + WebKit2 and enable localStorage on http://
+            try:
+                import gi
+                gi.require_version('WebKit2', '4.1')
+                from gi.repository import WebKit2
+                webkit_settings = WebKit2.Settings()
+                webkit_settings.set_enable_developer_extras(True)
+                webkit_settings.set_javascript_can_access_clipboard(True)
+                webkit_settings.set_enable_page_cache(True)
+                try:
+                    webkit_settings.set_enable_html5_local_storage(True)
+                    webkit_settings.set_enable_html5_database(True)
+                    print('[launcher] WebKit2 localStorage enabled ✓')
+                except Exception as e:
+                    print(f'[launcher] WebKit2 storage setting failed: {e}')
+            except Exception as e:
+                print(f'[launcher] WebKit2 config skipped: {e}')
+            webview.start(gui='gtk', debug=False)
+
+        elif sys.platform == 'win32':
+            # Windows: pywebview uses Edge WebView2 automatically — no extra config needed.
+            # WebView2 is pre-installed on Windows 10 (1803+) / Windows 11.
+            webview.start(debug=False)
+
+        else:
+            # macOS or other — let pywebview choose the best backend
+            webview.start(debug=False)
 
     except ImportError:
         # PyWebView not installed — fall back to opening in the system browser
