@@ -49,6 +49,7 @@ pyinstaller ^
   --add-data "prediction;prediction" ^
   --add-data "kids_hobby_prediction;kids_hobby_prediction" ^
   --add-data "static;static" ^
+  --add-data "templates;templates" ^
   --add-data "frontend\dist;frontend\dist" ^
   --add-data "db.sqlite3;." ^
   --add-data "manage.py;." ^
