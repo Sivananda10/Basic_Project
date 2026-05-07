@@ -17,6 +17,7 @@ import socket
 import threading
 import subprocess
 import webbrowser
+import traceback
 
 # ── Resolve BASE_DIR whether running as .py or PyInstaller bundle ─────────
 if getattr(sys, 'frozen', False):
@@ -68,30 +69,49 @@ def start_django() -> None:
     - When running as .py script: uses subprocess (normal dev mode).
     """
     if getattr(sys, 'frozen', False):
-        # ── Frozen mode: call Django management API directly in this thread ──
+        # ── Frozen mode: serve Django directly with wsgiref ──────────────────
+        # We CANNOT use runserver here because it tries to import wsgi.py as a
+        # module-path string, which fails if the module isn't compiled into the
+        # PyInstaller bundle. Instead, we import the WSGI app directly and serve
+        # it with Python's built-in wsgiref — more reliable in frozen mode.
         try:
-            log('[launcher] Frozen mode: starting Django via execute_from_command_line')
+            log('[launcher] Frozen mode: starting Django via wsgiref WSGI server')
 
-            # --windowed PyInstaller sets sys.stdout/stderr to None.
-            # Django (and many libraries) try to write to them → crash.
-            # Redirect to log file so everything is captured.
+            # Redirect stdout/stderr to log file — they are None in --windowed mode.
             _log_handle = open(LOG_FILE, 'a', encoding='utf-8')
             if sys.stdout is None:
                 sys.stdout = _log_handle
             if sys.stderr is None:
                 sys.stderr = _log_handle
 
-            # Must set working directory so Django finds manage.py, db.sqlite3, etc.
+            # Set working directory so Django finds db.sqlite3, saved_models/, etc.
             os.chdir(BASE_DIR)
-            from django.core.management import execute_from_command_line
-            execute_from_command_line([
-                'manage.py', 'runserver',
-                f'{DJANGO_HOST}:{DJANGO_PORT}',
-                '--noreload',
-                '--nothreading',
-            ])
+
+            # Boot Django
+            import django
+            django.setup()
+            log('[launcher] Django setup() complete')
+
+            # Import WSGI application
+            from kids_hobby_prediction.wsgi import application
+            log('[launcher] WSGI application imported')
+
+            # Serve with wsgiref (single-threaded, desktop-only)
+            from wsgiref.simple_server import WSGIServer, WSGIRequestHandler
+
+            class _SilentHandler(WSGIRequestHandler):
+                """Suppress noisy per-request log lines."""
+                def log_message(self, fmt, *args):
+                    pass
+
+            server = WSGIServer((DJANGO_HOST, DJANGO_PORT), _SilentHandler)
+            server.set_app(application)
+            log(f'[launcher] wsgiref listening on {DJANGO_HOST}:{DJANGO_PORT}')
+            server.serve_forever()
+
         except Exception as e:
             log(f'[launcher] Django crashed: {e}')
+            log(f'[launcher] Traceback:\n{traceback.format_exc()}')
     else:
         # ── Script mode: use subprocess (works fine when Python is sys.executable) ──
         python = sys.executable

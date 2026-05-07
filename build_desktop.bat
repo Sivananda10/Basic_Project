@@ -69,6 +69,21 @@ pyinstaller ^
   --hidden-import "corsheaders" ^
   --hidden-import "whitenoise" ^
   --hidden-import "dj_database_url" ^
+  --hidden-import "kids_hobby_prediction" ^
+  --hidden-import "kids_hobby_prediction.settings" ^
+  --hidden-import "kids_hobby_prediction.urls" ^
+  --hidden-import "kids_hobby_prediction.wsgi" ^
+  --hidden-import "prediction" ^
+  --hidden-import "prediction.models" ^
+  --hidden-import "prediction.admin" ^
+  --hidden-import "prediction.apps" ^
+  --hidden-import "prediction.serializers" ^
+  --hidden-import "prediction.api_views" ^
+  --hidden-import "prediction.api_urls" ^
+  --hidden-import "prediction.ml_helpers_v3" ^
+  --hidden-import "wsgiref" ^
+  --hidden-import "wsgiref.simple_server" ^
+  --hidden-import "wsgiref.handlers" ^
   --collect-all "webview" ^
   --collect-all "sklearn" ^
   --collect-all "django" ^
